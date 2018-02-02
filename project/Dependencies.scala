@@ -1,0 +1,24 @@
+import sbt._
+
+
+object Dependencies {
+
+	lazy val FindBugsJsr305 = "com.google.code.findbugs" % "jsr305" % "3.0.2"
+	lazy val Guava          = "com.google.guava" % "guava" % "23.6-jre"
+
+	lazy val Cats      = "org.typelevel" %% "cats-core" % "1.0.1"
+	lazy val Monix     = "io.monix" %% "monix" % "2.3.3"
+	lazy val MonixCats     = "io.monix" %% "monix-cats" % "2.3.3"
+
+	lazy val ScalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2"
+	lazy val Logback      = "ch.qos.logback" % "logback-classic" % "1.2.3"
+
+	lazy val Enumeratum = "com.beachape" %% "enumeratum" % "1.5.12"
+
+	lazy val ScalaTest        = "org.scalatest" %% "scalatest" % "3.0.4"
+	lazy val MockitoCore      = "org.mockito" % "mockito-core" % "2.10.0"
+
+
+
+
+}

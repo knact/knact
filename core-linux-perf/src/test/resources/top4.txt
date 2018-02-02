@@ -1,0 +1,375 @@
+top - 01:30:09 up 3 days, 20:52,  1 user,  load average: 0.53, 0.71, 1.03
+Tasks: 368 total,   1 running, 281 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  4.9 us,  1.6 sy,  0.0 ni, 92.9 id,  0.1 wa,  0.3 hi,  0.1 si,  0.0 st
+KiB Mem : 32742628 total,  2886136 free, 13029440 used, 16827052 buff/cache
+KiB Swap: 16474108 total, 16474108 free,        0 used. 18001476 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+24928 tom       20   0 1320632 104456  43596 S  26.3  0.3   5:29.88 nautilus /home/tom/knact/core
+ 4338 tom       20   0 5361420 337524  46532 S  15.8  1.0  13:13.15 /home/tom/.dropbox-dist/dropbox-lnx.x86_64-43.3.47/dropbox
+16018 tom       20   0  254264 123020   3220 S  15.8  0.4  10:49.47 tmux
+ 5335 tom       20   0  162592   4868   3944 R  10.5  0.0   0:00.04 top -bcn1 -w512
+ 9190 tom       20   0 2701412 187292  67304 S  10.5  0.6  28:46.71 rhythmbox
+ 2350 tom       20   0 9897604 3.158g  89648 S   5.3 10.1 532:20.07 /home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/jre64/bin/java -Xbootclasspath/a:/home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/lib/boot.jar -classpath /home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/lib/bootstrap.jar:/home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/lib/extensions.jar:/home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.2+
+ 2987 tom       20   0 4591056 338772 112456 S   5.3  1.0   4:32.93 share/jetbrains-toolbox/jetbrains-toolbox --disable-gpu --single-process --no-sandbox
+16658 tom       20   0  848472 106792  81492 S   5.3  0.3  83:07.57 /usr/libexec/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -background none -noreset -keeptty -verbose 3
+16668 tom       20   0  238160  17152  13924 S   5.3  0.1   0:38.49 i3
+20547 tom       20   0 1385384 164540  61188 S   5.3  0.5   4:47.37 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=A2A979E456CDA41C616B6F6B16CA46C8 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+32483 tom       20   0 1334612 150372  71888 S   5.3  0.5   2:42.23 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=D32D765E9373726BB6010D0C42AFA620 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+32607 tom       20   0 4232232 1.347g 1.248g S   5.3  4.3   7:45.55 /usr/lib/virtualbox/VirtualBox --comment ubuntu_sandbox --startvm d163f262-713b-4fd0-9a36-58ff71fc143b --no-startvm-errormsgbox
+    1 root      20   0  230640  12104   7688 S   0.0  0.0   2:41.12 /usr/lib/systemd/systemd --system --deserialize 170
+    2 root      20   0       0      0      0 S   0.0  0.0   0:00.28 [kthreadd]
+    4 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/0:0H]
+    6 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [mm_percpu_wq]
+    7 root      20   0       0      0      0 S   0.0  0.0   0:05.55 [ksoftirqd/0]
+    8 root      20   0       0      0      0 I   0.0  0.0   1:05.80 [rcu_sched]
+    9 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [rcu_bh]
+   10 root      rt   0       0      0      0 S   0.0  0.0   0:00.91 [migration/0]
+   11 root      rt   0       0      0      0 S   0.0  0.0   0:00.39 [watchdog/0]
+   12 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/0]
+   13 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/1]
+   14 root      rt   0       0      0      0 S   0.0  0.0   0:00.39 [watchdog/1]
+   15 root      rt   0       0      0      0 S   0.0  0.0   0:00.89 [migration/1]
+   16 root      20   0       0      0      0 S   0.0  0.0   0:03.82 [ksoftirqd/1]
+   18 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/1:0H]
+   19 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/2]
+   20 root      rt   0       0      0      0 S   0.0  0.0   0:00.40 [watchdog/2]
+   21 root      rt   0       0      0      0 S   0.0  0.0   0:00.93 [migration/2]
+   22 root      20   0       0      0      0 S   0.0  0.0   0:02.88 [ksoftirqd/2]
+   24 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/2:0H]
+   25 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/3]
+   26 root      rt   0       0      0      0 S   0.0  0.0   0:00.39 [watchdog/3]
+   27 root      rt   0       0      0      0 S   0.0  0.0   0:00.93 [migration/3]
+   28 root      20   0       0      0      0 S   0.0  0.0   0:02.51 [ksoftirqd/3]
+   30 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/3:0H]
+   31 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/4]
+   32 root      rt   0       0      0      0 S   0.0  0.0   0:00.40 [watchdog/4]
+   33 root      rt   0       0      0      0 S   0.0  0.0   0:00.91 [migration/4]
+   34 root      20   0       0      0      0 S   0.0  0.0   0:11.09 [ksoftirqd/4]
+   36 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/4:0H]
+   37 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/5]
+   38 root      rt   0       0      0      0 S   0.0  0.0   0:00.39 [watchdog/5]
+   39 root      rt   0       0      0      0 S   0.0  0.0   0:00.88 [migration/5]
+   40 root      20   0       0      0      0 S   0.0  0.0   0:04.94 [ksoftirqd/5]
+   42 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/5:0H]
+   43 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/6]
+   44 root      rt   0       0      0      0 S   0.0  0.0   0:00.40 [watchdog/6]
+   45 root      rt   0       0      0      0 S   0.0  0.0   0:00.93 [migration/6]
+   46 root      20   0       0      0      0 S   0.0  0.0   0:02.60 [ksoftirqd/6]
+   48 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/6:0H]
+   49 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [cpuhp/7]
+   50 root      rt   0       0      0      0 S   0.0  0.0   0:00.40 [watchdog/7]
+   51 root      rt   0       0      0      0 S   0.0  0.0   0:00.92 [migration/7]
+   52 root      20   0       0      0      0 S   0.0  0.0   0:02.37 [ksoftirqd/7]
+   54 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kworker/7:0H]
+   55 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kdevtmpfs]
+   56 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [netns]
+   59 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [oom_reaper]
+   60 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [writeback]
+   61 root      20   0       0      0      0 S   0.0  0.0   0:00.13 [kcompactd0]
+   62 root      25   5       0      0      0 S   0.0  0.0   0:00.00 [ksmd]
+   63 root      39  19       0      0      0 S   0.0  0.0   0:00.00 [khugepaged]
+   64 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [crypto]
+   65 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kintegrityd]
+   66 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kblockd]
+   73 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [ata_sff]
+   74 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [md]
+   75 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [edac-poller]
+   76 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [devfreq_wq]
+   77 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [watchdogd]
+   79 root      20   0       0      0      0 S   0.0  0.0   0:00.03 [kauditd]
+   80 root      20   0       0      0      0 S   0.0  0.0   0:11.27 [kswapd0]
+  129 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kthrotld]
+  130 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [acpi_thermal_pm]
+  131 root      20   0       0      0      0 S   0.0  0.0   0:00.01 [scsi_eh_0]
+  132 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_0]
+  133 root      20   0       0      0      0 S   0.0  0.0   0:00.03 [scsi_eh_1]
+  134 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_1]
+  135 root      20   0       0      0      0 S   0.0  0.0   0:00.01 [scsi_eh_2]
+  136 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_2]
+  137 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_3]
+  138 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_3]
+  139 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [scsi_eh_4]
+  140 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_4]
+  141 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [scsi_eh_5]
+  142 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_5]
+  149 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [dm_bufio_cache]
+  150 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [ipv6_addrconf]
+  156 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kstrp]
+  316 tom       20   0 1430812 215000  73900 S   0.0  0.7   1:18.58 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=A6D361FA8CF7D39D47BE21E2FDAA5775 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+  333 tom       20   0 1451792 214248  71416 S   0.0  0.7   0:10.29 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=595A10F743143C2539A8263A41D4D3B8 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+  416 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_6]
+  417 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [scsi_tmf_6]
+  418 root      20   0       0      0      0 S   0.0  0.0   0:27.15 [usb-storage]
+  419 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [nvme-wq]
+  421 root       0 -20       0      0      0 I   0.0  0.0   0:00.82 [kworker/5:1H]
+  422 root       0 -20       0      0      0 I   0.0  0.0   0:00.49 [kworker/7:1H]
+  424 root       0 -20       0      0      0 I   0.0  0.0   0:00.52 [kworker/1:1H]
+  430 root       0 -20       0      0      0 I   0.0  0.0   0:00.54 [kworker/0:1H]
+  431 root       0 -20       0      0      0 I   0.0  0.0   0:00.51 [kworker/6:1H]
+  432 root       0 -20       0      0      0 I   0.0  0.0   0:00.59 [kworker/4:1H]
+  434 root       0 -20       0      0      0 I   0.0  0.0   0:00.53 [kworker/2:1H]
+  453 root       0 -20       0      0      0 I   0.0  0.0   0:00.51 [kworker/3:1H]
+  457 root      -2   0       0      0      0 S   0.0  0.0   0:38.05 [i915/signal:0]
+  458 root      -2   0       0      0      0 S   0.0  0.0   0:03.92 [i915/signal:1]
+  459 root      -2   0       0      0      0 S   0.0  0.0   0:00.00 [i915/signal:2]
+  460 root      -2   0       0      0      0 S   0.0  0.0   0:00.00 [i915/signal:4]
+  467 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/2:2]
+  498 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kdmflush]
+  499 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [bioset]
+  508 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kdmflush]
+  509 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [bioset]
+  543 root      20   0       0      0      0 S   0.0  0.0   0:01.85 [jbd2/dm-0-8]
+  544 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [ext4-rsv-conver]
+  629 root      20   0  215128  73516  72564 S   0.0  0.2   0:06.76 /usr/lib/systemd/systemd-journald
+  658 root      20   0  101576  10432   7072 S   0.0  0.0   0:01.88 /usr/lib/systemd/systemd-udevd
+  733 root     -51   0       0      0      0 S   0.0  0.0   0:00.00 [irq/140-mei_me]
+  823 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [led_workqueue]
+  877 root       0 -20       0      0      0 I   0.0  0.0   1:01.58 [kworker/u17:0]
+  878 root       0 -20       0      0      0 I   0.0  0.0   1:01.73 [kworker/u17:1]
+  898 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [kdmflush]
+  900 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [bioset]
+  933 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [jbd2/nvme0n1p5-]
+  934 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [ext4-rsv-conver]
+  935 root      20   0       0      0      0 S   0.0  0.0   0:31.17 [jbd2/dm-2-8]
+  936 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [ext4-rsv-conver]
+  967 root      16  -4   64452   1960   1548 S   0.0  0.0   0:00.23 /sbin/auditd
+  969 root      12  -8   84680   1916   1792 S   0.0  0.0   0:00.54 /sbin/audispd
+  971 root      16  -4   38808   1924   1692 S   0.0  0.0   0:00.09 /usr/sbin/sedispatch
+  973 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [rpciod]
+  974 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [xprtiod]
+  994 avahi     20   0   74504   3960   3552 S   0.0  0.0   0:08.55 avahi-daemon: running [soraws-uk.local]
+  995 root      20   0  418016   9168   7352 S   0.0  0.0   0:00.02 /usr/sbin/ModemManager
+  996 dbus      20   0   80332   7136   4928 S   0.0  0.0   0:03.32 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+  997 avahi     20   0   74376    352      0 S   0.0  0.0   0:00.00 avahi-daemon: chroot helper
+ 1003 root      20   0  346424  32712  13216 S   0.0  0.1   0:00.55 /usr/bin/python3 -Es /usr/sbin/firewalld --nofork --nopid
+ 1004 root      20   0   14012   1112    996 S   0.0  0.0   0:23.44 /sbin/rngd -f
+ 1006 rtkit     21   1  184004   3296   3004 S   0.0  0.0   0:02.77 /usr/libexec/rtkit-daemon
+ 1007 root      39  19   17436   2980   2624 S   0.0  0.0   0:00.07 /usr/sbin/alsactl -s -n 19 -c -E ALSA_CONFIG_PATH=/etc/alsa/alsactl.conf --initfile=/lib/alsa/init/00main rdaemon
+ 1009 root      20   0  285204   8368   7336 S   0.0  0.0   0:00.44 /usr/sbin/sssd -i --logger=files
+ 1010 root      20   0   17496   2172   2040 S   0.0  0.0   0:00.00 /usr/sbin/mcelog --ignorenodev --daemon --foreground
+ 1014 root      20   0   43576   5352   4656 S   0.0  0.0   0:00.05 /usr/libexec/bluetooth/bluetoothd
+ 1040 root      20   0  466964  10956   9204 S   0.0  0.0   0:00.04 /usr/sbin/abrtd -d -s
+ 1068 chrony    20   0  118088   3088   2688 S   0.0  0.0   0:01.15 /usr/sbin/chronyd
+ 1133 root      20   0  292712  10412   7832 S   0.0  0.0   0:04.02 /usr/libexec/sssd/sssd_be --domain implicit_files --uid 0 --gid 0 --logger=files
+ 1137 root      20   0  767756  16400  14812 S   0.0  0.1   0:00.13 /usr/bin/abrt-dump-journal-oops -fxtD
+ 1138 root      20   0  784716  13948  12428 S   0.0  0.0   0:00.13 /usr/bin/abrt-dump-journal-core -D -T -f -e
+ 1139 root      20   0  767140  22288  20760 S   0.0  0.1   0:00.19 /usr/bin/abrt-dump-journal-xorg -fxtD
+ 1153 root      20   0  122096    508      0 S   0.0  0.0   0:00.03 /sbin/mount.ntfs /dev/sdb1 /mnt/BACKUP -o rw,nosuid,nodev
+ 1154 root      20   0  123676   3784   1840 S   0.0  0.0  25:59.75 /sbin/mount.ntfs /dev/sda1 /mnt/SORA2 -o rw,nosuid,nodev
+ 1181 root      20   0  282604  10036   8904 S   0.0  0.0   0:12.91 /usr/libexec/sssd/sssd_nss --uid 0 --gid 0 --logger=files
+ 1184 root      20   0  422660   7292   6232 S   0.0  0.0   0:00.18 /usr/libexec/accounts-daemon
+ 1186 root      20   0   79112   8580   6328 S   0.0  0.0   0:33.24 /usr/lib/systemd/systemd-logind
+ 1197 polkitd   20   0  564820  17280  10516 S   0.0  0.1   0:00.51 /usr/lib/polkit-1/polkitd --no-debug
+ 1501 root      20   0  585676  16800  13540 S   0.0  0.1   0:03.01 /usr/sbin/NetworkManager --no-daemon
+ 1533 root      20   0 1773604  38384  29468 S   0.0  0.1   0:00.29 /usr/sbin/libvirtd
+ 1535 root      20   0  231728   8880   7428 S   0.0  0.0   0:09.37 /usr/sbin/cupsd -l
+ 1547 root      20   0   42724   2432   2228 S   0.0  0.0   0:00.07 /usr/sbin/atd -f
+ 1685 colord    20   0  431044  10492   8400 S   0.0  0.0   0:00.08 /usr/libexec/colord
+ 2288 tom       20   0  120296   3284   2976 S   0.0  0.0   0:00.01 /bin/sh /home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/bin/idea.sh
+ 2323 root      20   0       0      0      0 I   0.0  0.0   0:00.06 [kworker/u16:4]
+ 2486 tom       20   0    5924   3004   1576 S   0.0  0.0   0:07.16 /home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/bin/fsnotifier64
+ 2651 tom       20   0 1397604 154708  86344 S   0.0  0.5   0:57.31 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=C4FC2FDCB2264FE65DE672B32F043F5D --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+ 2951 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/5:1]
+ 2971 tom       20   0  120296   3340   3092 S   0.0  0.0   0:00.00 /bin/sh ./bin//jetbrains-toolbox
+ 2974 tom       20   0  322544   2408    976 S   0.0  0.0   0:01.21 /home/tom/.local/share/JetBrains/Toolbox/bin/jetbrains-toolbox
+ 3461 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/6:0]
+ 3586 nobody    20   0   62008   2388   2024 S   0.0  0.0   0:00.00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/libexec/libvirt_leaseshelper
+ 3588 root      20   0   61980    352      0 S   0.0  0.0   0:00.00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro --dhcp-script=/usr/libexec/libvirt_leaseshelper
+ 3716 root      20   0       0      0      0 I   0.0  0.0   0:00.01 [kworker/0:1]
+ 4288 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/4:1]
+ 4397 root      20   0   79712   8736   6816 S   0.0  0.0   0:00.02 /sbin/dhclient -d -q -sf /usr/libexec/nm-dhcp-helper -pf /var/run/dhclient-enp0s31f6.pid -lf /var/lib/NetworkManager/dhclient-2d81e1e9-4193-3f4e-b0f1-33a29c14784c-enp0s31f6.lease -cf /var/lib/NetworkManager/dhclient-enp0s31f6.conf enp0s31f6
+ 4574 root      20   0       0      0      0 I   0.0  0.0   0:01.14 [kworker/u16:2]
+ 4602 ddclient  20   0  163152  11420   3952 S   0.0  0.0   0:08.34 ddclient - sleeping for 220 seconds
+ 4700 root      20   0  143656   3352   2704 S   0.0  0.0   0:00.86 /usr/sbin/crond -n
+ 4762 root      20   0  350108  20392  17900 S   0.0  0.1   0:01.16 /usr/sbin/smbd --foreground --no-process-group
+ 4764 root      20   0  322932   4220   1872 S   0.0  0.0   0:04.32 /usr/sbin/smbd --foreground --no-process-group
+ 4765 root      20   0  323424   5036   2684 S   0.0  0.0   0:00.36 /usr/sbin/smbd --foreground --no-process-group
+ 4767 root      20   0  350096   7760   5268 S   0.0  0.0   0:01.37 /usr/sbin/smbd --foreground --no-process-group
+ 4769 root      20   0  251400  12036  10140 S   0.0  0.0   0:07.46 /usr/sbin/nmbd --foreground --no-process-group
+ 4826 root      20   0   50380   5908   5340 S   0.0  0.0   0:01.23 /usr/sbin/wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant.conf -u -s
+ 5391 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/7:0]
+ 5535 tom       20   0  175040   7620   4588 S   0.0  0.0   0:00.48 -zsh
+ 6169 tom       20   0 1346648 131564  77140 S   0.0  0.4   0:05.27 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=A3A3C9757F6EC38DA2C0E1ECC09F96DA --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+ 6392 root      20   0       0      0      0 I   0.0  0.0   0:00.09 [kworker/1:0]
+ 6990 root      20   0       0      0      0 I   0.0  0.0   0:00.37 [kworker/5:3]
+ 7302 tom       20   0  553520   8052   7064 S   0.0  0.0   0:00.02 /usr/libexec/gvfsd-network --spawner :1.4 /org/gtk/gvfs/exec_spaw/2
+ 7323 tom       20   0  490604   7916   6952 S   0.0  0.0   0:00.05 /usr/libexec/gvfsd-dnssd --spawner :1.4 /org/gtk/gvfs/exec_spaw/4
+ 7933 tom       20   0 1415568 184244  80016 S   0.0  0.6   0:15.66 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=5D384777D09EF96FD5B97B91FFB5B418 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+ 8489 root      20   0       0      0      0 I   0.0  0.0   0:00.15 [kworker/4:2]
+ 8656 root      20   0       0      0      0 I   0.0  0.0   0:00.85 [kworker/u16:0]
+ 9311 tom       20   0  677612  24660  15088 S   0.0  0.1   0:00.08 /usr/libexec/gvfsd-http --spawner :1.4 /org/gtk/gvfs/exec_spaw/1
+10663 tom       20   0  172400   6956   4524 S   0.0  0.0   0:00.09 /bin/zsh -i
+11293 root      20   0  365060  19728  15188 S   0.0  0.1  12:30.66 /usr/sbin/smbd --foreground --no-process-group
+11434 tom       20   0 1392912 182792  79436 S   0.0  0.6   0:45.37 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=1EA97ADD126B7DD07CC5DFEA7CF55B14 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+11470 tom       20   0 84.125g  13028   9724 S   0.0  0.0   0:00.13 /opt/google/chrome/nacl_helper
+11504 tom       20   0 1382164 142060  78308 S   0.0  0.4   0:07.32 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=F2397CF540F01AEAD4E72239C437EDD2 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+11758 tom       20   0  120792   3824   3088 S   0.0  0.0   0:00.00 /bin/sh /usr/bin/xdg-open magnet:?xt=urn:btih:FQRA3IXAFZ66UTF3A34JQYY3UY4DCGUU&dn=%5B%E8%90%8C%E8%90%8C%E5%96%B5%E6%A2%A6%E5%AD%90%5DKashima&tr=http%3A%2F%2Fsukebei.tracker.wf%3A8888%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce
+11911 tom       20   0 3011544 363588  53884 S   0.0  1.1 108:48.58 qbittorrent magnet:?xt=urn:btih:FQRA3IXAFZ66UTF3A34JQYY3UY4DCGUU&dn=%5B%E8%90%8C%E8%90%8C%E5%96%B5%E6%A2%A6%E5%AD%90%5DKashima&tr=http%3A%2F%2Fsukebei.tracker.wf%3A8888%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce
+12146 tom       20   0 1332032 124356  74256 S   0.0  0.4   0:01.65 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=A731804B8A6853B65E306FD4E1060BF7 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+12205 tom       20   0 1328692 137064  70304 S   0.0  0.4   0:02.13 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=295E080EF50D99A75C403640F4CBC482 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+12537 tom       20   0  720088  46724  29016 S   0.0  0.1   0:12.34 /usr/bin/gedit --gapplication-service
+12786 root      20   0       0      0      0 I   0.0  0.0   0:00.13 [kworker/6:2]
+13219 root      20   0       0      0      0 I   0.0  0.0   0:00.05 [kworker/6:1]
+14250 tom       20   0 5655004 0.986g  22356 S   0.0  3.2   8:10.04 /usr/java/jdk1.8.0_152/bin/java -cp /usr/java/jdk1.8.0_152/lib/tools.jar:/home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/lib/jps-builders.jar:/home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/lib/util.jar:/home/tom/.local/share/JetBrains/Toolbox/apps/IDEA-U/ch-0/173.4301.25/lib/trove4j.jar:/home/tom/.IntelliJIdea2017.3/config/plugins/Scala/lib/scala-library.jar:/home/tom/.IntelliJIdea2017.3/config+
+14838 tom       20   0 1620676 288500  88432 S   0.0  0.9  22:48.07 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=D2B32675DA07D381F9C46C279A4DB99F --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+15168 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [iprt-VBoxWQueue]
+15172 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [iprt-VBoxTscThr]
+15948 tom       20   0  174944   7544   4604 S   0.0  0.0   0:00.09 zsh
+16307 root      20   0  424428   8128   7020 S   0.0  0.0   0:00.01 /usr/sbin/gdm
+16312 root      20   0  392572   9148   7612 S   0.0  0.0   0:00.01 gdm-session-worker [pam/gdm-launch-environment]
+16316 gdm       20   0   89876   8372   6964 S   0.0  0.0   0:00.07 /usr/lib/systemd/systemd --user
+16318 gdm       20   0  291124   4612     36 S   0.0  0.0   0:00.00 (sd-pam)
+16323 gdm       20   0  421640  10168   8936 S   0.0  0.0   0:00.03 /usr/libexec/gdm-wayland-session gnome-session --autostart /usr/share/gdm/greeter/autostart
+16325 gdm       20   0   72832   4888   3908 S   0.0  0.0   0:00.11 /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+16328 gdm       20   0  667608  15288  11308 S   0.0  0.0   0:00.11 /usr/libexec/gnome-session-binary --autostart /usr/share/gdm/greeter/autostart
+16335 gdm       20   0 3729900 129116  66176 S   0.0  0.4   0:07.30 /usr/bin/gnome-shell
+16340 root      20   0  427676   9204   7572 S   0.0  0.0   0:04.75 /usr/libexec/upowerd
+16381 gdm       20   0  834472  51772  33468 S   0.0  0.2   0:00.43 /usr/bin/Xwayland :1024 -rootless -terminate -core -listen 4 -listen 5 -displayfd 6
+16391 gdm       20   0  356032   6496   5864 S   0.0  0.0   0:00.02 /usr/libexec/at-spi-bus-launcher
+16396 gdm       20   0   72308   4656   4220 S   0.0  0.0   0:00.01 /bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
+16399 gdm       20   0  223292   7260   6480 S   0.0  0.0   0:00.00 /usr/libexec/at-spi2-registryd --use-gnome-session
+16405 gdm        9 -11 1588920  11428   8144 S   0.0  0.0   0:00.20 /usr/bin/pulseaudio --start --log-target=syslog
+16430 gdm       20   0  488388   9848   8312 S   0.0  0.0   0:00.00 /usr/libexec/xdg-permission-store
+16435 gdm       20   0  473484   8848   6280 S   0.0  0.0   0:00.06 ibus-daemon --xim --panel disable
+16438 gdm       20   0  387884   5664   5188 S   0.0  0.0   0:00.00 /usr/libexec/ibus-dconf
+16441 gdm       20   0  514720  29044  22256 S   0.0  0.1   0:00.07 /usr/libexec/ibus-x11 --kill-daemon
+16443 gdm       20   0  387748   5744   5252 S   0.0  0.0   0:00.00 /usr/libexec/ibus-portal
+16461 root      20   0  723476  88180  19748 S   0.0  0.3   0:03.25 /usr/libexec/packagekitd
+16467 gdm       20   0  599668  29608  22100 S   0.0  0.1   0:00.09 /usr/libexec/gsd-wacom
+16469 gdm       20   0  664632  29144  21724 S   0.0  0.1   0:00.09 /usr/libexec/gsd-xsettings
+16471 gdm       20   0  603512  29148  22176 S   0.0  0.1   0:00.08 /usr/libexec/gsd-a11y-keyboard
+16472 gdm       20   0  510948  10944   9516 S   0.0  0.0   0:00.01 /usr/libexec/gsd-a11y-settings
+16473 gdm       20   0  514372  28560  21768 S   0.0  0.1   0:00.07 /usr/libexec/gsd-clipboard
+16474 gdm       20   0  854004  31200  23728 S   0.0  0.1   1:40.27 /usr/libexec/gsd-color
+16475 gdm       20   0  471104  12564  10808 S   0.0  0.0   0:00.01 /usr/libexec/gsd-datetime
+16476 gdm       20   0  510568  10872   9480 S   0.0  0.0   0:00.01 /usr/libexec/gsd-housekeeping
+16479 gdm       20   0  675176  28984  22008 S   0.0  0.1   0:00.08 /usr/libexec/gsd-keyboard
+16480 gdm       20   0 1203984  31576  23976 S   0.0  0.1   0:00.12 /usr/libexec/gsd-media-keys
+16481 gdm       20   0  434724  10804   9452 S   0.0  0.0   0:00.01 /usr/libexec/gsd-mouse
+16484 gdm       20   0 1055168  31512  24092 S   0.0  0.1   0:01.87 /usr/libexec/gsd-power
+16488 gdm       20   0  472648  12136  10496 S   0.0  0.0   0:00.01 /usr/libexec/gsd-print-notifications
+16489 gdm       20   0  434740  10820   9464 S   0.0  0.0   0:00.01 /usr/libexec/gsd-rfkill
+16492 gdm       20   0  508456  10728   9348 S   0.0  0.0   0:00.00 /usr/libexec/gsd-screensaver-proxy
+16493 gdm       20   0  416956   7116   6372 S   0.0  0.0   0:00.00 /usr/libexec/gsd-sharing
+16498 gdm       20   0  613580  13244  11564 S   0.0  0.0   0:00.01 /usr/libexec/gsd-smartcard
+16502 gdm       20   0  553316  12544  10780 S   0.0  0.0   0:00.01 /usr/libexec/gsd-sound
+16525 gdm       20   0  192360   5180   4648 S   0.0  0.0   0:00.00 /usr/libexec/dconf-service
+16528 gdm       20   0  314080   6240   5560 S   0.0  0.0   0:00.00 /usr/libexec/ibus-engine-simple
+16625 root      20   0  417440  10228   8164 S   0.0  0.0   0:00.05 gdm-session-worker [pam/gdm-password]
+16636 tom       20   0   90024   8548   7000 S   0.0  0.0   0:00.48 /usr/lib/systemd/systemd --user
+16641 tom       20   0  291336   4660     36 S   0.0  0.0   0:00.00 (sd-pam)
+16652 tom       20   0  395656   7324   6168 S   0.0  0.0   0:00.24 /usr/bin/gnome-keyring-daemon --daemonize --login
+16656 tom       20   0  421656   9744   8560 S   0.0  0.0   0:00.03 /usr/libexec/gdm-x-session --run-script i3
+16665 tom       20   0   73060   5340   4124 S   0.0  0.0   0:02.41 /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+16683 tom       20   0   31248    484      0 S   0.0  0.0   0:01.12 /usr/bin/ssh-agent /bin/sh -c exec -l /bin/zsh -c "i3"
+16713 tom       20   0  105092  10360   9168 S   0.0  0.0   3:38.21 i3bar --bar_id=bar-0 --socket=/run/user/1000/i3/ipc-socket.16668
+16719 tom       20   0  211692   5700   4900 S   0.0  0.0   1:52.03 i3status
+16786 tom       20   0  401272   7180   6160 S   0.0  0.0   0:00.22 /usr/libexec/gvfsd
+16791 tom       20   0  422788   5372   4812 S   0.0  0.0   0:00.00 /usr/libexec/gvfsd-fuse /run/user/1000/gvfs -f -o big_writes
+16824 tom       20   0  436896   9864   7748 S   0.0  0.0   0:10.62 /usr/libexec/gvfs-udisks2-volume-monitor
+16827 root      20   0  521856  12424   8864 S   0.0  0.0   1:04.18 /usr/libexec/udisks2/udisksd
+16834 tom       20   0  488244   7884   6968 S   0.0  0.0   0:00.00 /usr/libexec/gvfs-afc-volume-monitor
+16839 tom       20   0  385472   5412   4676 S   0.0  0.0   0:00.00 /usr/libexec/gvfs-mtp-volume-monitor
+16843 tom       20   0  385940   6592   5764 S   0.0  0.0   0:00.00 /usr/libexec/gvfs-goa-volume-monitor
+16847 tom       20   0  927168  64440  32368 S   0.0  0.2   0:00.72 /usr/libexec/goa-daemon
+16855 tom       20   0  522068  12372  10608 S   0.0  0.0   0:13.19 /usr/libexec/goa-identity-service
+16858 tom       20   0  398108   6864   5784 S   0.0  0.0   0:00.00 /usr/libexec/gvfs-gphoto2-volume-monitor
+16872 tom       20   0  395268   7112   6396 S   0.0  0.0   0:00.00 /usr/bin/gnome-keyring-daemon --start --foreground --components=secrets
+16911 root      20   0       0      0      0 I   0.0  0.0   0:00.09 [kworker/5:2]
+17039 tom       20   0  356120   6544   5928 S   0.0  0.0   0:00.00 /usr/libexec/at-spi-bus-launcher
+17044 tom       20   0   72308   4652   4212 S   0.0  0.0   0:09.73 /bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 3
+17047 tom       20   0  223316   7212   6504 S   0.0  0.0   0:37.97 /usr/libexec/at-spi2-registryd --use-gnome-session
+17107 tom       20   0  172256   6892   4564 S   0.0  0.0   0:00.03 -zsh
+17136 tom       20   0  763468  19336  12792 S   0.0  0.1   0:00.06 /usr/libexec/tracker-store
+17433 tom       20   0  172256   6860   4532 S   0.0  0.0   0:00.04 -zsh
+17527 tom       20   0  172256   6852   4524 S   0.0  0.0   0:00.04 -zsh
+17610 tom       20   0  172256   6884   4556 S   0.0  0.0   0:00.04 -zsh
+17768 tom        9 -11 1698644  17948  14024 S   0.0  0.1 153:43.99 /usr/bin/pulseaudio --start --log-target=syslog
+17842 root      10 -10       0      0      0 S   0.0  0.0   0:00.00 [krfcommd]
+18606 tom       20   0 1477264 247540  79464 S   0.0  0.8   3:31.34 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=4DB4A4F1267CE2FCE91971B2E8D3CE43 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+19090 tom       20   0 1374824 142188  77472 S   0.0  0.4   1:04.01 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=F9EC4D27982B265EB29A16C0D26851E1 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+19406 root      20   0       0      0      0 I   0.0  0.0   0:00.07 [kworker/7:1]
+19437 root      20   0       0      0      0 I   0.0  0.0   0:01.72 [kworker/u16:1]
+19741 tom       20   0 1411060 161400  76972 S   0.0  0.5   0:14.61 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=73498EFC28AD5D40D1114A726200DF9C --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+20017 tom       20   0 1495916 266428  72584 S   0.0  0.8   2:01.80 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=879329C0EC7581AF13C261CE5B9597CB --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+20524 tom       20   0 1358820 161856  78364 S   0.0  0.5   5:34.66 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=F775FC455F47C3E2871A6750D6B487B2 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+20625 tom       20   0 1356100 155480  74296 S   0.0  0.5   5:41.85 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=105A523D15251750B32FB35F1B29B76B --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+20697 tom       20   0 1945480 508112 194436 S   0.0  1.6 127:48.27 /opt/google/chrome/chrome
+20702 tom       20   0  115012    484    424 S   0.0  0.0   0:00.00 cat
+20703 tom       20   0  115012    476    416 S   0.0  0.0   0:00.02 cat
+20706 tom       20   0  530260  53332  43592 S   0.0  0.2   0:00.10 /opt/google/chrome/chrome --type=zygote --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e,
+20707 tom       20   0  119796   8244   7076 S   0.0  0.0   0:00.00 /opt/google/chrome/nacl_helper
+20710 tom       20   0  530260  12328   2584 S   0.0  0.0   0:05.81 /opt/google/chrome/chrome --type=zygote --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e,
+20784 tom       20   0 1023112 387968 217128 S   0.0  1.2  73:53.61 /opt/google/chrome/chrome --type=gpu-process --field-trial-handle=13504085244971075974,8098988481477656094,131072 --ignore-gpu-blacklist --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --disable-breakpad --gpu-vendor-id=0x8086 --gpu-device-id=0x1912 --gpu-driver-vendor=Mesa --gpu-driver-version=17.2.4 --gpu-driver-date --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --service-request-channel-token=3A7879F14383C+
+20848 tom       20   0  561484  14220   3188 S   0.0  0.0   0:00.24 /opt/google/chrome/chrome --type=gpu-broker
+20923 tom       20   0 1763532 437700  77748 S   0.0  1.3 101:34.05 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=3A97932EC81AB2E9CBC2CC943EA079E2 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+20930 tom       20   0 1322724 126216  71952 S   0.0  0.4   0:13.83 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=DDB7B9065A09B4367BBD234FD93B3E4E --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+20962 tom       20   0 1309532 119232  65540 S   0.0  0.4   1:00.58 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=1710BD6D0706BF86EB018D836F6F30F1 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21050 tom       20   0 1480116 191304  64616 S   0.0  0.6   5:29.28 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=0F1C90FCBCFCED3CCC77F4983DF9BB4F --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21071 tom       20   0 1251600  83248  56732 S   0.0  0.3   0:07.59 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=680E8C309BD694F9CB6EBF741414CD5D --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21094 tom       20   0 1359680 141940  60256 S   0.0  0.4   1:39.88 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=02D94588285C88E85CFE339A61395E8E --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21123 tom       20   0 1300756 116168  58044 S   0.0  0.4   0:33.85 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=071DCEE001057DC61A7772AC701F0275 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21136 tom       20   0 1357132 157624  67696 S   0.0  0.5   2:48.43 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=FA4D5828D25F93F78335F8D9597CC203 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21145 tom       20   0 1336376 146896  59316 S   0.0  0.4   0:10.25 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=F2772CFE06BEA2D43712A7DD1E3A632F --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21162 tom       20   0 1249040  77796  56840 S   0.0  0.2   0:05.81 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=3FB2F8F9C59B12D4FD587FB664B81EF1 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21175 tom       20   0 1314008  96392  59496 S   0.0  0.3   0:43.35 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=CCA0738EABD845A4004C53802EB91E34 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21185 tom       20   0 1294620 106100  60368 S   0.0  0.3   0:33.56 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=1035AB00D8D0F9D63D74C00257279367 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21188 tom       20   0 1249040  80972  56544 S   0.0  0.2   0:09.37 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=E08CABD25223060FEF23194268FE21EC --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+21318 tom       20   0  175456   8196   4728 S   0.0  0.0   0:01.90 -zsh
+21386 tom       20   0 1445872 199144  76156 S   0.0  0.6   4:57.28 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=932EBC135941610BE494D418AE22AF18 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21414 tom       20   0 1317844 123020  72600 S   0.0  0.4   0:07.68 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=81BA968C099E2D4B62557589D06F2DA2 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21488 tom       20   0 1331732 132660  72508 S   0.0  0.4   0:12.34 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=084E484CF3655CF6E0274EA567477969 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21543 tom       20   0 1314164 123628  71080 S   0.0  0.4   0:06.19 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=CE809543B545A8F4445D1CA666007AF7 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21568 tom       20   0 1312964 120388  70376 S   0.0  0.4   0:07.55 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=EE4113C780B3E1630552BC64B7E71B8E --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21591 tom       20   0 2499000 214444  69908 S   0.0  0.7  25:14.23 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=5F49D678172E125B343C9BDC1F3A6B47 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21610 tom       20   0 1398864 172080  70764 S   0.0  0.5   0:53.39 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=D0436A2ABE9BF5B41FDCDB948C8D78AE --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21628 tom       20   0 1294680 104184  66360 S   0.0  0.3   0:05.78 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=6AD3208E6190205105691BE8EA1C53CB --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21657 tom       20   0 1312032 119000  69976 S   0.0  0.4   0:07.74 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=5E7E82BE2B0F60BB23CC47E006F31D29 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21712 tom       20   0 1307972 117984  70388 S   0.0  0.4   0:07.69 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=17BD1043406BD2636E2323C02106EF12 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21740 tom       20   0 1372984 158540  73560 S   0.0  0.5   0:08.37 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=E0556605073A0DA75037F988B0F495D3 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21779 tom       20   0 1414644 208992  73016 S   0.0  0.6   1:19.17 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=DF4263A8D2DE444E97781FCFAF918C8B --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21799 tom       20   0 1311176 138264  69832 S   0.0  0.4   0:09.94 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=E2F03A9C51FE51B019D8676E6B59DD46 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+21846 tom       20   0  601396  31176  20796 S   0.0  0.1   0:01.81 /opt/google/chrome/chrome --type=ppapi --field-trial-handle=13504085244971075974,8098988481477656094,131072 --ppapi-flash-args --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --service-request-channel-token=4534968011C35825DF8343786FB9E717
+21875 tom       20   0  793108  41192  27424 S   0.0  0.1   2:11.00 /usr/libexec/gnome-terminal-server
+21879 tom       20   0  619164  12952  10964 S   0.0  0.0   0:00.48 /usr/libexec/xdg-desktop-portal
+21883 tom       20   0  712208  11460   9768 S   0.0  0.0   0:00.17 /usr/libexec/xdg-document-portal
+21886 tom       20   0  488384   9864   8328 S   0.0  0.0   0:00.02 /usr/libexec/xdg-permission-store
+21897 tom       20   0  590524  20372  17428 S   0.0  0.1   0:02.16 /usr/libexec/xdg-desktop-portal-gtk
+22309 root      20   0  205356   3364   2904 S   0.0  0.0   0:00.14 /usr/sbin/gssproxy -D
+22676 tom       20   0 1910028 253812  80656 S   0.0  0.8  31:27.79 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=0CCD8250332D7D781226970442FEF9EA --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+23218 root      20   0       0      0      0 I   0.0  0.0   0:00.17 [kworker/3:0]
+23685 tom       20   0 1410940 149772  75544 S   0.0  0.5   1:25.74 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=781B8BD33DE79A9CA7EDA2784942D1BA --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+24020 tom       20   0  126484   3416   3076 S   0.0  0.0   0:00.00 tmux
+24021 tom       20   0  174900   7732   4752 S   0.0  0.0   0:00.53 -zsh
+24824 root      20   0       0      0      0 I   0.0  0.0   0:00.10 [kworker/0:2]
+24935 tom       20   0  477408   7608   6600 S   0.0  0.0   0:03.60 /usr/libexec/gvfsd-trash --spawner :1.4 /org/gtk/gvfs/exec_spaw/0
+24949 tom       20   0  193196   6032   4636 S   0.0  0.0   0:02.71 /usr/libexec/dconf-service
+24954 tom       20   0  310128   6816   5704 S   0.0  0.0   0:01.43 /usr/libexec/gvfsd-metadata
+25618 tom       20   0 1331996 111744  68892 S   0.0  0.3   0:08.74 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=7169D7094AAA2BB8E6EF47A097A2CAED --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+25953 root      20   0       0      0      0 I   0.0  0.0   0:00.31 [kworker/u16:3]
+26537 root      20   0       0      0      0 I   0.0  0.0   0:00.14 [kworker/1:2]
+27154 tom       20   0 1419548 150976  78192 S   0.0  0.5   0:49.15 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=61A24A4EFE602C2F50D42F84CD1F9391 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+27389 tom       20   0  755224  50588  30404 S   0.0  0.2   0:01.75 python3 /usr/bin/blueman-applet
+27395 tom       20   0  549088  43228  26580 S   0.0  0.1   0:01.66 python3 /usr/bin/blueman-tray
+27403 tom       20   0   87836   7192   6528 S   0.0  0.0   0:00.00 /usr/libexec/bluetooth/obexd
+27776 root      20   0       0      0      0 I   0.0  0.0   0:01.35 [kworker/5:5]
+28588 root      20   0       0      0      0 I   0.0  0.0   0:00.80 [kworker/5:0]
+29546 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/0:0]
+30309 tom       20   0 4278876 192908  24852 S   0.0  0.6   0:02.54 /usr/java/jdk1.8.0_152/bin/java -Xmx700m -Djava.awt.headless=true -Djava.endorsed.dirs="" -Djdt.compiler.useSingleThread=true -Dpreload.project.path=/home/tom/Dropbox/unmanaged_projects/knact -Dpreload.config.path=/home/tom/.IntelliJIdea2017.3/config/options -Dcompile.parallel=false -Drebuild.on.dependency.change=true -Djava.net.preferIPv4Stack=true -Dio.netty.initialSeedUniquifier=4682657992166671466 -Dfile.encoding=UTF-8 -Duser.language+
+30669 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/5:4]
+31086 tom       20   0 1319736  73564  53340 S   0.0  0.2   0:54.60 /usr/lib/virtualbox/VirtualBox
+31097 root      20   0       0      0      0 I   0.0  0.0   0:00.00 [kworker/3:1]
+31102 tom       20   0  236280  11640   9276 S   0.0  0.0   0:31.94 /usr/lib/virtualbox/VBoxXPCOMIPCD
+31107 tom       20   0  983400  25128  17300 S   0.0  0.1   1:13.16 /usr/lib/virtualbox/VBoxSVC --auto-shutdown
+31109 root      20   0   79408   7860   6640 S   0.0  0.0   0:00.05 /usr/lib/systemd/systemd --user
+31114 root      20   0  291296   4560      4 S   0.0  0.0   0:00.00 (sd-pam)
+31292 tom       20   0 2123612 285144  82340 S   0.0  0.9   1:14.08 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=0BE83E411B9FF79458CDB7F88D1A24D0 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+31877 tom       20   0 1440360 205256  70596 S   0.0  0.6   0:09.28 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=9468AF88D60012F3D358E79A10B92FCD --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+31967 tom       20   0 1474576 187192  91428 S   0.0  0.6   2:10.48 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=3A2B86AED08715286E12F73A9591A15A --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFrameOnSlowConnections=t+
+32017 root      20   0       0      0      0 I   0.0  0.0   0:00.02 [kworker/2:1]
+32018 root      20   0       0      0      0 I   0.0  0.0   0:00.03 [kworker/4:0]
+32277 tom       20   0 1437540 206460  70700 S   0.0  0.6   0:09.62 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=C25B26788929526810A09DCA198EA7F0 --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+32403 tom       20   0 1443944 206132  71088 S   0.0  0.6   0:09.14 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=4C8E9EB7DFB899102D9A91187743F65E --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+32435 tom       20   0 1471928 224304  76268 S   0.0  0.7   0:15.15 /opt/google/chrome/chrome --type=renderer --field-trial-handle=13504085244971075974,8098988481477656094,131072 --service-pipe-token=364408FDD417878E28C6B7AD6F9B575C --lang=en-GB --enable-crash-reporter=d2abdefa-4458-44b1-8a2f-4d9256d37a1e, --extension-process --enable-offline-auto-reload --enable-offline-auto-reload-visible-only --blink-settings=disallowFetchForDocWrittenScriptsInMainFrame=false,disallowFetchForDocWrittenScriptsInMainFram+
+32650 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 [dio/dm-2]

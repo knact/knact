@@ -1,0 +1,247 @@
+---
+swagger: "2.0"
+info:
+  description: "Knact server API"
+  version: "1.0.0"
+  title: "The node API"
+  contact:
+    email: "nm15042@my.bristol.ac.uk"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "virtserver.swaggerhub.com"
+basePath: "/Knact/Node-API/1.0.0"
+tags:
+- name: "node"
+  description: "Node related calls"
+schemes:
+- "https"
+paths:
+  /node:
+    post:
+      tags:
+      - "node"
+      summary: "Add a node"
+      operationId: "addNode"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "A new node to be added available nodes"
+        required: true
+        schema:
+          $ref: "#/definitions/Node"
+      responses:
+        405:
+          description: "Invalid input"
+  /node/findByStatus:
+    get:
+      tags:
+      - "node"
+      summary: "Find node by status"
+      description: "Multiple status values can be provided with comma seperated strings"
+      operationId: "findNodesByStatus"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "alive"
+          enum:
+          - "alive"
+          - "dead"
+          - "unused"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Node"
+        400:
+          description: "Invalid status value"
+  /node/{nodeId}:
+    get:
+      tags:
+      - "node"
+      summary: "Returns a node by Id"
+      description: "Returns a single node"
+      operationId: "getNodeById"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "nodeId"
+        in: "path"
+        description: "Id of node to return"
+        required: true
+        type: "string"
+        format: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Node"
+        400:
+          description: "Invalid Id supplied"
+        404:
+          description: "Node not found"
+    post:
+      tags:
+      - "node"
+      summary: "Update node with form data"
+      operationId: "updateNodeWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "nodeId"
+        in: "path"
+        description: "ID of node"
+        required: true
+        type: "string"
+        format: "string"
+      - name: "status"
+        in: "formData"
+        description: "Updated status of node"
+        required: false
+        type: "string"
+      responses:
+        405:
+          description: "Invalid input"
+    put:
+      tags:
+      - "node"
+      summary: "Updates existing node"
+      operationId: "updateNode"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "nodeId"
+        in: "path"
+        description: "Node to update"
+        required: true
+        type: "string"
+        format: "string"
+      responses:
+        400:
+          description: "Invalid ID"
+        404:
+          description: "Node not found"
+    delete:
+      tags:
+      - "node"
+      summary: "Deletes a node"
+      operationId: "deleteNode"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "nodeId"
+        in: "path"
+        description: "Node to delete"
+        required: true
+        type: "string"
+        format: "string"
+      responses:
+        400:
+          description: "Invalid Id given"
+        404:
+          description: "Node not found"
+  /node/{nodeId}/updateStats:
+    post:
+      tags:
+      - "node"
+      summary: "updates a nodes stats"
+      operationId: "updateStats"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "nodeId"
+        in: "path"
+        description: "Id of node"
+        required: true
+        type: "string"
+        format: "string"
+      - name: "stat"
+        in: "formData"
+        description: "new stats"
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+definitions:
+  Stats:
+    type: "object"
+    properties:
+      cpuUsage:
+        type: "integer"
+        format: "int64"
+      freeRam:
+        type: "integer"
+        format: "int64"
+      freeHdd:
+        type: "integer"
+        format: "int64"
+    example:
+      freeRam: 6
+      cpuUsage: 0
+      freeHdd: 1
+  Node:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "string"
+      stats:
+        $ref: "#/definitions/Stats"
+      status:
+        type: "string"
+        description: "Status of node"
+        enum:
+        - "alive"
+        - "dead"
+        - "unused"
+    example:
+      stats:
+        freeRam: 6
+        cpuUsage: 0
+        freeHdd: 1
+      id: "id"
+      status: "alive"
+    xml:
+      name: "Node"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+    example:
+      code: 0
+      type: "type"
+      message: "message"

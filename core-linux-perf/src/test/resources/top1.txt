@@ -1,0 +1,25 @@
+top - 12:42:43 up 3 days,  8:05,  1 user,  load average: 0.64, 0.91, 1.60
+Tasks: 359 total,   1 running, 271 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  4.1 us,  1.5 sy,  0.0 ni, 93.8 id,  0.1 wa,  0.3 hi,  0.1 si,  0.0 st
+KiB Mem : 32742628 total,  1764544 free,  9056736 used, 21921348 buff/cache
+KiB Swap: 16474108 total, 16474108 free,        0 used. 22239360 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+17231 tom       20   0 1616100 180024  83316 S  26.7  0.5   2:30.55 chrome
+11911 tom       20   0 3011544 356464  53884 S  20.0  1.1  84:27.74 qbittorrent
+16018 tom       20   0  226652  95376   3220 S  13.3  0.3   7:14.67 tmux: server
+ 2350 tom       20   0 9774132 2.496g  86996 S   6.7  8.0  92:26.41 java
+12329 tom       20   0  162428   4444   3788 R   6.7  0.0   0:00.01 top
+17160 tom       20   0 11.125g 116612  19328 S   6.7  0.4   0:32.90 java
+17768 tom        9 -11 1436472  17788  13860 S   6.7  0.1 124:17.41 pulseaudio
+    1 root      20   0  230640  12104   7688 S   0.0  0.0   1:56.98 systemd
+    2 root      20   0       0      0      0 S   0.0  0.0   0:00.24 kthreadd
+    4 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 kworker/0:0H
+    6 root       0 -20       0      0      0 I   0.0  0.0   0:00.00 mm_percpu_wq
+    7 root      20   0       0      0      0 S   0.0  0.0   0:04.28 ksoftirqd/0
+    8 root      20   0       0      0      0 I   0.0  0.0   0:54.57 rcu_sched
+    9 root      20   0       0      0      0 I   0.0  0.0   0:00.00 rcu_bh
+   10 root      rt   0       0      0      0 S   0.0  0.0   0:00.69 migration/0
+   11 root      rt   0       0      0      0 S   0.0  0.0   0:00.34 watchdog/0
+   12 root      20   0       0      0      0 S   0.0  0.0   0:00.00 cpuhp/0
+   13 root      20   0       0      0      0 S   0.0  0.0   0:00.00 cpuhp/1

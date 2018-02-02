@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.StackedAreaChart?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <SplitPane dividerPositions="0.23" orientation="VERTICAL" VBox.vgrow="ALWAYS">
+         <items>
+            <HBox SplitPane.resizableWithParent="false">
+               <children>
+                  <StackedAreaChart fx:id="overviewChart" HBox.hgrow="ALWAYS">
+                    <xAxis>
+                      <NumberAxis side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                      <NumberAxis side="LEFT" />
+                    </yAxis>
+                  </StackedAreaChart>
+               </children>
+            </HBox>
+            <TabPane tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="History">
+                     <content>
+                        <StackedAreaChart>
+                          <xAxis>
+                            <NumberAxis side="BOTTOM" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" />
+                          </yAxis>
+                        </StackedAreaChart>
+                     </content>
+                  </Tab>
+                <Tab text="Terminal">
+                     <content>
+                        <VBox>
+                           <children>
+                              <ToolBar prefHeight="40.0" prefWidth="200.0">
+                                <items>
+                                    <HBox>
+                                       <children>
+                                          <SplitMenuButton mnemonicParsing="false" text="SplitMenuButton">
+                                            <items>
+                                              <MenuItem mnemonicParsing="false" text="Action 1" />
+                                              <MenuItem mnemonicParsing="false" text="Action 2" />
+                                            </items>
+                                          </SplitMenuButton>
+                                       </children>
+                                    </HBox>
+                                </items>
+                              </ToolBar>
+                              <StackPane fx:id="terminalPane" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Logs">
+                     <content>
+                        <SplitPane dividerPositions="0.3">
+                           <items>
+                              <TreeTableView SplitPane.resizableWithParent="false">
+                                <columns>
+                                  <TreeTableColumn prefWidth="75.0" text="C1" />
+                                  <TreeTableColumn prefWidth="75.0" text="C2" />
+                                </columns>
+                              </TreeTableView>
+                              <StackPane fx:id="logPane" />
+                           </items>
+                        </SplitPane>
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </items>
+      </SplitPane>
+   </children>
+</VBox>
