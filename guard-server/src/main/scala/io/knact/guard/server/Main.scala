@@ -1,6 +1,5 @@
 package io.knact.guard.server
 
-import scala.Seq
 import fs2.{Stream, Task}
 import io.knact.guard.guard._
 import org.http4s.server.blaze._
@@ -8,8 +7,17 @@ import org.http4s.util.StreamApp
 import org.http4s._
 import org.http4s.dsl._
 
+import scala.collection.mutable.ArrayBuffer
+
 object Main extends StreamApp {
 	override def stream(args: List[String]): Stream[Task, Nothing] = {
+
+
+
+
+		val repo = new GuardGroupRepo()
+
+
 
 		var groups : Seq[GroupView] = new groupSeq
 
@@ -27,10 +35,11 @@ object Main extends StreamApp {
 		val groupService = HttpService {
 
 			case GET -> Root =>
-				if (groups.isEmpty)
-					BadRequest()
-				else
-					Ok(groups.toString())
+				Ok(				repo.findAll())
+//				if (groups.isEmpty)
+//					BadRequest()
+//				else
+//					Ok(groups.toString())
 
 			case GET -> Root / id =>
 				if (containedInGroups(id))

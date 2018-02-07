@@ -7,9 +7,6 @@ import monix.eval.Task
 
 package object guard {
 
-
-
-
 	case class EntityId(id: Long) extends AnyVal
 
 
@@ -53,11 +50,11 @@ package object guard {
 	type TelemetrySeries = TimeSeries[Either[Failure, Snapshot]]
 	type LogSeries = TimeSeries[Seq[Line]] // time series of log tails
 
-	case class NodeMeta(id: EntityId,
-						telemetries: TelemetrySeries,
-						logs: Map[Path, ByteSize])
-
 	case class Node(id: EntityId,
+											telemetries: TelemetrySeries,
+											logs: Map[Path, ByteSize])
+
+	case class NodeView(id: EntityId,
 					subject: Subject[NetAddress, PasswordCredential],
 					remark: String) extends Entity
 
@@ -69,17 +66,20 @@ package object guard {
 					 procedures: Seq[Procedure]) extends Entity
 
 
-	trait Repository[A] {
+	trait Repository[A, AView] {
+
+		def mapToView(a: A) :AView
+
 		def findAll(): Task[Seq[A]]
 		def findById(id: EntityId): Task[Option[A]]
 		def upsert(group: A): Task[Either[Failure, A]]
 		def delete(id: EntityId): Task[Either[Failure, EntityId]]
 	}
 
-	trait GroupRepo extends Repository[Group]
+	trait GroupRepo extends Repository[Group, GroupView]
 
-	trait ProcedureRepo extends Repository[Procedure]
-	trait NodeRepo extends Repository[Node] {
+	trait ProcedureRepo extends Repository[Procedure, ProcedureView]
+	trait NodeRepo extends Repository[Node, NodeView] {
 		def telemetries(id: EntityId)(bound: Bound): Task[TelemetrySeries]
 		def logs(id: EntityId)(path: Path)(bound: Bound): Task[LogSeries]
 		def execute(id: EntityId)(procedureId: EntityId): Task[String]
