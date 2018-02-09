@@ -15,19 +15,19 @@ object Main extends StreamApp {
 
 
 
-		val repo = new GuardGroupRepo()
+		var groupsViews : ArrayBuffer[GroupView] = ArrayBuffer()
+		var groups : ArrayBuffer[Group] = ArrayBuffer()
 
 
-
-		var groups : Seq[GroupView] = new groupSeq
+		val repo = new GuardGroupRepo(groups)
 
 		def containedInGroups(str: String) : Boolean =
-			isIntegral(str) && groups.isDefinedAt(Integer.parseInt(str))
+			isIntegral(str) && groupsViews.isDefinedAt(Integer.parseInt(str))
 
 		def containedInGroupNodes(groupId: String, nodeId: String) : Boolean =
 			containedInGroups(groupId) &&
 			isIntegral(nodeId) &&
-			groups(Integer.parseInt(groupId)).nodes.isDefinedAt(Integer.parseInt(nodeId))
+			groupsViews(Integer.parseInt(groupId)).nodes.isDefinedAt(Integer.parseInt(nodeId))
 
 
 		def isIntegral(str: String): Boolean = str.forall(_.isDigit)
@@ -35,28 +35,24 @@ object Main extends StreamApp {
 		val groupService = HttpService {
 
 			case GET -> Root =>
-				Ok(				repo.findAll())
-//				if (groups.isEmpty)
-//					BadRequest()
-//				else
-//					Ok(groups.toString())
+				Ok(repo.findAll())
 
 			case GET -> Root / id =>
 				if (containedInGroups(id))
-					Ok(groups(Integer.parseInt(id)).toString())
+					Ok(groupsViews(Integer.parseInt(id)).toString())
 				else
 					BadRequest()
 
 			//case request @ POST -> Root =>
 
 			case DELETE -> Root => {
-				groups = new groupSeq
+				groupsViews = ArrayBuffer()
 				Ok()
 			}
 
 			case DELETE -> Root / id => {
 				if (containedInGroups(id)) {
-					groups = groups.filter(elem => groups.indexOf(elem) != Integer.parseInt(id))
+					groupsViews = groupsViews.filter(elem => groupsViews.indexOf(elem) != Integer.parseInt(id))
 					Ok()
 				}
 				else
@@ -69,7 +65,7 @@ object Main extends StreamApp {
 
 			case GET -> Root / groupId / "node" => {
 				if (containedInGroups(groupId))
-					Ok(groups(Integer.parseInt(groupId)).nodes.toString())
+					Ok(groupsViews(Integer.parseInt(groupId)).nodes.toString())
 				else
 					BadRequest()
 			}
@@ -88,32 +84,6 @@ object Main extends StreamApp {
 			.mountService(groupService, "/group")
 			.mountService(nodeService, "/group")
 			.serve
-	}
-
-}
-
-
-
-class groupSeq extends Seq[GroupView] {
-	override def apply(idx: Int) = this.toList.apply(idx)
-
-	override def length = this.toList.length
-
-	override def iterator = new groupSeqIterator(this)
-}
-
-class groupSeqIterator(obj: groupSeq) extends Iterator[GroupView] {
-	var i = 0
-
-	override def hasNext =
-		if (obj.toList.length > i)
-			true
-		else
-			false
-
-	override def next = {
-		i = i + 1
-		obj(i - 1)
 	}
 
 }
