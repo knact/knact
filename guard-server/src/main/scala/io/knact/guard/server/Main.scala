@@ -14,12 +14,7 @@ object Main extends StreamApp {
 
 
 
-
-		var groupsViews : ArrayBuffer[GroupView] = ArrayBuffer()
-		var groups : ArrayBuffer[Group] = ArrayBuffer()
-
-
-		val repo = new GuardGroupRepo(groups)
+		val repo = new GuardGroupRepo()
 
 		def containedInGroups(str: String) : Boolean =
 			isIntegral(str) && groupsViews.isDefinedAt(Integer.parseInt(str))
