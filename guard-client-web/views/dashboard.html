@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="dashboard.css">
+
+    <style>
+    
+        .jumbotron {
+            background-color: #3c586d;
+            color: white;
+        }
+    
+    </style>
+
+    <title>Node Monitor</title>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <!-- Sidebar Holder -->
+        <nav id="sidebar">
+            
+            <div class="sidebar-header">
+                <h3>Active Nodes</h3>
+            </div>
+
+            <ul class="list-unstyled CTAs" id="sidebarButtons">
+                <li><a href="#refreshNodes" class="refreshNodes">Refresh Node List</a></li>
+                <li>
+                    <a href="#sortNodes" class="sortNodes" data-toggle="collapse" aria-expanded="false">Sort Nodes By:</a>
+                    <ul class="collapse list" id="sortNodes">
+                        <li><a href="#">Node Value</a></li>
+                        <li><a href="#">Alert Count</a></li>
+                        <li><a href="#">Alert Priority</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="list-unstyled components" id=nodeList>
+
+                <li class="active">
+                    <a href="#node0Menu" data-toggle="collapse" aria-expanded="false">Node 0 (192.168.0.0)</a>
+                    <ul class="collapse list" id="node0Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node1Menu" data-toggle="collapse" aria-expanded="false">Node 1 (192.168.0.1)</a>
+                    <ul class="collapse list" id="node1Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node2Menu" data-toggle="collapse" aria-expanded="false">Node 2 (192.168.0.2)</a>
+                    <ul class="collapse list" id="node2Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node3Menu" data-toggle="collapse" aria-expanded="false">Node 3 (192.168.0.3)</a>
+                    <ul class="collapse list" id="node3Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node4Menu" data-toggle="collapse" aria-expanded="false">Node 4 (192.168.0.4)</a>
+                    <ul class="collapse list" id="node4Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node5Menu" data-toggle="collapse" aria-expanded="false">Node 5 (192.168.0.5)</a>
+                    <ul class="collapse list" id="node5Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node6Menu" data-toggle="collapse" aria-expanded="false">Node 6 (192.168.0.6)</a>
+                    <ul class="collapse list" id="node6Menu">
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node7Menu" data-toggle="collapse" aria-expanded="false">Node 7 (192.168.0.7)</a>
+                    <ul class="collapse list" id="node7Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node8Menu" data-toggle="collapse" aria-expanded="false">Node 8 (192.168.0.8)</a>
+                    <ul class="collapse list" id="node8Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#node9Menu" data-toggle="collapse" aria-expanded="false">Node 9 (192.168.0.9)</a>
+                    <ul class="collapse list" id="node9Menu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#nodeXMenu" data-toggle="collapse" aria-expanded="false">Node X (192.168.0.X)</a>
+                    <ul class="collapse list" id="nodeXMenu">
+                        <li><a href="#">View Node</a></li>
+                        <li><a href="#">Remove Node</a></li>
+                    </ul>
+                </li>
+                
+            </ul>
+
+        </nav>
+
+        <!-- Page Content Holder -->
+        <div id="content">
+
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+
+                    <div class="navbar-header">
+                        <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn">
+                            <i class="glyphicon glyphicon-align-left"></i>
+                        </button>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="active"><a href="#">Dashboard</a></li>
+                            <li><a href="#">Settings</a></li>
+                            <li><a href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container" id="info">
+
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <div class="col-md-3 col-sm-6"><div class="jumbotron" id=jMemory>
+                            <h4 align="left">RAM</h4>
+                            <center><h1>99%</h1></center>
+                            <h4 align="right">+4%</h4>
+                        </div></div>
+
+                        <div class="col-md-3 col-sm-6"><div class="jumbotron" id=jProcessor>
+                            <h4 align="left">CPU</h4>
+                            <center><h1>92%</h1></center>
+                            <h4 align="right">+3%</h4>
+                        </div></div>
+
+                        <div class="col-md-3 col-sm-6"><div class="jumbotron" id=jDisk>
+                            <h4 align="left">HDD</h4>
+                            <center><h1>89%</h1></center>
+                            <h4 align="right">+7%</h4>
+                        </div></div>
+
+                        <div class="col-md-3 col-sm-6"><div class="jumbotron" id=jAlerts>
+                            <h4 align="left">Alerts</h4>
+                            <center><h1>1</h1></center>
+                            <h4 align="right">+1</h4>
+                        </div></div>
+
+                    </div>
+                </div>
+
+                <ul class="nav"><li class="nav-divider"></li></ul>
+                
+                <div class="container" id="scrollArea">
+
+                    <!-- NODE SYSTEM STATS AND GRAPH -->
+                    <div class="container" id="graph">
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <h2>Node 0</h2>
+                                <p>last updated: 17:02 (24 seconds ago)</p>            
+                                <table class="table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <td>Connection Strength</td>
+                                            <td>Strong</td>
+                                        </tr>
+                                        <tr>
+                                            <td>IPv4 Address</td>
+                                            <td>192.168.0.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Subnet Mask</td>
+                                            <td>225.225.225.0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Uptime</td>
+                                            <td>03:24:52</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Time since last alert</td>
+                                            <td>00:01:33</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Node Health</td>
+                                            <td>Normal</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col-md-8">
+                                <canvas id="resourceChart"></canvas>
+                            </div>  
+
+                        </div>
+                    </div>
+
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#alerts">Alerts</a></li>
+                        <li><a data-toggle="tab" href="#history">History</a></li>
+                        <li><a data-toggle="tab" href="#logs">Logs</a></li>
+                        <li><a data-toggle="tab" href="#remote">Remote</a></li>
+                    </ul>
+                        
+                    <div class="tab-content">
+
+                        <div id="alerts" class="tab-pane fade in active">
+                            <br>
+                            <p>List of most recent system alerts for node 0</p>            
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Event</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>02/02/2018 13:42:03</td>
+                                        <td>WARNING RAM and DISK running at 99%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>ERROR XXX</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="history" class="tab-pane fade">
+                            <br>
+                            <p>System resource usage stats since last boot for node 0</p>            
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Memory %</th>
+                                        <th>Processor %</th>
+                                        <th>Disk %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>02/02/2018 13:42:03</td>
+                                        <td>99</td>
+                                        <td>95</td>
+                                        <td>89</td>
+                                    </tr>
+                                    <tr>
+                                        <td>02/02/2018 13:41:33</td>
+                                        <td>95</td>
+                                        <td>89</td>
+                                        <td>82</td>
+                                    </tr>
+                                    <tr>
+                                        <td>02/02/2018 13:41:03</td>
+                                        <td>96</td>
+                                        <td>89</td>
+                                        <td>84</td>
+                                    </tr>
+                                    <tr>
+                                        <td>02/02/2018 13:40:33</td>
+                                        <td>92</td>
+                                        <td>86</td>
+                                        <td>84</td>
+                                    </tr>
+                                    <tr>
+                                        <td>02/02/2018 13:40:03</td>
+                                        <td>88</td>
+                                        <td>82</td>
+                                        <td>80</td>
+                                    </tr>
+                                    <tr>
+                                        <td>02/02/2018 13:39:33</td>
+                                        <td>88</td>
+                                        <td>82</td>
+                                        <td>79</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="logs" class="tab-pane fade">
+                            <br>
+                            <p>System logs for node 0</p>            
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Timestamp</th>
+                                        <th>Source</th>
+                                        <th>Event ID</th>
+                                        <th>Task Catagory</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Information</td>
+                                        <td>02/02/2018 13:24:58</td>
+                                        <td>Netwtw04</td>
+                                        <td>7003</td>
+                                        <td>None</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Warning</td>
+                                        <td>02/02/2018 13:01:34</td>
+                                        <td>Time-Service</td>
+                                        <td>47</td>
+                                        <td>None</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                    <tr>
+                                        <td>XX</td>
+                                        <td>XX/XX/2018 XX:XX:XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                        <td>XX</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            
+                        </div>
+
+                        <div id="remote" class="tab-pane fade">
+                            <br>
+                            <p>Remotely execute console for node 0</p>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="usr">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="push"></div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">           
+                <ul class="nav"><li class="nav-divider"></li></ul>
+                © Animal and Plant Health Agency Gov
+            </div>
+
+        </div>
+    </div>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Bootstrap Js CDN -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Chart Js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+
+    <script>
+
+        $(document).ready(function() {
+            $('[data-toggle=offcanvas]').click(function() {
+            $('.row-offcanvas').toggleClass('active');
+            });
+        });
+
+        let resourceChart = document.getElementById('resourceChart').getContext('2d');
+
+        let chart = new Chart(resourceChart, {
+            type:'line', 
+
+            data: {
+                labels: ["-2:30", "-2:00", "-1:30", "-1:00", "-0:30", "0:00"],
+                datasets: [
+                    {
+                    label: 'Disk',
+                    data: [79, 80, 84, 84, 82, 89],
+                    backgroundColor: 'rgba(28, 49, 65, 0.5)',
+                    borderColor: 'rgba(28, 49, 65, 1)',
+                    borderWidth: 1
+                    },
+                    {
+                    label: 'CPU',
+                    data: [82, 82, 86, 89, 89, 92],
+                    backgroundColor: 'rgba(60, 88, 109, 0.5)',
+                    borderColor: 'rgba(60, 88, 109, 1)',
+                    borderWidth: 1
+                    },
+                    {
+                    label: 'Memory',
+                    data: [88, 88, 92, 96, 95, 99],
+                    backgroundColor: 'rgba(63, 191, 63, 0.5)',
+                    borderColor: 'rgba(63, 191, 63, 1)',
+                    borderWidth: 1
+                    }
+                ]
+            },
+
+            options:{
+                legend: {
+                    display: true,
+                    position: 'right'
+                },
+                scales: {
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'time since last update'
+                        }
+                    }],
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'resource usage percentage'
+                        }
+                    }]
+                }
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>
