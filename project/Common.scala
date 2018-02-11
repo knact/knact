@@ -1,4 +1,6 @@
 import sbt.Keys._
+import sbt._
+import sbt.librarymanagement.CrossVersion
 
 object Common {
 
@@ -18,11 +20,15 @@ object Common {
 			"-Ywarn-value-discard",
 			"-Ywarn-unused",
 			"-Ypartial-unification",
+//			"-Xlog-implicits",
 		),
 		javacOptions ++= Seq(
 			"-target", "1.8",
 			"-source", "1.8",
 			"-Xlint:deprecation"),
+		addCompilerPlugin(
+			"org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
+		)
 	)
 
 

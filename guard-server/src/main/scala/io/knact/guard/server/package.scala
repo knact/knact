@@ -2,7 +2,6 @@ package io.knact.guard
 
 import org.http4s._, org.http4s.dsl._
 import org.http4s.HttpService
-import org.http4s.dsl.{Root, _}
 import cats._
 import cats.implicits._
 

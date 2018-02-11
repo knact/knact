@@ -1,13 +1,41 @@
-package io.knact.guard
-import java.time.{Duration, ZonedDateTime}
+package io.knact
 
+import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
+import java.time.format.{DateTimeFormatter, DateTimeParseException}
+import java.time.{Duration, LocalDateTime, ZonedDateTime}
+
+import io.circe._
+import io.circe.generic.auto._
+import io.circe.syntax._
+import io.circe.java8.time._
 import io.knact.Basic.{NetAddress, PasswordCredential}
-import io.knact.{Address, Command, Credential, Subject}
 import monix.eval.Task
+import shapeless.tag
+import shapeless.tag.@@
+
+import scala.util.Try
 
 package object guard {
 
-	case class EntityId(id: Long) extends AnyVal
+
+	// XXX we are using tagged refinements, which is not supported
+	// wanted : taggedEncoderProof[T, U](implicit ev : Encoder[T]) : Encoder[T @@ U]=???
+	// that causes ev to diverge, if the solver had SAT or something maybe it would work...
+	// see https://github.com/circe/circe/issues/220
+	implicit def taggedLongEncoderProof[U]: Encoder[Long @@ U] = {
+		import cats.syntax.contravariant._
+		Encoder[Long].narrow
+	}
+	implicit def taggedLongDecoderProof[U]: Decoder[Long @@ U] = {
+		Decoder[Long].map { l => tag[U][Long](l) }
+	}
+
+
+	implicit def zdtKeyEncoder: KeyEncoder[ZonedDateTime] =
+		key => key.format(ISO_ZONED_DATE_TIME)
+
+	implicit def zdtKeyDecoder: KeyDecoder[ZonedDateTime] =
+		key => Try {ZonedDateTime.parse(key)}.toOption
 
 
 	type Line = String
@@ -25,8 +53,15 @@ package object guard {
 	case class Bound(start: Option[ZonedDateTime],
 					 end: Option[ZonedDateTime])
 
-	// common root
-	sealed trait Entity {def id: EntityId}
+	// refined id
+	type Id[A] = Long @@ A
+
+	sealed trait Entity[A] {
+		def id: Id[A]
+		//		implicit val idAEnc: Encoder[Id[A]] = deriveEncoder
+		//		implicit val idADec: Decoder[Id[A]] = deriveDecoder
+	}
+	object Entity {def id[T](id: Long): Id[T] = tag[T][Long](id)}
 
 	// telemetry ADT
 	case class MemoryStat(total: Long, free: Long, used: Long, cache: Long)
@@ -39,51 +74,71 @@ package object guard {
 						threadStat: ThreadStat,
 						diskStats: Map[Path, DiskStat])
 
+
 	// stored procedure
-	case class ProcedureView(id: EntityId, description: String, timeout: Duration)
-	case class Procedure(id: EntityId,
+	case class ProcedureView(id: Id[Procedure],
+							 description: String, timeout: Duration)
+	case class Procedure(id: Id[Procedure],
 						 description: String,
 						 code: String,
-						 timeout: Duration) extends Entity
+						 timeout: Duration) extends Entity[Procedure]
 
 	type TimeSeries[A] = Map[ZonedDateTime, A]
 	type TelemetrySeries = TimeSeries[Either[Failure, Snapshot]]
 	type LogSeries = TimeSeries[Seq[Line]] // time series of log tails
 
-	case class Node(id: EntityId,
-											telemetries: TelemetrySeries,
-											logs: Map[Path, ByteSize])
 
-	case class NodeView(id: EntityId,
-					subject: Subject[NetAddress, PasswordCredential],
-					remark: String) extends Entity
+	case class Node(id: Id[Node],
+					telemetries: TelemetrySeries,
+					logs: Map[Path, ByteSize]) extends Entity[Node]
 
+	case class NodeView(id: Id[Node],
+						subject: Subject[NetAddress, PasswordCredential],
+						remark: String) extends Entity[Node]
 
-	case class GroupView(id: EntityId, name: String, nodes: Seq[EntityId])
-	case class Group(id: EntityId,
+	case class GroupView(id: Id[Group],
+						 name: String, nodes: Seq[Id[Node]])
+	case class Group(id: Id[Group],
 					 name: String,
 					 nodes: Seq[Node],
-					 procedures: Seq[Procedure]) extends Entity
+					 procedures: Seq[Procedure]) extends Entity[Group]
 
 
-	trait Repository[A, AView] {
+	trait Repository[A <: Entity[A], V, F[_]] {
 
-		def mapToView(a: A) :AView
+		def mapToView(a: A): V
+		def findAll(): F[Seq[A]]
+		def findById(id: Id[A]): F[Option[A]]
+		def upsert(group: A): F[Either[Failure, A]]
+		def delete(id: Id[A]): F[Either[Failure, Id[A]]]
+		def tag(id: Long): Id[A] = Entity.id[A](id)
 
-		def findAll(): Task[Seq[A]]
-		def findById(id: EntityId): Task[Option[A]]
-		def upsert(group: A): Task[Either[Failure, A]]
-		def delete(id: EntityId): Task[Either[Failure, EntityId]]
+
 	}
 
-	trait GroupRepo extends Repository[Group, GroupView]
+	trait GroupRepo extends Repository[Group, GroupView, Task]
 
-	trait ProcedureRepo extends Repository[Procedure, ProcedureView]
-	trait NodeRepo extends Repository[Node, NodeView] {
-		def telemetries(id: EntityId)(bound: Bound): Task[TelemetrySeries]
-		def logs(id: EntityId)(path: Path)(bound: Bound): Task[LogSeries]
-		def execute(id: EntityId)(procedureId: EntityId): Task[String]
+	trait ProcedureRepo extends Repository[Procedure, ProcedureView, Task]
+	trait NodeRepo extends Repository[Node, NodeView, Task] {
+		def telemetries(id: Id[Node])(bound: Bound): Task[TelemetrySeries]
+		def logs(id: Id[Node])(path: Path)(bound: Bound): Task[LogSeries]
+		def execute(id: Id[Node])(procedureId: Id[Procedure]): Task[String]
 
 	}
+
+	case class AA(v: Id[Group], s: Map[String, Long], xs: Seq[AA])
+
+		val x = Group(tag[Group][Long](1), "", Nil, Nil)
+
+	//	val x = Node(???, ???, ???)
+	//val x = Procedure(???, ???, ???, ???)
+
+
+	//	val x : TimeSeries[Either[Failure, Snapshot]] = ???
+	//	val x : Map[String, String] = ???
+
+//	val x = AA(tag[Group][Long](1), Map(), Nil)
+	x.asJson
+
 
 }

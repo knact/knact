@@ -7,7 +7,6 @@ lazy val core = project.settings(
 	commonSettings,
 	libraryDependencies ++= Seq(
 		Monix,
-//		MonixCats,
 		Cats,
 		"net.sf.expectit" % "expectit-core" % "0.9.0",
 		ScalaTest % Test
@@ -39,18 +38,14 @@ lazy val `core-sample` = project.settings(
 ).dependsOn(core, `core-linux-perf`, `core-ssh-transport`)
 
 lazy val `guard-client-common` = project.settings(
-	commonSettings,
+	commonSettings, libraryDependencies ++= circe
 ).dependsOn(core)
 
-val http4sVersion = "0.17.6"
+val http4sVersion = "0.18.0"
 
 lazy val `guard-server` = project.settings(
 	commonSettings,
-	libraryDependencies ++= Seq(
-		"org.http4s" %% "http4s-dsl" % http4sVersion,
-		"org.http4s" %% "http4s-blaze-server" % http4sVersion,
-		"org.http4s" %% "http4s-blaze-client" % http4sVersion
-	)
+	libraryDependencies ++= http4s
 ).dependsOn(core, `guard-client-common`)
 
 lazy val `guard-client-cli` = project.settings(
