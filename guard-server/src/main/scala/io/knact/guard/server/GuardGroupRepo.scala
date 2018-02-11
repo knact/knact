@@ -22,7 +22,7 @@ class GuardGroupRepo(private val groups: ArrayBuffer[Group] = ArrayBuffer()) ext
 	override def upsert(group: Group): Task[Either[Failure, Group]] = Task {
 		groups.indexWhere {_.id == group.id} match {
 			case -1  =>
-				val indexed = group.copy(id = tag(group.id))
+				val indexed = group.copy(id = tag(counter.getAndIncrement()))
 				groups += indexed
 				Right(indexed)
 			case idx =>

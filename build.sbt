@@ -45,7 +45,7 @@ val http4sVersion = "0.18.0"
 
 lazy val `guard-server` = project.settings(
 	commonSettings,
-	libraryDependencies ++= http4s
+	libraryDependencies ++= Seq(Logback) ++ http4s
 ).dependsOn(core, `guard-client-common`)
 
 lazy val `guard-client-cli` = project.settings(
