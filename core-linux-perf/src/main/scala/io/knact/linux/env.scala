@@ -1,13 +1,8 @@
 package io.knact.linux
 
-import java.time.{OffsetDateTime, ZonedDateTime}
-
-import fastparse.all.AnyChar
 import fastparse.core.Parsed.{Failure, Success}
 import io.knact.Basic.ConsoleNode
 import io.knact.Command
-
-import scala.util.Try
 
 object env {
 

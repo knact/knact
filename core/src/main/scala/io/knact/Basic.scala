@@ -1,19 +1,10 @@
 package io.knact
 
 import java.io._
-import java.lang.Thread.UncaughtExceptionHandler
 import java.net.InetAddress
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import java.util.concurrent.{ExecutorService, Executors, ThreadFactory}
-
-import monix.reactive.Observable
-import monix.execution.Scheduler.Implicits.global
-import net.sf.expectit.{Expect, ExpectBuilder}
-import net.sf.expectit.matcher.{Matcher, Matchers}
-
-import scala.io.Source
-import net.sf.expectit.filter.Filters.{removeColors, removeNonPrintable}
+import java.util.concurrent.{ExecutorService, Executors}
 
 object Basic {
 

@@ -1,13 +1,9 @@
 package io.knact
 
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
-import java.time.format.{DateTimeFormatter, DateTimeParseException}
-import java.time.{Duration, LocalDateTime, ZonedDateTime}
+import java.time.{Duration, ZonedDateTime}
 
 import io.circe._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import io.circe.java8.time._
 import io.knact.Basic.{NetAddress, PasswordCredential}
 import monix.eval.Task
 import shapeless.tag
@@ -105,40 +101,21 @@ package object guard {
 
 
 	trait Repository[A <: Entity[A], V, F[_]] {
-
 		def mapToView(a: A): V
 		def findAll(): F[Seq[A]]
 		def findById(id: Id[A]): F[Option[A]]
 		def upsert(group: A): F[Either[Failure, A]]
 		def delete(id: Id[A]): F[Either[Failure, Id[A]]]
 		def tag(id: Long): Id[A] = Entity.id[A](id)
-
-
 	}
 
 	trait GroupRepo extends Repository[Group, GroupView, Task]
-
 	trait ProcedureRepo extends Repository[Procedure, ProcedureView, Task]
 	trait NodeRepo extends Repository[Node, NodeView, Task] {
 		def telemetries(id: Id[Node])(bound: Bound): Task[TelemetrySeries]
 		def logs(id: Id[Node])(path: Path)(bound: Bound): Task[LogSeries]
 		def execute(id: Id[Node])(procedureId: Id[Procedure]): Task[String]
-
 	}
-
-	case class AA(v: Id[Group], s: Map[String, Long], xs: Seq[AA])
-
-		val x = Group(tag[Group][Long](1), "", Nil, Nil)
-
-	//	val x = Node(???, ???, ???)
-	//val x = Procedure(???, ???, ???, ???)
-
-
-	//	val x : TimeSeries[Either[Failure, Snapshot]] = ???
-	//	val x : Map[String, String] = ???
-
-//	val x = AA(tag[Group][Long](1), Map(), Nil)
-	x.asJson
 
 
 }

@@ -9,7 +9,6 @@ import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
 import scalafxml.core.{DependenciesByType, FXMLView}
 import scalafx.Includes._
-import scalafx.scene.image.Image
 
 object Main extends JFXApp with LazyLogging {
 

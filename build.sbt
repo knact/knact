@@ -38,21 +38,21 @@ lazy val `core-sample` = project.settings(
 ).dependsOn(core, `core-linux-perf`, `core-ssh-transport`)
 
 lazy val `guard-client-common` = project.settings(
-	commonSettings, libraryDependencies ++= circe
+	commonSettings,
+	libraryDependencies ++= circe ++ Seq(ScalaTest % Test)
 ).dependsOn(core)
 
 val http4sVersion = "0.18.0"
 
 lazy val `guard-server` = project.settings(
 	commonSettings,
-	libraryDependencies ++= Seq(Logback) ++ http4s
+	libraryDependencies ++= http4s ++ Seq(Logback, ScalaTest % Test)
 ).dependsOn(core, `guard-client-common`)
 
 lazy val `guard-client-cli` = project.settings(
 	commonSettings,
 	libraryDependencies ++= Seq(
 		"com.googlecode.lanterna" % "lanterna" % "3.0.0",
-
 	)
 ).dependsOn(core, `guard-client-common`)
 
@@ -65,7 +65,6 @@ lazy val `guard-client-jfx` = project.settings(
 		"org.scalafx" %% "scalafxml-core-sfx8" % "0.4",
 		ScalaTest % Test,
 	),
-	addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 ).dependsOn(core, `guard-client-common`)
 
 lazy val `guard-client-web` = project.settings(

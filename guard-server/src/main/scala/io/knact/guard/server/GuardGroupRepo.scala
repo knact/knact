@@ -2,10 +2,8 @@ package io.knact.guard.server
 
 import java.util.concurrent.atomic.AtomicLong
 
-import io.knact.guard
 import io.knact.guard._
 import monix.eval.Task
-import shapeless.tag.@@
 
 import scala.collection.mutable.ArrayBuffer
 

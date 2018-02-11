@@ -5,7 +5,6 @@ import io.knact.Basic.{ConsoleNode, NetAddress}
 import io.knact.{Subject, Transport}
 import io.knact.linux.{date, env, sleep}
 import io.knact.ssh.{PassphraseCredential, SshCredential, SshTransport}
-import cats._
 import cats.implicits._
 
 

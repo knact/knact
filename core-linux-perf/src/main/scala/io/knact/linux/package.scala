@@ -1,12 +1,11 @@
 package io.knact
 
-import java.util.concurrent.{Executors, TimeUnit}
 
 import io.knact.Basic.{ConsoleIO, ConsoleNode}
 import net.sf.expectit
 import net.sf.expectit.ExpectBuilder
 import net.sf.expectit.filter.Filters.{removeColors, removeNonPrintable}
-import net.sf.expectit.matcher.{Matcher, Matchers, SimpleResult}
+import net.sf.expectit.matcher.{Matcher, SimpleResult}
 
 package object linux {
 

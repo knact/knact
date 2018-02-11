@@ -1,8 +1,6 @@
 package io
 
 import cats.data._
-import cats.data.Kleisli
-import io.knact.Basic.ConsoleNode
 
 package object knact {
 

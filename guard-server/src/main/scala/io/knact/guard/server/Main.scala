@@ -1,15 +1,11 @@
 package io.knact.guard.server
 
-import java.time.ZonedDateTime
-
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
-import io.knact.guard.{Entity, Group, Node}
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import org.http4s.server.blaze._
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 
@@ -28,7 +24,7 @@ object Main extends StreamApp[Task] {
 			case Left(e)             => Stream.raiseError(e)
 			case Right(Config(port)) =>
 				val groupRepo = new GuardGroupRepo()
-				val service = new APIService(groupRepo)
+				val service = new ApiService(groupRepo)
 				for {
 					// TODO migration and stuff
 					exit <- BlazeBuilder[Task]

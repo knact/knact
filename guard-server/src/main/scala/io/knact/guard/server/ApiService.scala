@@ -1,26 +1,19 @@
-package io.knact.guard
+package io.knact.guard.server
 
-import org.http4s._, org.http4s.dsl._
-import org.http4s.HttpService
-import cats._
 import cats.implicits._
+import org.http4s.dsl.Http4sDsl
+import monix.eval.Task
+import org.http4s.HttpService
+import org.http4s._
+import org.http4s.circe._
+import io.circe.generic.auto._
+import io.circe.syntax._
+import io.knact.guard._
 
-package object server {
+import io.circe.java8.time._
 
 
-
-//	// TODO
-//	final val group = HttpService {
-//		case GET -> Root / "group" / groupId =>
-//			??? //Ok(s" ")
-//	}
-//
-//	// TODO
-//	final val node = HttpService {
-//		case GET -> Root / "group" / groupId / "node" / nodeId =>
-//			??? // Ok(s" ")
-//	}
-
+class ApiService(val groupRepo: GuardGroupRepo) extends Http4sDsl[Task] {
 
 
 	// GET     group          :: Seq[GroupView]
@@ -47,8 +40,16 @@ package object server {
 	// POST   group/procedure/{id}/exec
 
 
+	private val groups = HttpService[Task] {
+		case GET -> Root / "groups" => Ok(groupRepo.findAll().map{_.asJson})
+	}
+
+	private val nodes = HttpService[Task] {
+		case GET -> Root / "nodes" => ???
+	}
 
 
-//	final val services = group |+| node
+	lazy val services: HttpService[Task] = groups <+> nodes
+
 
 }
