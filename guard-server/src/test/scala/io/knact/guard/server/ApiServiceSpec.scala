@@ -33,6 +33,19 @@ class ApiServiceSpec extends FlatSpec with Matchers with EitherValues {
 		}
 	}
 
+	it should "return groups with given groups" in SyncContext {
+
+		val expected = Seq(
+			Group(id(1), "foo", Nil, Nil),
+			Group(id(42), "bar", Nil, Nil))
+
+		given(new ApiService(new GuardGroupRepo(ArrayBuffer(expected :_*))).services,
+			Request[Task](Method.GET, uri("/groups"))) { response =>
+			response.status shouldBe Status.Ok
+			jsonBody[Seq[Group]](response) {_.right.value shouldBe expected}
+		}
+	}
+
 	// TODO test return some value where group is Group(id(1), "", Nil, Nil)::Nil
 
 }
