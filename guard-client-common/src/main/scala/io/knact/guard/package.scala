@@ -85,11 +85,16 @@ package object guard {
 
 
 	case class Node(id: Id[Node],
+//					subject: Subject[NetAddress, PasswordCredential],
 					telemetries: TelemetrySeries,
-					logs: Map[Path, ByteSize]) extends Entity[Node]
+									logs : Map[Path, LogSeries]
+					) extends Entity[Node]
 
+	case class TelemetrySummary(failed: Long, success: Long)
 	case class NodeView(id: Id[Node],
 						subject: Subject[NetAddress, PasswordCredential],
+											telemetry : TelemetrySummary,
+											logs: Map[Path, ByteSize],
 						remark: String) extends Entity[Node]
 
 	case class GroupView(id: Id[Group],
@@ -106,16 +111,16 @@ package object guard {
 		def findById(id: Id[A]): F[Option[A]]
 		def upsert(group: A): F[Either[Failure, A]]
 		def delete(id: Id[A]): F[Either[Failure, Id[A]]]
+		def deleteAll() : F[Either[Failure, Unit]]
 		def tag(id: Long): Id[A] = Entity.id[A](id)
 	}
 
 	trait GroupRepo extends Repository[Group, GroupView, Task]
 	trait ProcedureRepo extends Repository[Procedure, ProcedureView, Task]
 	trait NodeRepo extends Repository[Node, NodeView, Task] {
-		def telemetries(id: Id[Node])(bound: Bound): Task[TelemetrySeries]
-		def logs(id: Id[Node])(path: Path)(bound: Bound): Task[LogSeries]
-		def execute(id: Id[Node])(procedureId: Id[Procedure]): Task[String]
+		def telemetries(id: Id[Node])(bound: Bound): Task[Option[TelemetrySeries]] //changed that to Task[Option[TelemetrySeries]]
+		def logs(id: Id[Node])(path: Path)(bound: Bound): Task[Option[LogSeries]] //and that
+		def execute(id: Id[Node])(procedureId: Id[Procedure]): Task[Option[String]]	//and that
 	}
-
 
 }

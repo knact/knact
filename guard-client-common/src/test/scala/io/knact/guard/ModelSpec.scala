@@ -37,18 +37,18 @@ class ModelSpec extends FlatSpec with Matchers with EitherValues {
 		))(shouldBeBijective[Procedure])
 	}
 
-	"Node" should ExhibitJsonBijectiveProperties in {
-		forAll(Table(
-			("input", "expected"),
-			// TODO write me
-		))(shouldBeBijective[Node])
-	}
-
-	"Group" should ExhibitJsonBijectiveProperties in {
-		forAll(Table(
-			("input", "expected"),
-			// TODO write me
-		))(shouldBeBijective[Group])
-	}
+//	"Node" should ExhibitJsonBijectiveProperties in {
+//		forAll(Table(
+//			("input", "expected"),
+//			// TODO write me
+//		))(shouldBeBijective[Node])
+//	}
+//
+//	"Group" should ExhibitJsonBijectiveProperties in {
+//		forAll(Table(
+//			("input", "expected"),
+//			// TODO write me
+//		))(shouldBeBijective[Group])
+//	}
 
 }

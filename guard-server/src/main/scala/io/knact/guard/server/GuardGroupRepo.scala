@@ -31,8 +31,11 @@ class GuardGroupRepo(private val groups: ArrayBuffer[Group] = ArrayBuffer()) ext
 
 	override def delete(id: Id[Group]): Task[Either[Failure, Id[Group]]] = Task {
 		groups.find(_.id == id) match {
-			case None    => Left(s"group with $id does not exist")
-			case Some(g) => Right(g.id)
+			case None    => Left(s"group with ID = $id does not exist")
+			case Some(g) => {
+				groups -= g
+				Right(g.id)
+			}
 		}
 	}
 
@@ -40,4 +43,7 @@ class GuardGroupRepo(private val groups: ArrayBuffer[Group] = ArrayBuffer()) ext
 		id = that.id,
 		name = that.name,
 		nodes = that.nodes.map {_.id})
+
+	override def deleteAll() : Task[Either[Failure, Unit]] =
+		Task(Right(groups.drop(counter.getAndSet(0).toInt)))
 }
