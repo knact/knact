@@ -44,9 +44,23 @@ lazy val `guard-client-common` = project.settings(
 
 val http4sVersion = "0.18.0"
 
+scalacOptions += "-Ypartial-unification"
+
 lazy val `guard-server` = project.settings(
 	commonSettings,
-	libraryDependencies ++= http4s ++ Seq(Logback, ScalaTest % Test)
+	libraryDependencies ++= http4s ++ Seq(Logback, ScalaTest % Test) ++ Seq(
+
+		// Start with this one
+		"org.tpolecat" %% "doobie-core"      % "0.5.0",
+
+		// And add any of these as needed
+		"org.tpolecat" %% "doobie-h2"        % "0.5.0", // H2 driver 1.4.196 + type mappings.
+		"org.tpolecat" %% "doobie-hikari"    % "0.5.0", // HikariCP transactor.
+		"org.tpolecat" %% "doobie-postgres"  % "0.5.0", // Postgres driver 42.2.1 + type mappings.
+		"org.tpolecat" %% "doobie-specs2"    % "0.5.0", // Specs2 support for typechecking statements.
+		"org.tpolecat" %% "doobie-scalatest" % "0.5.0"  // ScalaTest support for typechecking statements.
+
+	)
 ).dependsOn(core, `guard-client-common`)
 
 lazy val `guard-client-cli` = project.settings(

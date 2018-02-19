@@ -1,26 +1,11 @@
 package io.knact.guard.server
 
 import java.nio.file.{Path, Paths}
-
-import doobie._
-import doobie.implicits._
-import cats._
-import cats.data._
-import cats.implicits._
-import doobie._
-import cats._
-import cats.effect._
-import cats.implicits._
-import fs2.Stream
-import doobie._
-import doobie.implicits._
-import cats._
-import cats.data._
-import cats.effect.IO
-import cats.implicits._
-
-
 import io.knact.guard._
+
+import doobie._
+import doobie.implicits._
+import monix.eval.Task
 
 class H2JdbcContext extends ApiContext {
 
