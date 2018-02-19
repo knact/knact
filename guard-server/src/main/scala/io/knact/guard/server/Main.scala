@@ -28,7 +28,7 @@ object Main extends StreamApp[Task] {
 		config match {
 			case Left(e)             => Stream.raiseError(e)
 			case Right(Config(port)) =>
-				val repos = new InMemoryRepository()
+				val repos = new InMemoryContext()
 				val service = new ApiService(repos)
 
 				def migrate() = for {

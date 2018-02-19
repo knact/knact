@@ -12,7 +12,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 	behavior of "GroupRepository"
 
 	it should "insert with incremented id" in SyncContext {
-		val imr = new InMemoryRepository()
+		val imr = new InMemoryContext()
 		val group = Group(id(42), "foo", Nil)
 		for {
 			a <- imr.groups.insert(group)
@@ -24,7 +24,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 	}
 
 	it should "find inserted items" in SyncContext {
-		val imr = new InMemoryRepository()
+		val imr = new InMemoryContext()
 		for {
 			id <- imr.groups.insert(Group(id(42), "foo", Nil))
 			found <- imr.groups.find(id.right.value)
@@ -32,7 +32,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 	}
 
 	it should "insert discards id and relations" in SyncContext {
-		val imr = new InMemoryRepository()
+		val imr = new InMemoryContext()
 		for {
 			id <- imr.groups.insert(Group(id(42), "bar", Seq(id(42), id(43))))
 			found <- imr.groups.find(id.right.value)
@@ -40,7 +40,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 	}
 
 	it should "list all ids in insert order" in SyncContext {
-		val imr = new InMemoryRepository()
+		val imr = new InMemoryContext()
 		val groups = List.fill(10) {Group(id(42), "foo", Nil)}
 		for {
 			ids <- Task.traverse(groups) {imr.groups.insert}

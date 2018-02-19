@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import io.knact.guard.Entity._
 import io.knact.guard.Telemetry.{Online, Verdict}
-import io.knact.guard.server.InMemoryRepository.MapBackedRepository
+import io.knact.guard.server.InMemoryContext.MapBackedRepository
 import io.knact.guard.{Bound, Entity, Failure, GroupRepository, Line, NodeRepository, Path, ProcedureRepository, Repository, Telemetry, |}
 import monix.eval.Task
 
@@ -14,7 +14,7 @@ import scala.collection.mutable
 /**
   * An in-memory implementation of all the repositories the API needs
   */
-class InMemoryRepository extends ApiDependency {
+class InMemoryContext extends ApiContext {
 
 	private final val idCounter: AtomicLong = new AtomicLong(0)
 
@@ -141,7 +141,7 @@ class InMemoryRepository extends ApiDependency {
 
 }
 
-object InMemoryRepository {
+object InMemoryContext {
 	/**
 	  * A map backed repository that covers generic CRUD tasks
 	  * @tparam E the entity type(where {{{ Id[K] }}} is the key of the map)

@@ -15,9 +15,9 @@ import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 
 
-class ApiService(dependency: ApiDependency) extends Http4sDsl[Task] {
+class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 
-	val (groups, nodes, procedures) = dependency.asTuple
+	val (groups, nodes, procedures) = dependency.repos
 
 	private implicit val groupDecoder          = jsonOf[Task, Group]
 	private implicit val groupPatchDecoder     = jsonOf[Task, Group => Group]
@@ -90,21 +90,21 @@ class ApiService(dependency: ApiDependency) extends Http4sDsl[Task] {
 	}
 
 	private val procedureService = HttpService[Task] {
-		case GET -> Root / Node                   => list(procedures)
-		case GET -> Root / Node / IntVar(id)      => find(procedures, id)
-		case req@POST -> Root / Node              => insert(procedures, req)
-		case req@POST -> Root / Node / IntVar(id) => update(procedures, req, id)
-		case DELETE -> Root / Node / IntVar(id)   => delete(procedures, id)
+		case GET -> Root / Procedure                   => list(procedures)
+		case GET -> Root / Procedure / IntVar(id)      => find(procedures, id)
+		case req@POST -> Root / Procedure              => insert(procedures, req)
+		case req@POST -> Root / Procedure / IntVar(id) => update(procedures, req, id)
+		case DELETE -> Root / Procedure / IntVar(id)   => delete(procedures, id)
 
 		// TODO telemetry and log endpoints
 	}
 
 	private val nodeService = HttpService[Task] {
-		case GET -> Root / Procedure                   => list(nodes)
-		case GET -> Root / Procedure / IntVar(id)      => find(nodes, id)
-		case req@POST -> Root / Procedure              => insert(nodes, req)
-		case req@POST -> Root / Procedure / IntVar(id) => update(nodes, req, id)
-		case DELETE -> Root / Procedure / IntVar(id)   => delete(nodes, id)
+		case GET -> Root / Node                   => list(nodes)
+		case GET -> Root / Node / IntVar(id)      => find(nodes, id)
+		case req@POST -> Root / Node              => insert(nodes, req)
+		case req@POST -> Root / Node / IntVar(id) => update(nodes, req, id)
+		case DELETE -> Root / Node / IntVar(id)   => delete(nodes, id)
 
 		// TODO code CRUD
 

@@ -20,7 +20,7 @@ class ApiServiceSpec extends FlatSpec with Matchers with EitherValues {
 	behavior of "ApiService"
 
 	private def mkEndpoints: HttpService[Task] =
-		new ApiService(new InMemoryRepository()).services
+		new ApiService(new InMemoryContext()).services
 
 	it should "return empty with no groups" in SyncContext {
 		given(mkEndpoints, Request[Task](GET, uri("/group"))) { response =>
