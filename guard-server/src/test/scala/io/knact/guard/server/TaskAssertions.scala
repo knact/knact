@@ -2,7 +2,6 @@ package io.knact.guard.server
 
 import cats.FlatMap
 import io.circe.{Decoder, DecodingFailure, Json}
-import io.knact.guard.Group
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import org.http4s.dsl.Http4sDsl
@@ -15,7 +14,7 @@ import scala.concurrent.duration._
 object TaskAssertions {
 
 	object SyncContext {
-		def apply[A](ioa: Task[A]): Unit = Await.result(ioa.runAsync, 30 seconds)
+		def apply[A](ioa: Task[A]): A = Await.result(ioa.runAsync, 30 seconds)
 	}
 
 	final def given(service: HttpService[Task], request: Request[Task])

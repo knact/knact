@@ -1,7 +1,12 @@
 package io.knact.guard.server
 
+import java.time.ZonedDateTime
+
 import fs2.StreamApp.ExitCode
 import fs2.{Stream, StreamApp}
+import io.knact.guard.Entity
+import io.knact.guard.Entity._
+import io.knact.guard.Telemetry.Offline
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import org.http4s.server.blaze._
@@ -23,10 +28,18 @@ object Main extends StreamApp[Task] {
 		config match {
 			case Left(e)             => Stream.raiseError(e)
 			case Right(Config(port)) =>
-				val groupRepo = new GuardGroupRepo()
-				val service = new ApiService(groupRepo)
+				val repos = new InMemoryRepository()
+				val service = new ApiService(repos)
+
+				def migrate() = for {
+					// TODO do actual migration and not just dummy data
+					a <- repos.groups.insert(Group(id(1), "b", Nil))
+					n <- repos.nodes.insert(Node(id(1), a.right.get, SshKeyTarget("1", 22, Array(42)), "a"))
+					_ <- repos.nodes.persist(n.right.get, ZonedDateTime.now(), Offline)
+				} yield ()
+
 				for {
-					// TODO migration and stuff
+					_ <- Stream.eval(migrate())
 					exit <- BlazeBuilder[Task]
 						.bindHttp(port, "localhost")
 						.mountService(service.services, "/api")

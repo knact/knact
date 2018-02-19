@@ -1,98 +1,116 @@
 package io.knact.guard.server
 
-import shapeless.tag
-import cats.effect.IO
+import cats.data.EitherT
 import cats.implicits._
-import io.circe.Json
-import org.http4s.dsl.Http4sDsl
+import io.circe.{Json, _}
+import io.circe.generic.auto._
+import io.circe.java8.time._
+import io.circe.syntax._
+import io.knact.guard
+import io.knact.guard.Entity.{Altered, Failed, Group, Id, Node, Procedure, id => coerce}
+import io.knact.guard._
 import monix.eval.Task
-import org.http4s.HttpService
-import org.http4s._
+import org.http4s.{HttpService, _}
 import org.http4s.circe._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import io.knact.guard._
-import org.http4s.dsl.io._
-import io.circe.java8.time._
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import io.circe.parser.decode
-import io.circe.java8.time._
-import io.knact.guard.Entity.id
-import io.knact.guard._
-import monix.eval.Task.{Async, Error, Eval, FlatMap, Map, MemoizeSuspend, Now, Suspend}
-
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.syntax._
-import io.circe.parser.decode
-import io.circe.java8.time._
-import io.knact.guard.Entity.id
-import io.knact.guard._
-import org.http4s.circe._
+import org.http4s.dsl.Http4sDsl
 
 
-class ApiService(val groupRepo: GuardGroupRepo) extends Http4sDsl[Task] {
+class ApiService(dependency: ApiDependency) extends Http4sDsl[Task] {
+
+	val (groups, nodes, procedures) = dependency.asTuple
+
+	private implicit val groupDecoder          = jsonOf[Task, Group]
+	private implicit val groupPatchDecoder     = jsonOf[Task, Group => Group]
+	private implicit val nodeDecoder           = jsonOf[Task, Node]
+	private implicit val nodePatchDecoder      = jsonOf[Task, Node => Node]
+	private implicit val procedureDecoder      = jsonOf[Task, Procedure]
+	private implicit val procedurePatchDecoder = jsonOf[Task, Procedure => Procedure]
+
+	private def boxAlteration[A](x: Either[String, Id[A]]): Task[Response[Task]] = x match {
+		case Right(id)   => Ok(Altered(id).asJson)
+		case Left(error) => BadRequest(Failed(error).asJson)
+	}
+
+	type E[A] = guard.Entity[A]
+
+	private def list[A <: E[A]](repo: Repository[A, Task]) =
+		repo.list() >>= { xs => Ok(xs.asJson) }
+	private def find[A <: E[A]](repo: Repository[A, Task], id: Int)(implicit ev: Encoder[A]) =
+		repo.find(coerce(id)).flatMap {
+			case None    => NotFound()
+			case Some(x) => Ok(x.asJson)
+		}
+	private def insert[A <: E[A]](repo: Repository[A, Task], req: Request[Task])
+								 (implicit ev: EntityDecoder[Task, A]) = (for {
+		decoded <- req.attemptAs[A].leftMap {_.message}
+		id <- EitherT(repo.insert(decoded))
+	} yield id).value >>= boxAlteration
+	private def update[A <: E[A]](repo: Repository[A, Task], req: Request[Task], id: Int)
+								 (implicit ev: EntityDecoder[Task, A => A]) = (for {
+		f <- req.attemptAs[A => A].leftMap {_.message}
+		updated <- EitherT(repo.update(coerce(id), f))
+	} yield updated).value >>= boxAlteration
+	private def delete[A <: E[A]](repo: Repository[A, Task], id: Int) =
+		repo.delete(coerce(id)) >>= boxAlteration
 
 
-  // GET     group          :: Seq[GroupView]
-  // GET     group/{id}     :: Group
-  // POST    group	      :: Seq[Group] -> Seq[EntityId]  // update a group if found; add if no id specified,
-  // DELETE  group          :: Seq[EntityId] // delete all groups
-  // DELETE  group/{id}     :: EntityId  // delete specific group
+	private final val Group     = "group"
+	private final val Node      = "node"
+	private final val Procedure = "procedure"
+
+	// GET     group          :: Seq[Id]
+	// GET     group/{id}     :: Group
+	// POST    group	      :: Group => Id
+	// POST    group/{id}	  :: Group => Id
+	// DELETE  group/{id}     :: Id
+
+	// GET     group/node/        :: Seq[Id]
+	// GET     group/node/{id}    :: Node
+	// POST    group/node/        :: Node => Id
+	// POST    group/node/{id}    :: Node => Id
+	// DELETE  group/node/{id}    :: Id
+	// GET     group/node/{id}/telemetry/&+{bound}   :: TelemetrySeries
+	// GET     group/node/{id}/log/{file}/&+{bound}  :: LogSeries
+
+	// GET     procedure/           :: Seq[Id]
+	// GET     procedure/{id}       :: Procedure
+	// GET     procedure/{id}/code  :: Procedure
+	// POST    procedure/           :: Procedure  => Id
+	// POST    procedure/{id}       :: Procedure  => Id
+	// POST    procedure/{id}/code  :: String     => Id
+	// DELETE  procedure/{id}       :: EntityId
+	// POST    procedure/{id}/exec
+
+	private val groupService = HttpService[Task] {
+		case GET -> Root / Group                   => list(groups)
+		case GET -> Root / Group / IntVar(id)      => find(groups, id)
+		case req@POST -> Root / Group              => insert(groups, req)
+		case req@POST -> Root / Group / IntVar(id) => update(groups, req, id)
+		case DELETE -> Root / Group / IntVar(id)   => delete(groups, id)
+	}
+
+	private val procedureService = HttpService[Task] {
+		case GET -> Root / Node                   => list(procedures)
+		case GET -> Root / Node / IntVar(id)      => find(procedures, id)
+		case req@POST -> Root / Node              => insert(procedures, req)
+		case req@POST -> Root / Node / IntVar(id) => update(procedures, req, id)
+		case DELETE -> Root / Node / IntVar(id)   => delete(procedures, id)
+
+		// TODO telemetry and log endpoints
+	}
+
+	private val nodeService = HttpService[Task] {
+		case GET -> Root / Procedure                   => list(nodes)
+		case GET -> Root / Procedure / IntVar(id)      => find(nodes, id)
+		case req@POST -> Root / Procedure              => insert(nodes, req)
+		case req@POST -> Root / Procedure / IntVar(id) => update(nodes, req, id)
+		case DELETE -> Root / Procedure / IntVar(id)   => delete(nodes, id)
+
+		// TODO code CRUD
+
+	}
 
 
-  // GET     group/{id}/node/         ::Seq[Node]
-  // POST    group/{id}/node/         ::Seq[Node] -> Seq[EntityId] // update a node if found; add if no id specified,
-  // DELETE  group/{id}/node/         ::Seq[EntityId]
-  // GET     group/{id}/node/{nid}/   ::Node
-  // DELETE  group/{id}/node/{nid}/   ::EntityId
-  // GET     group/{id}/node/{nid}/telemetry/&+{bound}   :: TelemetrySeries
-  // GET     group/{id}/node/{nid}/log/{file}/&+{bound}  :: LogSeries
-
-
-  // GET    group/procedure/      :: Seq[ProcedureView]
-  // GET    group/procedure/{id}  :: Group
-  // POST   group/procedure/      :: Seq[Procedure] -> Seq[EntityId]
-  // DELETE group/procedure/      :: Seq[EntityId]  // delete all procedure
-  // DELETE group/procedure/{id}  :: EntityId       // delete specific procedure
-  // POST   group/procedure/{id}/exec
-
-//  implicit val groupDecoder = jsonOf[Task, Group]
-
-  private val groups = HttpService[Task] {
-    case GET -> Root / "groups" => Ok(groupRepo.findAll().map {
-      _.asJson
-    })
-//    case GET -> Root / "groups" / IntVar(id) => Ok(groupRepo.findById(groupRepo.tag(id)).asJson)
-    case request@POST -> Root / "groups" =>
-
-      val decoded = request.as[Json].map { v => v.as[Group] }
-
-     val thing =  for {
-        result <- decoded
-        outcome <- result match {
-                    case Left(failed) => Task.pure(Left(failed.message))
-                    case Right(success) => groupRepo.upsert(success)
-                    }
-      } yield outcome
-
-     thing.map {
-       case Left(value) => value.asJson
-       case Right(value) => value.asJson
-     }.flatMap{ v => Ok(v)}
-
-    //			Ok(groupRepo.upsert(group))
-//    case DELETE -> Root / "groups" => Ok(groupRepo.deleteAll())
-//    case DELETE -> Root / "groups" / IntVar(id) => Ok(groupRepo.delete(groupRepo.tag(id)))
-  }
-
-  private val nodes = HttpService[Task] {
-    case GET -> Root / "nodes" => Ok()
-  }
-
-
-  lazy val services: HttpService[Task] = groups <+> nodes
+	lazy val services: HttpService[Task] = groupService <+> procedureService <+> nodeService
 
 }

@@ -1,10 +1,12 @@
 package io.knact
 
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
-import java.time.{Duration, ZonedDateTime}
 
+import enumeratum.EnumEntry
 import io.circe._
-import io.knact.Basic.{NetAddress, PasswordCredential}
+import io.knact.guard.Entity._
+import io.knact.guard.Telemetry.Status
 import monix.eval.Task
 import shapeless.tag
 import shapeless.tag.@@
@@ -26,7 +28,6 @@ package object guard {
 		Decoder[Long].map { l => tag[U][Long](l) }
 	}
 
-
 	implicit def zdtKeyEncoder: KeyEncoder[ZonedDateTime] =
 		key => key.format(ISO_ZONED_DATE_TIME)
 
@@ -37,90 +38,51 @@ package object guard {
 	type Line = String
 	type Path = String
 	type ByteSize = Long
-	type Failure = String
-
 
 	// bounds and parameters
-	sealed trait Sort
-	case object Asc extends Sort
-	case object Desc extends Sort
+
+	sealed trait Sort extends EnumEntry
+	object Sort extends enumeratum.Enum[Sort] {
+		case object Asc extends Sort
+		case object Desc extends Sort
+		val values = findValues
+	}
 
 	case class Parameters(limit: Int, offset: Int, sort: Sort)
-	case class Bound(start: Option[ZonedDateTime],
-					 end: Option[ZonedDateTime])
+	case class Bound(start: Option[ZonedDateTime], end: Option[ZonedDateTime])
 
-	// refined id
-	type Id[A] = Long @@ A
+	// fake coproducts :)
+	type Failure = String
+	type |[A, B] = Either[A, B]
 
-	sealed trait Entity[A] {
-		def id: Id[A]
-		//		implicit val idAEnc: Encoder[Id[A]] = deriveEncoder
-		//		implicit val idADec: Decoder[Id[A]] = deriveDecoder
+	trait Repository[A <: Entity[A], F[_]] {
+		def list(): Task[Seq[Id[A]]]
+		def find(id: Id[A]): F[Option[A]]
+		def delete(id: Id[A]): F[Failure | Id[A]]
+		def insert(a: A): F[Failure | Id[A]]
+		def update(id: Id[A], f: A => A): F[Failure | Id[A]]
 	}
-	object Entity {def id[T](id: Long): Id[T] = tag[T][Long](id)}
+	trait GroupRepository extends Repository[Group, Task] {}
+	trait ProcedureRepository extends Repository[Procedure, Task] {}
+	trait NodeRepository extends Repository[Entity.Node, Task] {
+		def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]]
+		def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]]
+		def execute(nid: Id[Entity.Node])(pid: Id[Procedure]): Task[Failure | String]
 
-	// telemetry ADT
-	case class MemoryStat(total: Long, free: Long, used: Long, cache: Long)
-	case class ThreadStat(running: Long, sleeping: Long, stopped: Long, zombie: Long)
-	case class DiskStat(free: Long, used: Long)
-	case class Snapshot(uptime: Duration,
-						users: Long,
-						loadAverage: Double,
-						memoryStat: MemoryStat,
-						threadStat: ThreadStat,
-						diskStats: Map[Path, DiskStat])
-
-
-	// stored procedure
-	case class ProcedureView(id: Id[Procedure],
-							 description: String, timeout: Duration)
-	case class Procedure(id: Id[Procedure],
-						 description: String,
-						 code: String,
-						 timeout: Duration) extends Entity[Procedure]
-
-	type TimeSeries[A] = Map[ZonedDateTime, A]
-	type TelemetrySeries = TimeSeries[Either[Failure, Snapshot]]
-	type LogSeries = TimeSeries[Seq[Line]] // time series of log tails
-
-
-	case class Node(id: Id[Node],
-//					subject: Subject[NetAddress, PasswordCredential],
-					telemetries: TelemetrySeries,
-									logs : Map[Path, LogSeries]
-					) extends Entity[Node]
-
-	case class TelemetrySummary(failed: Long, success: Long)
-	case class NodeView(id: Id[Node],
-						subject: Subject[NetAddress, PasswordCredential],
-											telemetry : TelemetrySummary,
-											logs: Map[Path, ByteSize],
-						remark: String) extends Entity[Node]
-
-	case class GroupView(id: Id[Group],
-						 name: String, nodes: Seq[Id[Node]])
-	case class Group(id: Id[Group],
-					 name: String,
-					 nodes: Seq[Node],
-					 procedures: Seq[Procedure]) extends Entity[Group]
-
-
-	trait Repository[A <: Entity[A], V, F[_]] {
-		def mapToView(a: A): V
-		def findAll(): F[Seq[A]]
-		def findById(id: Id[A]): F[Option[A]]
-		def upsert(group: A): F[Either[Failure, A]]
-		def delete(id: Id[A]): F[Either[Failure, Id[A]]]
-		def deleteAll() : F[Either[Failure, Unit]]
-		def tag(id: Long): Id[A] = Entity.id[A](id)
+		def persist(nid: Id[Entity.Node],
+					time: ZonedDateTime,
+					status: Status): Task[Failure | Id[Entity.Node]]
+		def persist(nid: Id[Entity.Node],
+					time: ZonedDateTime,
+					path: Path,
+					lines: Seq[Line]): Task[Failure | Id[Entity.Node]]
 	}
 
-	trait GroupRepo extends Repository[Group, GroupView, Task]
-	trait ProcedureRepo extends Repository[Procedure, ProcedureView, Task]
-	trait NodeRepo extends Repository[Node, NodeView, Task] {
-		def telemetries(id: Id[Node])(bound: Bound): Task[Option[TelemetrySeries]] //changed that to Task[Option[TelemetrySeries]]
-		def logs(id: Id[Node])(path: Path)(bound: Bound): Task[Option[LogSeries]] //and that
-		def execute(id: Id[Node])(procedureId: Id[Procedure]): Task[Option[String]]	//and that
-	}
+
+	// XXX to make sure we have proof for all the the JSON mappings, we find them here
+
+	@inline private[guard] final def ensureCodec[T]
+	(implicit enc: Encoder[T], dec: Decoder[T]) = (enc, dec)
+
 
 }

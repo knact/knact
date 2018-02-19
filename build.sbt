@@ -39,7 +39,7 @@ lazy val `core-sample` = project.settings(
 
 lazy val `guard-client-common` = project.settings(
 	commonSettings,
-	libraryDependencies ++= circe ++ Seq(ScalaTest % Test)
+	libraryDependencies ++= circe ++ Seq(Enumeratum, ScalaTest % Test)
 ).dependsOn(core)
 
 val http4sVersion = "0.18.0"
