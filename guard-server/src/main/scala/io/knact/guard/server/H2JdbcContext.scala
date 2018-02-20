@@ -5,7 +5,17 @@ import io.knact.guard._
 
 import doobie._
 import doobie.implicits._
+// In order to evaluate tasks, we'll need a Scheduler
+import monix.execution.Scheduler.Implicits.global
+
+// A Future type that is also Cancelable
+import monix.execution.CancelableFuture
+
+// Task is in monix.eval
 import monix.eval.Task
+import cats._
+import cats.effect._
+import cats.implicits._
 
 class H2JdbcContext extends ApiContext {
 
@@ -36,13 +46,13 @@ class H2JdbcContext extends ApiContext {
           remark VARCHAR
           // telemetries
           //logs
-          )"""
+          )""".update.run
 		groups <- sql"""CREATE TABLE GROUP(
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR NOT NULL,
       nodes BIGINT,
       FOREIGN KEY (nodes) REFERENCES public.NODE(id)
-    )"""
+    )""".update.run
 
 		procedures <- sql"""CREATE TABLE PROCEDURE(
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -50,10 +60,10 @@ class H2JdbcContext extends ApiContext {
       code VARCHAR
       //timeout Duration?
 
-    )"""
+    )""".update.run
 	} yield(nodes, groups, procedures)
 
-	println(ddl.transact(xa).unsafeRunSync)
+	//println(ddl.transact(xa).unsafeRunSync)
 
 
 }
