@@ -10,7 +10,7 @@ pipelines:
     - step:
         caches:
           - sbt
-          - ivy
+          - ivy2
         script: # Modify the commands below to build your repository.
           - apt-get update
           - apt-get install -y openjfx
