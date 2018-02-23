@@ -19,12 +19,7 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 
 	val (groups, nodes, procedures) = dependency.repos
 
-	private implicit val groupDecoder          = jsonOf[Task, Group]
-	private implicit val groupPatchDecoder     = jsonOf[Task, Group => Group]
-	private implicit val nodeDecoder           = jsonOf[Task, Node]
-	private implicit val nodePatchDecoder      = jsonOf[Task, Node => Node]
-	private implicit val procedureDecoder      = jsonOf[Task, Procedure]
-	private implicit val procedurePatchDecoder = jsonOf[Task, Procedure => Procedure]
+	import io.knact.guard.Service._
 
 	private def boxAlteration[A](x: Either[String, Id[A]]): Task[Response[Task]] = x match {
 		case Right(id)   => Ok(Altered(id).asJson)
@@ -54,10 +49,6 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		repo.delete(coerce(id)) >>= boxAlteration
 
 
-	private final val Group     = "group"
-	private final val Node      = "node"
-	private final val Procedure = "procedure"
-
 	// GET     group          :: Seq[Id]
 	// GET     group/{id}     :: Group
 	// POST    group	      :: Group => Id
@@ -81,30 +72,35 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 	// DELETE  procedure/{id}       :: EntityId
 	// POST    procedure/{id}/exec
 
+	import io.knact.guard.{NodePath, GroupPath, ProcedurePath}
+
+	implicit def entityDecoderForAllA[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
+		jsonOf[Task, A]
+
 	private val groupService = HttpService[Task] {
-		case GET -> Root / Group                   => list(groups)
-		case GET -> Root / Group / IntVar(id)      => find(groups, id)
-		case req@POST -> Root / Group              => insert(groups, req)
-		case req@POST -> Root / Group / IntVar(id) => update(groups, req, id)
-		case DELETE -> Root / Group / IntVar(id)   => delete(groups, id)
+		case GET -> Root / GroupPath                   => list(groups)
+		case GET -> Root / GroupPath / IntVar(id)      => find(groups, id)
+		case req@POST -> Root / GroupPath              => insert(groups, req)
+		case req@POST -> Root / GroupPath / IntVar(id) => update(groups, req, id)
+		case DELETE -> Root / GroupPath / IntVar(id)   => delete(groups, id)
 	}
 
 	private val procedureService = HttpService[Task] {
-		case GET -> Root / Procedure                   => list(procedures)
-		case GET -> Root / Procedure / IntVar(id)      => find(procedures, id)
-		case req@POST -> Root / Procedure              => insert(procedures, req)
-		case req@POST -> Root / Procedure / IntVar(id) => update(procedures, req, id)
-		case DELETE -> Root / Procedure / IntVar(id)   => delete(procedures, id)
+		case GET -> Root / ProcedurePath                   => list(procedures)
+		case GET -> Root / ProcedurePath / IntVar(id)      => find(procedures, id)
+		case req@POST -> Root / ProcedurePath              => insert(procedures, req)
+		case req@POST -> Root / ProcedurePath / IntVar(id) => update(procedures, req, id)
+		case DELETE -> Root / ProcedurePath / IntVar(id)   => delete(procedures, id)
 
 		// TODO telemetry and log endpoints
 	}
 
 	private val nodeService = HttpService[Task] {
-		case GET -> Root / Node                   => list(nodes)
-		case GET -> Root / Node / IntVar(id)      => find(nodes, id)
-		case req@POST -> Root / Node              => insert(nodes, req)
-		case req@POST -> Root / Node / IntVar(id) => update(nodes, req, id)
-		case DELETE -> Root / Node / IntVar(id)   => delete(nodes, id)
+		case GET -> Root / NodePath                   => list(nodes)
+		case GET -> Root / NodePath / IntVar(id)      => find(nodes, id)
+		case req@POST -> Root / NodePath              => insert(nodes, req)
+		case req@POST -> Root / NodePath / IntVar(id) => update(nodes, req, id)
+		case DELETE -> Root / NodePath / IntVar(id)   => delete(nodes, id)
 
 		// TODO code CRUD
 

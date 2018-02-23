@@ -71,6 +71,8 @@ object Entity {
 	}
 
 	ensureCodec[Target]
+	ensureCodec[LogSeries]
+	ensureCodec[TelemetrySeries]
 	ensureCodec[Group]
 	ensureCodec[Node]
 	ensureCodec[Procedure]

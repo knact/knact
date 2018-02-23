@@ -3,6 +3,7 @@ package io.knact
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
+import cats.{Contravariant, FlatMap, Monad}
 import enumeratum.EnumEntry
 import io.circe._
 import io.knact.guard.Entity._
@@ -11,6 +12,7 @@ import monix.eval.Task
 import shapeless.tag
 import shapeless.tag.@@
 
+import scala.annotation.tailrec
 import scala.util.Try
 
 package object guard {
@@ -76,6 +78,44 @@ package object guard {
 					time: ZonedDateTime,
 					path: Path,
 					lines: Seq[Line]): Task[Failure | Id[Entity.Node]]
+	}
+
+
+	final val GroupPath     = "group"
+	final val ProcedurePath = "procedure"
+	final val NodePath      = "node"
+
+	sealed trait RemoteResult[+A]
+	case class ConnectionError(e: Throwable) extends RemoteResult[Nothing]
+	case class ServerError(reason: String) extends RemoteResult[Nothing]
+	case class ClientError(reason: String) extends RemoteResult[Nothing]
+	case class DecodeError(reason: String) extends RemoteResult[Nothing]
+	case object NotFound extends RemoteResult[Nothing]
+	case class Found[+A](a: A) extends RemoteResult[A]
+
+	implicit val remoteResultInstance: Monad[RemoteResult] = new Monad[RemoteResult] {
+		override def pure[A](x: A): RemoteResult[A] = Found(x)
+		override def flatMap[A, B](fa: RemoteResult[A])(f: A => RemoteResult[B]): RemoteResult[B] = fa match {
+			case Found(a)   => f(a)
+				// TODO this is trivially true, but can we do better?
+			case v => v.asInstanceOf[RemoteResult[B]]
+		}
+		@tailrec
+		override def tailRecM[A, B](a: A)(f: A => RemoteResult[Either[A, B]]): RemoteResult[B] = f(a) match {
+			// TODO this is trivially true, but can we do better?
+			case v => v.asInstanceOf[RemoteResult[B]]
+			case Found(Left(x))  => tailRecM(x)(f)
+			case Found(Right(x)) => Found(x)
+		}
+	}
+
+
+	trait EntityService[A <: Entity[A]] {
+		def list(): Task[RemoteResult[Seq[Id[A]]]]
+		def find(id: Long): Task[RemoteResult[A]]
+		def insert(a: A): Task[RemoteResult[Outcome[A]]]
+		def update(id: Long, a: A): Task[RemoteResult[Outcome[A]]]
+		def delete(id: Long): Task[RemoteResult[Outcome[A]]]
 	}
 
 

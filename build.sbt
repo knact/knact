@@ -1,7 +1,6 @@
 
 import Common._
 import Dependencies.{ScalaTest, _}
-import sbt.librarymanagement.CrossVersion
 
 lazy val core = project.settings(
 	commonSettings,
@@ -37,40 +36,75 @@ lazy val `core-sample` = project.settings(
 	commonSettings,
 ).dependsOn(core, `core-linux-perf`, `core-ssh-transport`)
 
-lazy val `guard-client-common` = project.settings(
-	commonSettings,
-	libraryDependencies ++= circe ++ Seq(Enumeratum, ScalaTest % Test)
-).dependsOn(core)
+lazy val guardCommonSettings = commonSettings ++ Seq(
+	unmanagedSourceDirectories in Compile += {
+		baseDirectory.value.getParentFile / "shared" / "src" / "main" / "scala"
+	},
+	unmanagedSourceDirectories in Test += {
+		baseDirectory.value.getParentFile / "shared" / "src" / "test" / "scala"
+	},
+	libraryDependencies ++= circe ++ Seq(
+		Enumeratum,
+		Monix,
+		ScalaTest % Test
+	)
+)
 
-val http4sVersion = "0.18.0"
+lazy val `guard-common-js` = project.in(file("guard-common/js"))
+	.settings(guardCommonSettings)
+	.enablePlugins(ScalaJSPlugin)
+
+lazy val `guard-common-jvm` = project.in(file("guard-common/jvm"))
+	.settings(
+		guardCommonSettings,
+		libraryDependencies ++= http4sClient
+	)
 
 lazy val `guard-server` = project.settings(
 	commonSettings,
-	libraryDependencies ++= http4s ++ Seq(Logback, ScalaTest % Test)
-).dependsOn(core, `guard-client-common`)
+	libraryDependencies ++= http4sServer ++ Seq(
+		Logback,
+		ScalaTest % Test)
+).dependsOn(
+	`guard-common-jvm`,
+	`core-ssh-transport`,
+	`core-linux-perf`,
+)
 
 lazy val `guard-client-cli` = project.settings(
 	commonSettings,
 	libraryDependencies ++= Seq(
+		Cats,
+		ScalaLogging,
 		"com.googlecode.lanterna" % "lanterna" % "3.0.0",
 	)
-).dependsOn(core, `guard-client-common`)
+).dependsOn(`guard-common-jvm`)
 
 lazy val `guard-client-jfx` = project.settings(
 	commonSettings,
 	libraryDependencies ++= Seq(
+		Cats,
 		Guava,
 		ScalaLogging, Logback,
 		"org.scalafx" %% "scalafx" % "8.0.144-R12",
 		"org.scalafx" %% "scalafxml-core-sfx8" % "0.4",
 		ScalaTest % Test,
 	),
-).dependsOn(core, `guard-client-common`)
+).dependsOn(`guard-common-jvm`)
 
 lazy val `guard-client-web` = project.settings(
 	commonSettings,
-	// TODO add dependencies for web module
-).dependsOn(core, `guard-client-common`)
+	scalaJSUseMainModuleInitializer := true,
+	skip in packageJSDependencies := false,
+	LessKeys.compress in Assets := true,
+	workbenchStartMode := WorkbenchStartModes.Manual,
+	libraryDependencies ++= Seq(
+		Cats,
+		ScalaTest % Test,
+	),
+	jsDependencies ++= Seq(),
+).enablePlugins(ScalaJSPlugin)
+	.dependsOn(`guard-common-js`)
 
 
 //lazy val knact = (project in file("."))
