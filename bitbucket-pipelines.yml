@@ -11,5 +11,6 @@ pipelines:
         script: # Modify the commands below to build your repository.
           - apt-get update
           - apt-get install -y openjfx
+          - curl -sL https://deb.nodesource.com/setup_8.x | bash -
           - apt-get install -y nodejs
           - sbt test
