@@ -1,13 +1,10 @@
 package io.knact.guard.jfx
 
-import com.google.common.io.Resources
+import io.knact.guard.Entity.Node
 
-import scalafx.Includes._
 import scalafx.scene.control._
-import scalafx.scene.layout.VBox
-import scalafx.stage.Stage
+import scalafx.scene.layout.{StackPane, VBox}
 import scalafxml.core.macros.sfxml
-import scalafxml.core.{DependenciesByType, FXMLView}
 
 @sfxml
 class FrameController(root: VBox,
@@ -19,26 +16,11 @@ class FrameController(root: VBox,
 					  groupInNewWindow: CheckMenuItem,
 					  manual: MenuItem,
 					  about: MenuItem,
-					  tabs: TabPane,
-					  stage: Stage,
-					 ) {
+					  sort: SplitMenuButton,
+					  filter: TextField,
+					  nodes: ListView[Node],
+					  nodeStatus: Label,
+					  nodePane: StackPane) {
 
-
-	connectTo.onAction = handle {
-		new TextInputDialog {
-			title = "Server URL"
-			headerText = "Connect to a Knact guard server"
-			contentText = "URL"
-		}.showAndWait().foreach { url =>
-			println(s"url $url")
-			var root = FXMLView(
-				Resources.getResource("Overview.fxml"),
-				new DependenciesByType(Map()))
-			tabs.tabs += new Tab {
-				text = "Foo"
-				content = root
-			}.delegate
-		}
-	}
 
 }
