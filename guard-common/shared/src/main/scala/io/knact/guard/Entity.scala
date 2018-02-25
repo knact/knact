@@ -34,6 +34,9 @@ object Entity {
 							key: Array[Byte]) extends Target
 
 
+	case class ServerStatus(group: Long, nodes: Long, procedures: Long,
+							startTime: ZonedDateTime, samples: Long)
+
 	type TimeSeries[A] = Map[ZonedDateTime, A]
 
 	case class TelemetrySeries(origin: Id[Node], series: TimeSeries[Status])
@@ -75,6 +78,7 @@ object Entity {
 	}
 
 	ensureCodec[Target]
+	ensureCodec[ServerStatus]
 	ensureCodec[LogSeries]
 	ensureCodec[TelemetrySeries]
 	ensureCodec[Group]

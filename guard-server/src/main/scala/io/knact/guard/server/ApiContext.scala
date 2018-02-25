@@ -1,8 +1,12 @@
 package io.knact.guard.server
 
+import java.time.ZonedDateTime
+
 import io.knact.guard.{GroupRepository, NodeRepository, ProcedureRepository}
 
 trait ApiContext {
+
+	def startTime: ZonedDateTime
 
 	def groups: GroupRepository
 	def nodes: NodeRepository

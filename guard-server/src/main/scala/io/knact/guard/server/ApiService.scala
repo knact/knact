@@ -7,7 +7,7 @@ import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.syntax._
 import io.knact.guard
-import io.knact.guard.Entity.{Altered, Failed, Group, Id, Node, Procedure, id => coerce}
+import io.knact.guard.Entity.{Altered, Failed, Group, Id, Node, Procedure, ServerStatus, id => coerce}
 import io.knact.guard._
 import monix.eval.Task
 import org.http4s.{HttpService, _}
@@ -49,6 +49,8 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		repo.delete(coerce(id)) >>= boxAlteration
 
 
+	// GET 	   / 		  :: Stat
+
 	// GET     group          :: Seq[Id]
 	// GET     group/{id}     :: Group
 	// POST    group	      :: Group => Id
@@ -76,6 +78,17 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 
 	implicit def entityDecoderForAllA[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
 		jsonOf[Task, A]
+
+
+	private val statService = HttpService[Task] {
+		case GET -> Root => Ok(Task {
+			for {
+				gs <- groups.list()
+				ns <- nodes.list()
+				ps <- procedures.list()
+			} yield ServerStatus(gs.size, ns.size, ps.size, dependency.startTime, ???).asJson
+		})
+	}
 
 	private val groupService = HttpService[Task] {
 		case GET -> Root / GroupPath                   => list(groups)
@@ -107,6 +120,9 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 	}
 
 
-	lazy val services: HttpService[Task] = groupService <+> procedureService <+> nodeService
+	lazy val services: HttpService[Task] = statService <+>
+										   groupService <+>
+										   procedureService <+>
+										   nodeService
 
 }

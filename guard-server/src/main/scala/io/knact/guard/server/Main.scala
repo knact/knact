@@ -49,7 +49,7 @@ object Main extends StreamApp[Task] with LazyLogging {
 		config match {
 			case Left(e)             => Stream.raiseError(e)
 			case Right(Config(port)) =>
-				val repos = new InMemoryContext()
+				val repos = new InMemoryContext(ZonedDateTime.now())
 				val service = new ApiService(repos)
 
 				def migrate() = for {

@@ -16,7 +16,7 @@ import scala.collection.mutable
 /**
   * An in-memory implementation of all the repositories the API needs
   */
-class InMemoryContext extends ApiContext {
+class InMemoryContext(override val startTime: ZonedDateTime) extends ApiContext {
 
 	private final val idCounter: AtomicLong = new AtomicLong(0)
 
