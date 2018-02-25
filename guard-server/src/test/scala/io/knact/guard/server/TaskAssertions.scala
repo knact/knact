@@ -3,7 +3,6 @@ package io.knact.guard.server
 import cats.FlatMap
 import io.circe.{Decoder, DecodingFailure, Json}
 import monix.eval.Task
-import monix.execution.Scheduler.Implicits.global
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, HttpService, Request, Response}
 import org.http4s.circe._

@@ -2,8 +2,9 @@ package io.knact.sample
 
 import java.util.Random
 
-import io.knact.Basic._
+import cats.implicits._
 import io.knact._
+import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import monix.reactive.Observable
 
@@ -12,26 +13,21 @@ import scala.language.postfixOps
 
 object WatchdogSample extends App {
 
+	implicit val stringInstance: Connectable[String, Unit] = _ => Task.unit
 
-	val ok = Command[ConsoleNode, String] { _ =>
-		Thread.sleep(new Random().nextInt(2000))
-		Result.success("ok")
-	}
-
-	val subjects: Observable[Set[Subject[Address, Credential]]] =
+	val subjects: Observable[Set[String]] =
 		Observable.interval(10 seconds)
 			.map { v => v + 5 }
 			.map { v => v % 10 }
 			.dump("Nodes")
-			.map { v =>
-				List.tabulate(v.toInt) { i =>
-					Subject(NetAddress.LocalHost(22), PasswordCredential(s"u$i=$v", ""))
-				}.toSet
-			}
+			.map { v => List.tabulate(v.toInt) { i => s"u$i=$v" }.toSet }
 
-	val watchdog = new Watchdog[Address, Credential, ConsoleNode](
-		subjects = subjects,
-		transport = (_: Subject[Address, Credential]) => (_: String) => ???)
+	val watchdog = new Watchdog[String, Unit](subjects)
+
+	val ok = Command[Unit, String] { _ =>
+		Thread.sleep(new Random().nextInt(2000))
+		Result.success("ok")
+	}
 
 	watchdog
 		.dispatchRepeated(1 second, ok)

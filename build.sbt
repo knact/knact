@@ -63,7 +63,7 @@ lazy val `guard-common-jvm` = project.in(file("guard-common/jvm"))
 lazy val `guard-server` = project.settings(
 	commonSettings,
 	libraryDependencies ++= http4sServer ++ Seq(
-		Logback,
+		ScalaLogging, Logback,
 		ScalaTest % Test)
 ).dependsOn(
 	`guard-common-jvm`,

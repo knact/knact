@@ -18,7 +18,7 @@ class envSpec extends FlatSpec with Matchers with EitherValues {
 			  |A1=2
 			  |_=A=B=C
 			""".stripMargin
-		val mock = MockShell.mkMockedShell(Source.fromString(kvm))
+		val mock = MockShell.alwaysRespondWith(Source.fromString(kvm))
 		env.command.run(mock).right.value shouldBe Map(
 			"A" -> "B",
 			"B" -> "C",
@@ -29,7 +29,7 @@ class envSpec extends FlatSpec with Matchers with EitherValues {
 	}
 
 	it should "parse sample corpus" in {
-		val mock = MockShell.mkMockedShell(Source.fromResource("env1.txt"))
+		val mock = MockShell.alwaysRespondWith(Source.fromResource("env1.txt"))
 		val value = env.command.run(mock)
 		value.right.value.size shouldBe 53
 	}

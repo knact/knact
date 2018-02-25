@@ -30,7 +30,7 @@ object Telemetry {
 	sealed trait Status
 	case object Offline extends Status
 	case object Timeout extends Status
-	case object NoData extends Status
+	case class Error(error: String) extends Status
 	case class Online(state: Verdict, reason: Option[String], telemetry: Telemetry) extends Status
 
 	ensureCodec[Telemetry]

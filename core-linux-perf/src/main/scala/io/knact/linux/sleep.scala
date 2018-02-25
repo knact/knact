@@ -2,7 +2,7 @@ package io.knact.linux
 
 
 import io.knact.Basic.ConsoleNode
-import io.knact.Command
+import io.knact.{Command, Result}
 import net.sf.expectit.matcher.Matchers
 
 
@@ -12,7 +12,7 @@ object sleep {
 		ms =>
 			Command[ConsoleNode, Unit] { implicit n =>
 				mkExpect(n.exec(s"sleep $ms")).expect(Matchers.eof())
-				Right(())
+				Result.success(())
 			}
 	}
 

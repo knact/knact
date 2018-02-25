@@ -9,6 +9,7 @@ import io.circe._
 import io.knact.guard.Entity._
 import io.knact.guard.Telemetry.Status
 import monix.eval.Task
+import monix.reactive.Observable
 import shapeless.tag
 import shapeless.tag.@@
 
@@ -67,6 +68,7 @@ package object guard {
 	trait GroupRepository extends Repository[Group, Task] {}
 	trait ProcedureRepository extends Repository[Procedure, Task] {}
 	trait NodeRepository extends Repository[Entity.Node, Task] {
+		def observable : Observable[Vector[Id[Entity.Node]]]
 		def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]]
 		def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]]
 		def execute(nid: Id[Entity.Node])(pid: Id[Procedure]): Task[Failure | String]

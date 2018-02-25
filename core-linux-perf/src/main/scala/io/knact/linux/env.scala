@@ -2,7 +2,7 @@ package io.knact.linux
 
 import fastparse.core.Parsed.{Failure, Success}
 import io.knact.Basic.ConsoleNode
-import io.knact.Command
+import io.knact.{Command, Result}
 
 object env {
 
@@ -17,8 +17,8 @@ object env {
 	final val command = Command[ConsoleNode, Map[String, String]] { implicit n =>
 		val str = sendAndReadUntilEOF("env")
 		parser.parse(str) match {
-			case Success(ts, _)     => Right(ts.toMap)
-			case f@Failure(_, _, _) => Left(f.msg)
+			case Success(ts, _)     => Result.success(ts.toMap)
+			case f@Failure(_, _, _) => Result.failure(f.msg)
 		}
 	}
 

@@ -6,9 +6,10 @@ import java.nio.charset.{Charset, StandardCharsets}
 import java.security.{KeyPair, KeyPairGenerator}
 import java.time.{OffsetDateTime, ZonedDateTime}
 
-import io.knact.Basic.{ConsoleNode, NetAddress, PasswordCredential}
-import io.knact.{Command, Subject}
-import io.knact.ssh.{PassphraseCredential, PublicKeyCredential, SshTransport}
+import io.knact.Basic.ConsoleNode
+import io.knact.Command
+import io.knact.ssh.{PasswordCredential, PublicKeyCredential}
+import io.knact.ssh._
 import monix.reactive.Observable
 import net.sf.expectit.{Expect, ExpectBuilder, Result}
 import org.apache.sshd.common.Factory
@@ -27,7 +28,10 @@ import net.sf.expectit.interact.Action
 import cats._
 import cats.implicits._
 import io.knact
+import monix.eval.Task
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 import scala.sys.process.BasicIO
 
 
@@ -50,14 +54,10 @@ class SshTransportSpec extends FlatSpec with Matchers {
 	// TODO still has ??? sprinkled throughout the impl
 	ignore should "work" in {
 
-		val transport = new SshTransport()
-		val node = transport.connect(subject = Subject(
-			address = NetAddress.LocalHost(Port),
-			credential = PassphraseCredential(
-				username = "",
-				passphrase = "",
-				pk.getPublic
-			)))
+		val s = sshInstance(new SshAuth[Unit] {
+			override def address(a: Unit): SshAddress = SshAddress(InetAddress.getLocalHost, Port)
+			override def credential(a: Unit): SshCredential = PasswordCredential("", "", pk.getPublic)
+		})
 
 
 		val echo = { s: String =>
@@ -77,8 +77,10 @@ class SshTransportSpec extends FlatSpec with Matchers {
 			b <- echo("b")
 		} yield a + b
 
-		val value: knact.Result[String] = ab.run(node)
-		value should === ("ab")
+		Await.result((for {
+			n <- s.connect(())
+			r <- Task {ab.run(n)}
+		} yield r).runAsync, Duration.Inf) should be("ab")
 
 	}
 
