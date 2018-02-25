@@ -34,8 +34,9 @@ object Entity {
 							key: Array[Byte]) extends Target
 
 
-	case class ServerStatus(group: Long, nodes: Long, procedures: Long,
-							startTime: ZonedDateTime, samples: Long)
+	case class ServerStatus(version: String,
+							group: Long, nodes: Long, procedures: Long,
+							startTime: ZonedDateTime)
 
 	type TimeSeries[A] = Map[ZonedDateTime, A]
 

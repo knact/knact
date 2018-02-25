@@ -26,9 +26,6 @@ import scala.util.Try
 object Main extends StreamApp[Task] with LazyLogging {
 
 
-
-
-
 	case class Config(port: Int)
 
 	implicit val targetSshAuthInstance: SshAuth[Node] = new SshAuth[Node] {
@@ -49,7 +46,10 @@ object Main extends StreamApp[Task] with LazyLogging {
 		config match {
 			case Left(e)             => Stream.raiseError(e)
 			case Right(Config(port)) =>
-				val repos = new InMemoryContext(ZonedDateTime.now())
+				val repos = new InMemoryContext(
+					version = "0.0.1",
+					startTime = ZonedDateTime.now())
+
 				val service = new ApiService(repos)
 
 				def migrate() = for {

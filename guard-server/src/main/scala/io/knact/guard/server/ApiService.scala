@@ -1,5 +1,7 @@
 package io.knact.guard.server
 
+import java.time.{Instant, LocalDateTime, ZoneOffset, ZonedDateTime}
+
 import cats.data.EitherT
 import cats.implicits._
 import io.circe.{Json, _}
@@ -49,7 +51,7 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		repo.delete(coerce(id)) >>= boxAlteration
 
 
-	// GET 	   / 		  :: Stat
+	// GET 	   / 		      :: Stat
 
 	// GET     group          :: Seq[Id]
 	// GET     group/{id}     :: Group
@@ -57,7 +59,7 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 	// POST    group/{id}	  :: Group => Id
 	// DELETE  group/{id}     :: Id
 
-	// GET     group/node/        :: Seq[Id]
+	// GET     group/node/        :: Seq[Id]full
 	// GET     group/node/{id}    :: Node
 	// POST    group/node/        :: Node => Id
 	// POST    group/node/{id}    :: Node => Id
@@ -80,16 +82,21 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		jsonOf[Task, A]
 
 
+	/*_*/
 	private val statService = HttpService[Task] {
 		case GET -> Root => Ok(Task {
 			for {
 				gs <- groups.list()
 				ns <- nodes.list()
 				ps <- procedures.list()
-			} yield ServerStatus(gs.size, ns.size, ps.size, dependency.startTime, ???).asJson
+			} yield ServerStatus(version,
+				gs.size, ns.size, ps.size,
+				dependency.startTime).asJson
 		})
 	}
+	/*_*/
 
+	/*_*/
 	private val groupService = HttpService[Task] {
 		case GET -> Root / GroupPath                   => list(groups)
 		case GET -> Root / GroupPath / IntVar(id)      => find(groups, id)
@@ -97,7 +104,9 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		case req@POST -> Root / GroupPath / IntVar(id) => update(groups, req, id)
 		case DELETE -> Root / GroupPath / IntVar(id)   => delete(groups, id)
 	}
+	/*_*/
 
+	/*_*/
 	private val procedureService = HttpService[Task] {
 		case GET -> Root / ProcedurePath                   => list(procedures)
 		case GET -> Root / ProcedurePath / IntVar(id)      => find(procedures, id)
@@ -107,7 +116,16 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 
 		// TODO telemetry and log endpoints
 	}
+	/*_*/
 
+
+	implicit val zdtQueryParamDecoder: QueryParamDecoder[ZonedDateTime] = QueryParamDecoder[Long]
+		.map { epoch => ZonedDateTime.ofInstant(Instant.ofEpochMilli(epoch), ZoneOffset.UTC) }
+
+	object StartVar extends OptionalQueryParamDecoderMatcher[ZonedDateTime]("start")
+	object EndVar extends OptionalQueryParamDecoderMatcher[ZonedDateTime]("end")
+
+	/*_*/
 	private val nodeService = HttpService[Task] {
 		case GET -> Root / NodePath                   => list(nodes)
 		case GET -> Root / NodePath / IntVar(id)      => find(nodes, id)
@@ -115,14 +133,25 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		case req@POST -> Root / NodePath / IntVar(id) => update(nodes, req, id)
 		case DELETE -> Root / NodePath / IntVar(id)   => delete(nodes, id)
 
-		// TODO code CRUD
-
+		case GET -> Root / NodePath / IntVar(id) / "telemetry" :? StartVar(s) +& EndVar(e)  =>
+			nodes.telemetries(coerce(id))(Bound(s, e)).flatMap {
+				case None    => NotFound()
+				case Some(x) => Ok(x.asJson)
+			}
+		case GET -> Root / NodePath / IntVar(id) / "log" / path :? StartVar(s) +& EndVar(e) =>
+			nodes.logs(coerce(id))(path)(Bound(s, e)).flatMap {
+				case None    => NotFound()
+				case Some(x) => Ok(x.asJson)
+			}
 	}
+	/*_*/
 
 
+	/*_*/
 	lazy val services: HttpService[Task] = statService <+>
 										   groupService <+>
 										   procedureService <+>
 										   nodeService
+	/*_*/
 
 }

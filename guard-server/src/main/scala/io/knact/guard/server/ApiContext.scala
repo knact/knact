@@ -6,6 +6,7 @@ import io.knact.guard.{GroupRepository, NodeRepository, ProcedureRepository}
 
 trait ApiContext {
 
+	def version: String
 	def startTime: ZonedDateTime
 
 	def groups: GroupRepository
