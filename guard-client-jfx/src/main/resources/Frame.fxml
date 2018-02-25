@@ -2,15 +2,11 @@
 
 <?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitMenuButton?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -43,31 +39,11 @@
         </Menu>
       </menus>
     </MenuBar>
-      <SplitPane dividerPositions="0.28" VBox.vgrow="ALWAYS">
-         <items>
-            <VBox SplitPane.resizableWithParent="false">
-               <children>
-                  <ToolBar prefHeight="40.0" prefWidth="200.0">
-                    <items>
-                        <SplitMenuButton fx:id="sort" mnemonicParsing="false" text="Sort">
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="Action 1" />
-                            <MenuItem mnemonicParsing="false" text="Action 2" />
-                          </items>
-                        </SplitMenuButton>
-                        <TextField fx:id="filter" />
-                    </items>
-                  </ToolBar>
-                  <ListView fx:id="nodes" VBox.vgrow="ALWAYS" />
-                  <ToolBar prefHeight="40.0" prefWidth="200.0">
-                    <items>
-                        <Label fx:id="nodeStatus" text="Connected" />
-                    </items>
-                  </ToolBar>
-               </children>
-            </VBox>
-            <StackPane fx:id="nodePane" />
-         </items>
-      </SplitPane>
+      <StackPane VBox.vgrow="ALWAYS">
+         <children>
+            <Label text="Connect to a serve:File | Connect to server" />
+            <TabPane fx:id="tabs" tabClosingPolicy="ALL_TABS" />
+         </children>
+      </StackPane>
   </children>
 </VBox>
