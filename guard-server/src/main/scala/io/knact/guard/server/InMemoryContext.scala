@@ -3,12 +3,14 @@ package io.knact.guard.server
 import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicLong
 
+import cats.implicits._
 import io.knact.guard.Entity._
 import io.knact.guard.Telemetry.{Online, Verdict}
 import io.knact.guard.server.InMemoryContext.MapBackedRepository
 import io.knact.guard.{Bound, Entity, Failure, GroupRepository, Line, NodeRepository, Path, ProcedureRepository, Repository, Telemetry, |}
 import monix.eval.Task
-
+import monix.reactive.Observable
+import monix.reactive.subjects.ConcurrentSubject
 import scala.collection.mutable
 
 /**
@@ -51,6 +53,7 @@ class InMemoryContext extends ApiContext {
 		override def counter: AtomicLong = idCounter
 		override def entityName: String = "Node"
 		override def extract: NodeEntry => Node = { entry =>
+
 			// fold through the summary, discarding(fusing) points that have the same status
 			// comparing to the previous point
 			val summarised = entry.telemetries.series
@@ -77,6 +80,13 @@ class InMemoryContext extends ApiContext {
 			case Some(value) => Right(value.copy(node = node))
 			case None        => Right(NodeEntry(node, TelemetrySeries(node.id, Map()), Map()))
 		}
+
+
+		private val ids = ConcurrentSubject.replay[Vector[Id[Node]]](Seq())
+
+
+		override def observable: Observable[Vector[Id[Node]]] = ids.distinctUntilChanged
+
 
 		private def filterSeries[A](bound: Bound, s: TimeSeries[A]) = {
 			bound match {
@@ -137,6 +147,23 @@ class InMemoryContext extends ApiContext {
 			}
 			op.map { _ => nid }.toRight(notFound(nid))
 		}
+		def notifyIdsChanged[A](task: Task[Failure | A]): Task[Failure | A] = {
+			for {
+				v <- task
+				_ <- Task.defer {
+					v match {
+						case Left(_)  => Task.unit
+						case Right(_) => list().map { ls => ids.onNext(ls.toVector); () }
+					}
+				}
+			} yield v
+		}
+		override def insert(a: Node): Task[Failure | Id[Node]] =
+			notifyIdsChanged(super.insert(a))
+		override def delete(id: Id[Node]): Task[Failure | Id[Node]] =
+			notifyIdsChanged(super.delete(id))
+		override def update(id: Id[Node], f: Node => Node): Task[Failure | Id[Node]] =
+			notifyIdsChanged(super.update(id, f))
 	}
 
 }

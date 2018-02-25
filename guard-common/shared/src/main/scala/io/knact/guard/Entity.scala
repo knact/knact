@@ -2,6 +2,7 @@ package io.knact.guard
 
 import java.time.{Duration, ZonedDateTime}
 
+import cats.Eq
 import shapeless.tag
 import shapeless.tag.@@
 import io.circe.java8.time._
@@ -19,6 +20,8 @@ object Entity {
 	// refined id
 	type Id[A] = Long @@ A
 
+	implicit def idEq[A]: Eq[Id[A]] = _ == _
+
 	def id[T, B](id: B)(implicit ev: Numeric[B]): Id[T] = tag[T][Long](ev.toLong(id))
 
 	sealed trait Target {
@@ -27,8 +30,9 @@ object Entity {
 	}
 	case class SshPasswordTarget(host: String, port: Int,
 								 username: String, password: String) extends Target
-	case class SshKeyTarget(host: String, port: Int,
+	case class SshKeyTarget(host: String, port: Int, username: String,
 							key: Array[Byte]) extends Target
+
 
 	type TimeSeries[A] = Map[ZonedDateTime, A]
 

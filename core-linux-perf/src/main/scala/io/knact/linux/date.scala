@@ -12,7 +12,7 @@ object date {
 	final val command = Command[ConsoleNode, ZonedDateTime] { implicit n =>
 		Try {
 			OffsetDateTime.parse(sendAndReadUntilEOF("date --iso-8601=second").trim).toZonedDateTime
-		}.toEither.left.map(_.getMessage)
+		}.toEither
 	}
 
 }
