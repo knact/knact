@@ -65,10 +65,13 @@ package object guard {
 		def insert(a: A): F[Failure | Id[A]]
 		def update(id: Id[A], f: A => A): F[Failure | Id[A]]
 	}
-	trait GroupRepository extends Repository[Group, Task] {}
 	trait ProcedureRepository extends Repository[Procedure, Task] {}
 	trait NodeRepository extends Repository[Entity.Node, Task] {
-		def observable : Observable[Vector[Id[Entity.Node]]]
+
+		def poolDelta: Observable[Vector[Id[Entity.Node]]]
+		def telemetryDelta: Observable[Id[Entity.Node]]
+		def logDelta: Observable[Id[Entity.Node]]
+
 		def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]]
 		def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]]
 		def execute(nid: Id[Entity.Node])(pid: Id[Procedure]): Task[Failure | String]
@@ -83,7 +86,6 @@ package object guard {
 	}
 
 
-	final val GroupPath     = "group"
 	final val ProcedurePath = "procedure"
 	final val NodePath      = "node"
 
@@ -98,14 +100,14 @@ package object guard {
 	implicit val remoteResultInstance: Monad[RemoteResult] = new Monad[RemoteResult] {
 		override def pure[A](x: A): RemoteResult[A] = Found(x)
 		override def flatMap[A, B](fa: RemoteResult[A])(f: A => RemoteResult[B]): RemoteResult[B] = fa match {
-			case Found(a)   => f(a)
-				// TODO this is trivially true, but can we do better?
+			case Found(a) => f(a)
+			// TODO this is trivially true, but can we do better?
 			case v => v.asInstanceOf[RemoteResult[B]]
 		}
 		@tailrec
 		override def tailRecM[A, B](a: A)(f: A => RemoteResult[Either[A, B]]): RemoteResult[B] = f(a) match {
 			// TODO this is trivially true, but can we do better?
-			case v => v.asInstanceOf[RemoteResult[B]]
+			case v               => v.asInstanceOf[RemoteResult[B]]
 			case Found(Left(x))  => tailRecM(x)(f)
 			case Found(Right(x)) => Found(x)
 		}

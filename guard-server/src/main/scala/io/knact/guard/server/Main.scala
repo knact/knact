@@ -16,6 +16,10 @@ import monix.eval.Task
 import io.knact.guard.server.scheduler
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
+
+import scala.concurrent.duration
+import scala.concurrent.duration.Duration.Infinite
+import scala.concurrent.duration._
 //import monix.execution.Scheduler.Implicits.global
 import monix.reactive.Observable
 import org.http4s.server.blaze._
@@ -26,7 +30,7 @@ import scala.util.Try
 object Main extends StreamApp[Task] with LazyLogging {
 
 
-	case class Config(port: Int)
+	case class Config(port: Int, eventInterval: FiniteDuration)
 
 	implicit val targetSshAuthInstance: SshAuth[Node] = new SshAuth[Node] {
 		override def address(a: Node): SshAddress = SshAddress(InetAddress.getByName(a.target.host), a.target.port)
@@ -37,27 +41,32 @@ object Main extends StreamApp[Task] with LazyLogging {
 	}
 
 	override def stream(args: List[String], requestShutdown: Task[Unit]): Stream[Task, ExitCode] = {
-
 		val config = for {
 			// TODO other parameters
 			port <- Try {sys.env.getOrElse("port", "8080").toInt}.toEither
-		} yield Config(port)
+			eventInterval <- Try {
+				Duration(sys.env.getOrElse("eventInterval", "1s")) match {
+					case d: Infinite       =>
+						throw new IllegalArgumentException(s"Infinite duration $d is unsupported")
+					case d: FiniteDuration => d
+				}
+			}.toEither
+		} yield Config(port, eventInterval)
 
 		config match {
 			case Left(e)             => Stream.raiseError(e)
-			case Right(Config(port)) =>
+			case Right(config @ Config(port, _)) =>
 				val repos = new InMemoryContext(
 					version = "0.0.1",
 					startTime = ZonedDateTime.now())
 
-				val service = new ApiService(repos)
+				val service = new ApiService(repos, config)
 
 				def migrate() = for {
 					// TODO do actual migration and not just dummy data
 					_ <- Task {logger.info("Migration started")}
-					a <- repos.groups.insert(Group(id(1), "b", Nil))
-					n <- repos.nodes.insert(Node(id(1), a.right.get, SshKeyTarget("1", 22, "foo", Array(42)), "a"))
-					_ <- repos.nodes.insert(Node(id(1), a.right.get, SshKeyTarget("2", 22, "bar", Array(42)), "a"))
+					n <- repos.nodes.insert(Node(id(1), SshKeyTarget("1", 22, "foo", Array(42)), "a"))
+					_ <- repos.nodes.insert(Node(id(1), SshKeyTarget("2", 22, "bar", Array(42)), "a"))
 					_ <- repos.nodes.persist(n.right.get, ZonedDateTime.now(), Offline)
 					_ <- Task {logger.info("Migration completed")}
 				} yield ()
@@ -65,7 +74,7 @@ object Main extends StreamApp[Task] with LazyLogging {
 				def setupWatchdog() = Task {
 
 					val ts: Observable[Set[Node]] =
-						service.nodes.observable.flatMap { ns =>
+						service.nodes.poolDelta.flatMap { ns =>
 							Observable.fromTask(Task.traverse(ns)(service.nodes.find))
 						}.map {_.flatten.toSet}
 

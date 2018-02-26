@@ -6,7 +6,7 @@ import io.circe._
 import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.{Decoder, Encoder, Json, _}
-import io.knact.guard.Entity.{Group, Id, LogSeries, Node, Outcome, Procedure, TelemetrySeries}
+import io.knact.guard.Entity.{Id, LogSeries, Node, Outcome, Procedure, TelemetrySeries}
 import io.knact.guard.Service.{send}
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
@@ -26,12 +26,6 @@ class Service(val baseUri: Uri) {
 	// for Node -> TelemetrySeries | LogSeries or in prodecure(potentially)
 	implicit def entityDecoderForAllA[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
 		jsonOf[Task, A]
-
-	def groups(): EntityService[Group] = new Http4sEntityService[Group] {
-		override def path: Uri = baseUri / GroupPath
-		override protected[this] implicit val decoder: Decoder[Group] = implicitly
-		override protected[this] implicit val encoder: Encoder[Group] = implicitly
-	}
 
 	def procedures(): EntityService[Procedure] = new Http4sEntityService[Procedure] {
 		override def path: Uri = baseUri / ProcedurePath

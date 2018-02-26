@@ -1,59 +1,73 @@
 package io.knact.guard.server
 
+import java.time.ZonedDateTime
+
 import io.circe._
 import io.knact.guard.Entity
 import io.knact.guard.Entity._
 import io.knact.guard.server.TaskAssertions.SyncContext
 import monix.eval.Task
 import org.scalatest.{EitherValues, FlatSpec, Matchers}
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 
-	behavior of "GroupRepository"
+	behavior of "NodeRepository"
 
-	it should "insert with incremented id" in SyncContext {
-		val imr = new InMemoryContext()
-		val group = Group(id(42), "foo", Nil)
-		for {
-			a <- imr.groups.insert(group)
-			b <- imr.groups.insert(group)
-		} yield {
-			a.right.value shouldBe id(0)
-			b.right.value shouldBe id(1)
+	private def mkContext(): InMemoryContext = new InMemoryContext("0.0.1", ZonedDateTime.now())
+
+	forAll(Table("repo",
+		() => new InMemoryContext("0.0.1", ZonedDateTime.now()): ApiContext
+	)) { f =>
+
+		val target = SshPasswordTarget("a", 42, "a", "a")
+
+		it should "insert with incremented id" in SyncContext {
+			val ctx = f()
+			val node = Node(id(42), target, "foo")
+			for {
+				a <- ctx.nodes.insert(node)
+				b <- ctx.nodes.insert(node)
+			} yield {
+				a.right.value shouldBe id(0)
+				b.right.value shouldBe id(1)
+			}
 		}
-	}
 
-	it should "find inserted items" in SyncContext {
-		val imr = new InMemoryContext()
-		for {
-			id <- imr.groups.insert(Group(id(42), "foo", Nil))
-			found <- imr.groups.find(id.right.value)
-		} yield found contains Group(Entity.id(0), "foo", Nil)
-	}
+		it should "find inserted items" in SyncContext {
+			val ctx = f()
+			for {
+				id <- ctx.nodes.insert(Node(id(42), target, "foo"))
+				found <- ctx.nodes.find(id.right.value)
+			} yield found contains Node(Entity.id(0), target, "foo")
+		}
 
-	it should "insert discards id and relations" in SyncContext {
-		val imr = new InMemoryContext()
-		for {
-			id <- imr.groups.insert(Group(id(42), "bar", Seq(id(42), id(43))))
-			found <- imr.groups.find(id.right.value)
-		} yield found contains Group(Entity.id(0), "bar", Nil)
-	}
+		it should "insert discards id and relations" in SyncContext {
+			val ctx = f()
+			for {
+				id <- ctx.nodes.insert(Node(id(42), target, "bar", Map(), Map()))
+				found <- ctx.nodes.find(id.right.value)
+			} yield found contains Node(Entity.id(0), target, "bar")
+		}
 
-	it should "list all ids in insert order" in SyncContext {
-		val imr = new InMemoryContext()
-		val groups = List.fill(10) {Group(id(42), "foo", Nil)}
-		for {
-			ids <- Task.traverse(groups) {imr.groups.insert}
-			gs <- imr.groups.list()
-		} yield gs should contain theSameElementsInOrderAs ids.map {_.right.value}
-	}
+		it should "list all ids in insert order" in SyncContext {
+			val ctx = f()
+			val nodes = List.fill(10) {Node(id(42), target, "foo")}
+			for {
+				ids <- Task.traverse(nodes) {ctx.nodes.insert}
+				gs <- ctx.nodes.list()
+			} yield gs should contain theSameElementsInOrderAs ids.map {_.right.value}
+		}
 
-	it should "update" in {
-		// TODO write me
-	}
+		it should "update" in {
+			val ctx = f()
+			// TODO write me
+		}
 
-	it should "delete" in {
-		// TODO write me
+		it should "delete" in {
+			val ctx = f()
+			// TODO write me
+		}
 	}
 
 

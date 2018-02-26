@@ -35,7 +35,7 @@ object Entity {
 
 
 	case class ServerStatus(version: String,
-							group: Long, nodes: Long, procedures: Long,
+							nodes: Int, procedures: Int,
 							startTime: ZonedDateTime)
 
 	type TimeSeries[A] = Map[ZonedDateTime, A]
@@ -45,7 +45,6 @@ object Entity {
 
 
 	case class Node(id: Id[Node],
-					group: Id[Group],
 					target: Target,
 					remark: String,
 					telemetries: TimeSeries[Option[Verdict]] = Map(),
@@ -63,12 +62,9 @@ object Entity {
 		override def withId(a: Procedure, that: Id[Procedure]): Procedure = a.copy(id = that)
 	}
 
-	case class Group(id: Id[Group],
-					 name: String,
-					 nodes: Seq[Id[Node]],
-					) extends Entity[Group] {
-		override def withId(a: Group, that: Id[Group]): Group = a.copy(id = that)
-	}
+	sealed trait Event
+	case class PoolChanged(ns: Vector[Id[Node]]) extends Event
+	case class NodeUpdated(ns: Vector[Id[Node]]) extends Event
 
 	sealed trait Outcome[+A]
 	case class Altered[A](altered: Id[A]) extends Outcome[A]
@@ -79,10 +75,10 @@ object Entity {
 	}
 
 	ensureCodec[Target]
+	ensureCodec[Event]
 	ensureCodec[ServerStatus]
 	ensureCodec[LogSeries]
 	ensureCodec[TelemetrySeries]
-	ensureCodec[Group]
 	ensureCodec[Node]
 	ensureCodec[Procedure]
 

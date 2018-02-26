@@ -7,10 +7,11 @@ import cats.implicits._
 import io.knact.guard.Entity._
 import io.knact.guard.Telemetry.{Online, Verdict}
 import io.knact.guard.server.InMemoryContext.MapBackedRepository
-import io.knact.guard.{Bound, Entity, Failure, GroupRepository, Line, NodeRepository, Path, ProcedureRepository, Repository, Telemetry, |}
+import io.knact.guard.{Bound, Entity, Failure, Line, NodeRepository, Path, ProcedureRepository, Repository, Telemetry, |}
 import monix.eval.Task
 import monix.reactive.Observable
 import monix.reactive.subjects.ConcurrentSubject
+
 import scala.collection.mutable
 
 /**
@@ -21,22 +22,10 @@ class InMemoryContext(override val version: String,
 
 	private final val idCounter: AtomicLong = new AtomicLong(0)
 
-	private val groupStore    : mutable.Map[Id[Group], Group]         = mutable.LinkedHashMap()
 	private val nodeStore     : mutable.Map[Id[Node], NodeEntry]      = mutable.LinkedHashMap()
 	private val procedureStore: mutable.Map[Id[Procedure], Procedure] = mutable.LinkedHashMap()
 
-	val groups    : GroupRepository     = new GroupRepository
-		with MapBackedRepository[Group, Group] {
-		override val buffer: mutable.Map[Id[Group], Group] = groupStore
-		override def counter: AtomicLong = idCounter
-		override def entityName: String = "Group"
-		override def extract: Group => Group = g => g.copy(
-			nodes = nodeStore.values.map {_.node}.filter {_.group == g.id}.map {_.id}.toSeq,
-		)
-		override def resolve: Group => (Failure | Group) = x =>
-			Right(x.copy(nodes = Nil)) // XXX can't update relations like this
 
-	}
 	val procedures: ProcedureRepository = new ProcedureRepository
 		with MapBackedRepository[Procedure, Procedure] {
 		override val buffer: mutable.Map[Id[Procedure], Procedure] = procedureStore
@@ -82,11 +71,14 @@ class InMemoryContext(override val version: String,
 			case None        => Right(NodeEntry(node, TelemetrySeries(node.id, Map()), Map()))
 		}
 
+		private val poolSubject      = ConcurrentSubject.publish[Vector[Id[Node]]](scheduler)
+		private val telemetrySubject = ConcurrentSubject.publish[Id[Node]](scheduler)
+		private val logSubject       = ConcurrentSubject.publish[Id[Node]](scheduler)
 
-		private val ids = ConcurrentSubject.replay[Vector[Id[Node]]](Seq())
 
-
-		override def observable: Observable[Vector[Id[Node]]] = ids.distinctUntilChanged
+		override def poolDelta: Observable[Vector[Id[Node]]] = poolSubject.distinctUntilChanged
+		override def telemetryDelta: Observable[Id[Node]] = telemetrySubject
+		override def logDelta: Observable[Id[Node]] = logSubject
 
 
 		private def filterSeries[A](bound: Bound, s: TimeSeries[A]) = {
@@ -129,6 +121,7 @@ class InMemoryContext(override val version: String,
 				val appended = x.telemetries.series + (time -> status)
 				buffer.update(nid, x.copy(
 					telemetries = x.telemetries.copy(series = appended)))
+				telemetrySubject.onNext(nid)
 			}
 			op.map { _ => nid }.toRight(notFound(nid))
 		}
@@ -145,26 +138,29 @@ class InMemoryContext(override val version: String,
 					case None     => LogSeries(nid, Map(time -> lines))
 				}
 				buffer.update(nid, x.copy(logs = x.logs.updated(path, updated)))
+				logSubject.onNext(nid)
 			}
 			op.map { _ => nid }.toRight(notFound(nid))
 		}
-		def notifyIdsChanged[A](task: Task[Failure | A]): Task[Failure | A] = {
+
+
+		def notifyPoolChanged[A](task: Task[Failure | A]): Task[Failure | A] = {
 			for {
 				v <- task
 				_ <- Task.defer {
 					v match {
 						case Left(_)  => Task.unit
-						case Right(_) => list().map { ls => ids.onNext(ls.toVector); () }
+						case Right(_) => list().map { ls => poolSubject.onNext(ls.toVector); () }
 					}
 				}
 			} yield v
 		}
 		override def insert(a: Node): Task[Failure | Id[Node]] =
-			notifyIdsChanged(super.insert(a))
+			notifyPoolChanged(super.insert(a))
 		override def delete(id: Id[Node]): Task[Failure | Id[Node]] =
-			notifyIdsChanged(super.delete(id))
+			notifyPoolChanged(super.delete(id))
 		override def update(id: Id[Node], f: Node => Node): Task[Failure | Id[Node]] =
-			notifyIdsChanged(super.update(id, f))
+			notifyPoolChanged(super.update(id, f))
 	}
 
 }

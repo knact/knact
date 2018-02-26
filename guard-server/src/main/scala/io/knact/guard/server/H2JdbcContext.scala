@@ -9,7 +9,6 @@ class H2JdbcContext(override val version: String,
 
 	// TODO write me
 
-	override def groups: GroupRepository = ???
 	override def nodes: NodeRepository = ???
 	override def procedures: ProcedureRepository = ???
 

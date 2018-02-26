@@ -4,24 +4,27 @@ import java.time.{Instant, LocalDateTime, ZoneOffset, ZonedDateTime}
 
 import cats.data.EitherT
 import cats.implicits._
+import com.google.common.base.Ascii
+import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Json, _}
 import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.syntax._
 import io.knact.guard
-import io.knact.guard.Entity.{Altered, Failed, Group, Id, Node, Procedure, ServerStatus, id => coerce}
+import io.knact.guard.Entity.{Altered, Failed, Id, Node, NodeUpdated, PoolChanged, Procedure, ServerStatus, id => coerce}
 import io.knact.guard._
+import io.knact.guard.server.Main.Config
 import monix.eval.Task
+import monix.reactive.Observable
 import org.http4s.{HttpService, _}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 
 
-class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
+class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] with LazyLogging {
 
-	val (groups, nodes, procedures) = dependency.repos
+	val (nodes, procedures) = context.repos
 
-	import io.knact.guard.Service._
 
 	private def boxAlteration[A](x: Either[String, Id[A]]): Task[Response[Task]] = x match {
 		case Right(id)   => Ok(Altered(id).asJson)
@@ -53,12 +56,6 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 
 	// GET 	   / 		      :: Stat
 
-	// GET     group          :: Seq[Id]
-	// GET     group/{id}     :: Group
-	// POST    group	      :: Group => Id
-	// POST    group/{id}	  :: Group => Id
-	// DELETE  group/{id}     :: Id
-
 	// GET     group/node/        :: Seq[Id]full
 	// GET     group/node/{id}    :: Node
 	// POST    group/node/        :: Node => Id
@@ -76,33 +73,22 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 	// DELETE  procedure/{id}       :: EntityId
 	// POST    procedure/{id}/exec
 
-	import io.knact.guard.{NodePath, GroupPath, ProcedurePath}
+	import io.knact.guard.{NodePath, ProcedurePath}
 
 	implicit def entityDecoderForAllA[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
 		jsonOf[Task, A]
 
-
 	/*_*/
 	private val statService = HttpService[Task] {
-		case GET -> Root => Ok(Task {
+		case GET -> Root => Ok(
 			for {
-				gs <- groups.list()
 				ns <- nodes.list()
 				ps <- procedures.list()
-			} yield ServerStatus(version,
-				gs.size, ns.size, ps.size,
-				dependency.startTime).asJson
-		})
-	}
-	/*_*/
-
-	/*_*/
-	private val groupService = HttpService[Task] {
-		case GET -> Root / GroupPath                   => list(groups)
-		case GET -> Root / GroupPath / IntVar(id)      => find(groups, id)
-		case req@POST -> Root / GroupPath              => insert(groups, req)
-		case req@POST -> Root / GroupPath / IntVar(id) => update(groups, req, id)
-		case DELETE -> Root / GroupPath / IntVar(id)   => delete(groups, id)
+			} yield ServerStatus(
+				version = context.version,
+				nodes = ns.size, procedures = ps.size,
+				startTime = context.startTime).asJson
+		)
 	}
 	/*_*/
 
@@ -143,13 +129,38 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 				case None    => NotFound()
 				case Some(x) => Ok(x.asJson)
 			}
+		case GET -> Root / NodePath / "events"                                              =>
+			import fs2._
+			import org.http4s.server.websocket._
+			import org.http4s.websocket.WebsocketBits._
+
+			val fs = for {
+				d <- fs2.Stream.eval(fs2.async.unboundedQueue[Task, WebSocketFrame])
+				_ <- fs2.Stream.eval(Task.apply {
+					nodes.poolDelta
+						.mapTask(ns => d.enqueue1(Text(PoolChanged(ns).asJson.noSpaces)))
+						.subscribe()
+					// TODO technically, an event about pool invalidates any buffered node delta
+					Observable.merge(nodes.logDelta, nodes.telemetryDelta)
+						.bufferTimed(config.eventInterval)
+						.mapTask(ns => d.enqueue1(Text(NodeUpdated(ns.toVector).asJson.noSpaces)))
+						.subscribe()
+				})
+				v <- d.dequeue
+			} yield v
+			WebSocketBuilder[Task].build(fs, Sink(v => Task {
+				val summary = v match {
+					case Text(msg, _) => Ascii.truncate(msg, 80, "...")
+					case frame        => frame.getClass.toGenericString
+				}
+				logger.info(s"Client responded to listen only channel with $summary")
+			}))
 	}
 	/*_*/
 
 
 	/*_*/
 	lazy val services: HttpService[Task] = statService <+>
-										   groupService <+>
 										   procedureService <+>
 										   nodeService
 	/*_*/
