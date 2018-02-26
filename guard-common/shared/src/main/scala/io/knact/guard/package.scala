@@ -59,7 +59,7 @@ package object guard {
 	type |[A, B] = Either[A, B]
 
 	trait Repository[A <: Entity[A], F[_]] {
-		def list(): Task[Seq[Id[A]]]
+		def list(): Task[Seq[Id[A]]] // TODO Seq or Set?
 		def find(id: Id[A]): F[Option[A]]
 		def delete(id: Id[A]): F[Failure | Id[A]]
 		def insert(a: A): F[Failure | Id[A]]
@@ -68,7 +68,10 @@ package object guard {
 	trait ProcedureRepository extends Repository[Procedure, Task] {}
 	trait NodeRepository extends Repository[Entity.Node, Task] {
 
-		def poolDelta: Observable[Vector[Id[Entity.Node]]]
+		def ids: Observable[Set[Id[Entity.Node]]]
+		def entities: Observable[Set[Node]] = ids
+			.switchMap { ns => Observable.fromTask(Task.traverse(ns)(find)) }
+			.map {_.flatten.toSet}
 		def telemetryDelta: Observable[Id[Entity.Node]]
 		def logDelta: Observable[Id[Entity.Node]]
 

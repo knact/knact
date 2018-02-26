@@ -137,13 +137,15 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 			val fs = for {
 				d <- fs2.Stream.eval(fs2.async.unboundedQueue[Task, WebSocketFrame])
 				_ <- fs2.Stream.eval(Task.apply {
-					nodes.poolDelta
+					nodes.ids
 						.mapTask(ns => d.enqueue1(Text(PoolChanged(ns).asJson.noSpaces)))
 						.subscribe()
 					// TODO technically, an event about pool invalidates any buffered node delta
 					Observable.merge(nodes.logDelta, nodes.telemetryDelta)
 						.bufferTimed(config.eventInterval)
-						.mapTask(ns => d.enqueue1(Text(NodeUpdated(ns.toVector).asJson.noSpaces)))
+						.map{_.toSet}
+						.filter{_.nonEmpty}
+						.mapTask(ns => d.enqueue1(Text(NodeUpdated(ns.toSet).asJson.noSpaces)))
 						.subscribe()
 				})
 				v <- d.dequeue

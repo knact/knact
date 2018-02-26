@@ -8,5 +8,6 @@ package object server {
 		name = "guard",
 		parallelism = sys.runtime.availableProcessors(),
 		maxThreads = sys.runtime.availableProcessors())
+//	implicit val scheduler: Scheduler = monix.execution.Scheduler.Implicits.global
 
 }

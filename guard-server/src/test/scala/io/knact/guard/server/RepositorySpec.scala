@@ -50,13 +50,13 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 			} yield found contains Node(Entity.id(0), target, "bar")
 		}
 
-		it should "list all ids in insert order" in SyncContext {
+		it should "list all ids in any order" in SyncContext {
 			val ctx = f()
 			val nodes = List.fill(10) {Node(id(42), target, "foo")}
 			for {
 				ids <- Task.traverse(nodes) {ctx.nodes.insert}
 				gs <- ctx.nodes.list()
-			} yield gs should contain theSameElementsInOrderAs ids.map {_.right.value}
+			} yield gs should contain theSameElementsAs ids.map {_.right.value}
 		}
 
 		it should "update" in {

@@ -6,8 +6,8 @@ import io.circe._
 import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.{Decoder, Encoder, Json, _}
-import io.knact.guard.Entity.{Id, LogSeries, Node, Outcome, Procedure, TelemetrySeries}
-import io.knact.guard.Service.{send}
+import io.knact.guard.Entity.{Id, LogSeries, Node, Outcome, Procedure, ServerStatus, TelemetrySeries}
+import io.knact.guard.Service.send
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import org.http4s.{EntityDecoder, Method, Request, Response, Status, Uri}
@@ -19,13 +19,15 @@ import org.http4s.client.dsl.Http4sClientDsl
 
 
 // TODO test me
-class Service(val baseUri: Uri) {
+class Service(val baseUri: Uri)  extends Http4sClientDsl[Task] {
 
 
 	// bring all unrelated decoder instances into scope, this arises
 	// for Node -> TelemetrySeries | LogSeries or in prodecure(potentially)
 	implicit def entityDecoderForAllA[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
 		jsonOf[Task, A]
+
+	def status(): ResultF[ServerStatus] = send[ServerStatus](Method.GET(baseUri))
 
 	def procedures(): EntityService[Procedure] = new Http4sEntityService[Procedure] {
 		override def path: Uri = baseUri / ProcedurePath
@@ -51,7 +53,7 @@ class Service(val baseUri: Uri) {
 
 
 	type ResultF[X] = Task[RemoteResult[X]]
-	private trait Http4sEntityService[A <: Entity[A]] extends EntityService[A] with Http4sClientDsl[Task] {
+	private trait Http4sEntityService[A <: Entity[A]] extends EntityService[A] {
 		def path: Uri
 		protected[this] implicit val decoder: Decoder[A]
 		protected[this] implicit val encoder: Encoder[A]
@@ -97,10 +99,8 @@ object Service {
 		}
 	}
 
-//	implicit def entityDecoderProof[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
-//		jsonOf[Task, A]
-
-
+	//	implicit def entityDecoderProof[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
+	//		jsonOf[Task, A]
 
 
 }

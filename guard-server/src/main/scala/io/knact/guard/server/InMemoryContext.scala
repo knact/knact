@@ -12,6 +12,7 @@ import monix.eval.Task
 import monix.reactive.Observable
 import monix.reactive.subjects.ConcurrentSubject
 
+import scala.collection.concurrent.TrieMap
 import scala.collection.mutable
 
 /**
@@ -22,8 +23,8 @@ class InMemoryContext(override val version: String,
 
 	private final val idCounter: AtomicLong = new AtomicLong(0)
 
-	private val nodeStore     : mutable.Map[Id[Node], NodeEntry]      = mutable.LinkedHashMap()
-	private val procedureStore: mutable.Map[Id[Procedure], Procedure] = mutable.LinkedHashMap()
+	private val nodeStore     : mutable.Map[Id[Node], NodeEntry]      = TrieMap()
+	private val procedureStore: mutable.Map[Id[Procedure], Procedure] = TrieMap()
 
 
 	val procedures: ProcedureRepository = new ProcedureRepository
@@ -71,15 +72,14 @@ class InMemoryContext(override val version: String,
 			case None        => Right(NodeEntry(node, TelemetrySeries(node.id, Map()), Map()))
 		}
 
-		private val poolSubject      = ConcurrentSubject.publish[Vector[Id[Node]]](scheduler)
+		private val poolSubject      = ConcurrentSubject.publish[Set[Id[Node]]](scheduler)
 		private val telemetrySubject = ConcurrentSubject.publish[Id[Node]](scheduler)
 		private val logSubject       = ConcurrentSubject.publish[Id[Node]](scheduler)
 
 
-		override def poolDelta: Observable[Vector[Id[Node]]] = poolSubject.distinctUntilChanged
+		override def ids: Observable[Set[Id[Node]]] = poolSubject.distinctUntilChanged
 		override def telemetryDelta: Observable[Id[Node]] = telemetrySubject
 		override def logDelta: Observable[Id[Node]] = logSubject
-
 
 		private def filterSeries[A](bound: Bound, s: TimeSeries[A]) = {
 			bound match {
@@ -93,7 +93,7 @@ class InMemoryContext(override val version: String,
 		}
 
 		override def telemetries(nid: Id[Node])
-								(bound: Bound): Task[Option[TelemetrySeries]] = Task.pure {
+								(bound: Bound): Task[Option[TelemetrySeries]] = Task {
 			buffer.get(nid).map { x =>
 				// XXX use lens here
 				x.telemetries.copy(series = filterSeries(bound, x.telemetries.series))
@@ -102,7 +102,7 @@ class InMemoryContext(override val version: String,
 
 		override def logs(nid: Id[Node])
 						 (path: Path)
-						 (bound: Bound): Task[Option[LogSeries]] = Task.pure {
+						 (bound: Bound): Task[Option[LogSeries]] = Task {
 			for {
 				entry <- buffer.get(nid)
 				logs <- entry.logs.get(path)
@@ -147,12 +147,12 @@ class InMemoryContext(override val version: String,
 		def notifyPoolChanged[A](task: Task[Failure | A]): Task[Failure | A] = {
 			for {
 				v <- task
-				_ <- Task.defer {
+				_ <-
 					v match {
 						case Left(_)  => Task.unit
-						case Right(_) => list().map { ls => poolSubject.onNext(ls.toVector); () }
+						case Right(_) => list().map { ls => poolSubject.onNext(ls.toSet); () }
 					}
-				}
+
 			} yield v
 		}
 		override def insert(a: Node): Task[Failure | Id[Node]] =

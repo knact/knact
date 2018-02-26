@@ -63,8 +63,8 @@ object Entity {
 	}
 
 	sealed trait Event
-	case class PoolChanged(ns: Vector[Id[Node]]) extends Event
-	case class NodeUpdated(ns: Vector[Id[Node]]) extends Event
+	case class PoolChanged(pool: Set[Id[Node]]) extends Event
+	case class NodeUpdated(delta: Set[Id[Node]]) extends Event
 
 	sealed trait Outcome[+A]
 	case class Altered[A](altered: Id[A]) extends Outcome[A]
