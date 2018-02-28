@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox fx:id="root" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.LogController">
+   <children>
+      <TableView fx:id="entries" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+        <columns>
+          <TableColumn fx:id="time" maxWidth="200.0" minWidth="100.0" prefWidth="160.0" text="Time" />
+          <TableColumn fx:id="level" maxWidth="100.0" minWidth="60.0" prefWidth="60.0" text="Level" />
+            <TableColumn fx:id="message" maxWidth="1.7976931348623157E308" prefWidth="300.0" text="Message" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </children>
+</VBox>

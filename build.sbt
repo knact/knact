@@ -89,6 +89,7 @@ lazy val `guard-client-jfx` = project.settings(
 		ScalaLogging, Logback,
 		"org.scalafx" %% "scalafx" % "8.0.144-R12",
 		"org.scalafx" %% "scalafxml-core-sfx8" % "0.4",
+		"org.controlsfx" % "controlsfx" % "8.40.14",
 		ScalaTest % Test,
 	),
 ).dependsOn(`guard-common-jvm`)

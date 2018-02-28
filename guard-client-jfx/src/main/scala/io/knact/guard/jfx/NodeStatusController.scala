@@ -8,11 +8,11 @@ import scalafx.scene.layout.{StackPane, VBox}
 import scalafxml.core.macros.sfxml
 
 @sfxml
-class OverviewController(root: SplitPane,
-						 filter: TextField,
-						 nodes: ListView[Node],
-						 nodeStatus: Label,
-						 nodePane: StackPane) {
+class NodeStatusController(root: SplitPane,
+						   filter: TextField,
+						   nodes: ListView[Node],
+						   nodeStatus: Label,
+						   nodePane: StackPane) {
 
 
 

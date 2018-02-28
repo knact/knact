@@ -1,49 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.SegmentedButton?>
 
-<VBox fx:id="root" prefHeight="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.FrameController">
-  <children>
-    <MenuBar VBox.vgrow="NEVER">
-      <menus>
-        <Menu mnemonicParsing="false" text="File">
-          <items>
-            <MenuItem fx:id="connectTo" mnemonicParsing="false" text="Connect to server" />
-            <Menu fx:id="recentServers" mnemonicParsing="false" text="Recent servers" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem fx:id="export" mnemonicParsing="false" text="Export" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem fx:id="preferences" mnemonicParsing="false" text="Preferences…" />
-            <MenuItem fx:id="quit" mnemonicParsing="false" text="Quit" />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Group">
-          <items>
-                  <CheckMenuItem fx:id="groupInNewWindow" mnemonicParsing="false" text="Open in new window" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Help">
-          <items>
-                  <MenuItem fx:id="manual" mnemonicParsing="false" text="Manual" />
-            <MenuItem fx:id="about" mnemonicParsing="false" text="About Knact JFX" />
-          </items>
-        </Menu>
-      </menus>
-    </MenuBar>
-      <StackPane VBox.vgrow="ALWAYS">
-         <children>
-            <Label text="Connect to a serve:File | Connect to server" />
-            <TabPane fx:id="tabs" tabClosingPolicy="ALL_TABS" />
-         </children>
-      </StackPane>
-  </children>
+<VBox fx:id="root" prefHeight="600.0" prefWidth="960.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.FrameController">
+    <children>
+        <HBox fx:id="toolbar" styleClass="tool-bar">
+            <children>
+              <MenuBar minWidth="-Infinity">
+                  <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                          <items>
+                              <MenuItem fx:id="newWindow" mnemonicParsing="false" text="Connect to server" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="export" mnemonicParsing="false" text="Export" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="preferences" mnemonicParsing="false" text="Preferences…" />
+                              <MenuItem fx:id="quit" mnemonicParsing="false" text="Quit" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Help">
+                          <items>
+                              <MenuItem fx:id="manual" mnemonicParsing="false" text="Manual" />
+                              <MenuItem fx:id="about" mnemonicParsing="false" text="About Knact JFX" />
+                          </items>
+                      </Menu>
+                  </menus>
+              </MenuBar>
+
+                <SegmentedButton fx:id="views" minWidth="-Infinity">
+                    <buttons>
+                        <ToggleButton fx:id="nodeStatus" mnemonicParsing="false" selected="true" text="Node status" />
+                        <ToggleButton fx:id="guardStatus" mnemonicParsing="false" text="Guard status" />
+                        <ToggleButton fx:id="log" mnemonicParsing="false" text="Client log" />
+                    </buttons>
+                </SegmentedButton>
+
+
+                <Region HBox.hgrow="ALWAYS" />
+                <TextField fx:id="serverUrl" prefColumnCount="40" />
+            </children>
+        </HBox>
+        <StackPane fx:id="viewPane" VBox.vgrow="ALWAYS" />
+    </children>
 </VBox>

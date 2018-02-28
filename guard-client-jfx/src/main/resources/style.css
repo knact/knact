@@ -1,0 +1,17 @@
+
+#root {
+    /*TODO dark theme*/
+}
+
+#toolbar {
+    -fx-padding: 0 4px 0 0;
+}
+
+#toolbar .menu-bar {
+    -fx-background-color: transparent;
+}
+
+#toolbar .menu {
+    -fx-padding: 8px;
+
+}
