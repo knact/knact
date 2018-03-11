@@ -1,5 +1,6 @@
 package io.knact.guard.server
 
+<<<<<<< HEAD
 import java.nio.file.{Path, Paths}
 import io.knact.guard._
 
@@ -27,7 +28,6 @@ class H2JdbcContext extends ApiContext {
 
 	val dbPath = Paths.get(".test").toAbsolutePath
 
-	override def groups: GroupRepository = ???
 	override def nodes: NodeRepository = ???
 	override def procedures: ProcedureRepository = ???
 

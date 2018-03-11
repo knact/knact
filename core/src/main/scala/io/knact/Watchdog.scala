@@ -19,30 +19,32 @@ import scala.concurrent.duration.FiniteDuration
   * this service. The implied threading means that no commands will return synchronously so every
   * method either return a [[monix.eval.Task]] monad or a [[monix.reactive.Observable]] container.
   *
-  * @param subjects  an observable set of nodes
-  * @param transport the transport for the nodes
+  * @param nodes an observable set of nodes
   */
-class Watchdog[A <: Address, C <: Credential, N <: Node](subjects: Observable[Set[Subject[A, C]]],
-														 transport: Transport[A, C, N]) {
+class Watchdog[A, B](nodes: Observable[Set[A]])(implicit ev: Connectable[A, B]) {
 
 
-	type Outcome[R] = (Subject[A, C], Result[R])
-	type RepeatedOutput[R] = (Subject[A, C], Long, Result[R])
+	type Outcome[R] = (A, Result[R])
+	type RepeatedOutput[R] = (Long, A, Result[R])
+
 
 	/**
-	  * Execute a command on all [[subjects]]
+	  * Execute a command on all [[nodes]]
 	  * @tparam R the return type of the command
 	  * @return a monad representing results collected in a list
 	  */
-	def dispatch[R](c: Command[N, R]): Task[Seq[Outcome[R]]] =
-		subjects.mapTask { subjects =>
-			Task.wanderUnordered(subjects) { subject =>
-				Task {(subject, c.run(transport.connect(subject)))}
+	def dispatch[R](command: Command[B, R]): Task[Seq[Outcome[R]]] =
+		nodes.mapTask { as =>
+			Task.wanderUnordered(as) { a =>
+				(for {
+					n <- ev.connect(a)
+					r <- Task {command.run(n)}
+				} yield (a, r)).onErrorHandle(e => (a, Result.failure(e)))
 			}
 		}.firstOrElseL(Nil)
 
 	/**
-	  * Execute a command asynchronously and repeatedly on all [[subjects]]
+	  * Execute a command asynchronously and repeatedly on all [[nodes]]
 	  * To illustrate, given subject `A, B, C`:
 	  * {{{
 	  * A ----> A --> A ---> A --> ...
@@ -61,20 +63,20 @@ class Watchdog[A <: Address, C <: Credential, N <: Node](subjects: Observable[Se
 	  * @return a observable with sequenced output
 	  */
 	def dispatchRepeated[R](interval: FiniteDuration,
-							c: Command[N, R]): Observable[RepeatedOutput[R]] =
-		bindLatest { subjects =>
+							command: Command[B, R]): Observable[RepeatedOutput[R]] =
+		bindLatest { as =>
 			// F[G[A]] >>= { (G[A] => F[A]) >>= { A => (F[B] >>= {B => F[C]}) }}
-			Observable.fromIterable(subjects).mergeMap { subject =>
+			Observable.fromIterable(as).mergeMap { a =>
 				for {
 					id <- Observable.intervalAtFixedRate(interval)
-					result <- mkOutcome(id, subject, c)
-				} yield result
+					r <- mkOutcome(id, a, command)
+				} yield r
 			}
 		}
 
 	/**
 	  * Execute a command asynchronously and repeatedly while synchronising at each interval for
-	  * all [[subjects]]
+	  * all [[nodes]]
 	  * To illustrate, given subject `A, B, C`:
 	  * {{{
 	  * A ---->          A ------> A ->         ...
@@ -92,18 +94,17 @@ class Watchdog[A <: Address, C <: Credential, N <: Node](subjects: Observable[Se
 	  * @return a observable with sequenced output
 	  */
 	def dispatchRepeatedSyncInterval[R](interval: FiniteDuration,
-										c: Command[N, R]): Observable[RepeatedOutput[R]] =
-		bindLatest { subjects =>
+										command: Command[B, R]): Observable[RepeatedOutput[R]] =
+		bindLatest { as =>
 			for {
 				id <- Observable.intervalAtFixedRate(interval)
-				result <- Observable.fromIterable(subjects)
-					.mergeMap { ss => mkOutcome(id, ss, c) }
-			} yield result
+				r <- Observable.fromIterable(as).mergeMap { a => mkOutcome(id, a, command) }
+			} yield r
 		}
 
 	/**
 	  * Execute a command asynchronously and repeatedly while synchronising at for each subject for
-	  * all [[subjects]]
+	  * all [[nodes]]
 	  * To illustrate, given subject `A, B, C`:
 	  * {{{
 	  * A ----> B ---------> C ---> A --> B --> C
@@ -119,20 +120,22 @@ class Watchdog[A <: Address, C <: Credential, N <: Node](subjects: Observable[Se
 	  * @return a observable with sequenced output
 	  */
 	def dispatchRepeatedSyncAll[R](interval: FiniteDuration,
-								   c: Command[N, R]): Observable[RepeatedOutput[R]] =
-		bindLatest { subjects =>
+								   command: Command[B, R]): Observable[RepeatedOutput[R]] =
+		bindLatest { as =>
 			for {
 				id <- Observable.intervalAtFixedRate(interval)
-				subject <- Observable.fromIterable(subjects)
-				result <- mkOutcome(id, subject, c)
-			} yield result
+				a <- Observable.fromIterable(as)
+				r <- mkOutcome(id, a, command)
+			} yield r
 		}
 
 
-	private def bindLatest[B](f: Set[Subject[A, C]] => Observable[B]) = subjects.flatMapLatest(f)
-	private def mkOutcome[B](id: Long, subject: Subject[A, C], command: Command[N, B]) = {
-		// can't compose generic functions, need Observable ~> Observable
-		Observable.fork(Observable.eval {(subject, id, command.run(transport.connect(subject)))})
+	private def bindLatest[C](f: Set[A] => Observable[C]) = nodes.flatMapLatest(f)
+	private def mkOutcome[C](id: Long, a: A, command: Command[B, C]) = {
+		Observable.fork(Observable.fromTask(for {
+			n <- ev.connect(a)
+			r <- Task {command.run(n)}
+		} yield (id, a, r))).onErrorHandle(e => (id, a, Result.failure(e)))
 	}
 
 }

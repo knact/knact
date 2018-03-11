@@ -5,7 +5,7 @@ import java.time.{Duration, LocalTime}
 import fastparse.core.Parsed.{Failure, Success}
 import fastparse.{WhitespaceApi, all}
 import io.knact.Basic.ConsoleNode
-import io.knact.Command
+import io.knact.{Command, Result}
 
 object top {
 
@@ -212,8 +212,8 @@ object top {
 	final val command = Command[ConsoleNode, TopData] { implicit n =>
 		val str = sendAndReadUntilEOF("top -b -n1 -w512 -c")
 		parser.parse(str) match {
-			case Success(v, _)      => Right(v)
-			case f@Failure(_, _, _) => Left(f.msg)
+			case Success(v, _)      => Result.success(v)
+			case f@Failure(_, _, _) => Result.failure(f.msg)
 		}
 	}
 

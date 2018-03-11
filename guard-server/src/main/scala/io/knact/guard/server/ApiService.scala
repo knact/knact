@@ -1,30 +1,30 @@
 package io.knact.guard.server
 
+import java.time.{Instant, LocalDateTime, ZoneOffset, ZonedDateTime}
+
 import cats.data.EitherT
 import cats.implicits._
+import com.google.common.base.Ascii
+import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Json, _}
 import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.syntax._
 import io.knact.guard
-import io.knact.guard.Entity.{Altered, Failed, Group, Id, Node, Procedure, id => coerce}
+import io.knact.guard.Entity.{Altered, Failed, Id, Node, NodeUpdated, PoolChanged, Procedure, ServerStatus, id => coerce}
 import io.knact.guard._
+import io.knact.guard.server.Main.Config
 import monix.eval.Task
+import monix.reactive.Observable
 import org.http4s.{HttpService, _}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
 
 
-class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
+class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] with LazyLogging {
 
-	val (groups, nodes, procedures) = dependency.repos
+	val (nodes, procedures) = context.repos
 
-	private implicit val groupDecoder          = jsonOf[Task, Group]
-	private implicit val groupPatchDecoder     = jsonOf[Task, Group => Group]
-	private implicit val nodeDecoder           = jsonOf[Task, Node]
-	private implicit val nodePatchDecoder      = jsonOf[Task, Node => Node]
-	private implicit val procedureDecoder      = jsonOf[Task, Procedure]
-	private implicit val procedurePatchDecoder = jsonOf[Task, Procedure => Procedure]
 
 	private def boxAlteration[A](x: Either[String, Id[A]]): Task[Response[Task]] = x match {
 		case Right(id)   => Ok(Altered(id).asJson)
@@ -54,17 +54,9 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 		repo.delete(coerce(id)) >>= boxAlteration
 
 
-	private final val Group     = "group"
-	private final val Node      = "node"
-	private final val Procedure = "procedure"
+	// GET 	   / 		      :: Stat
 
-	// GET     group          :: Seq[Id]
-	// GET     group/{id}     :: Group
-	// POST    group	      :: Group => Id
-	// POST    group/{id}	  :: Group => Id
-	// DELETE  group/{id}     :: Id
-
-	// GET     group/node/        :: Seq[Id]
+	// GET     group/node/        :: Seq[Id]full
 	// GET     group/node/{id}    :: Node
 	// POST    group/node/        :: Node => Id
 	// POST    group/node/{id}    :: Node => Id
@@ -81,36 +73,98 @@ class ApiService(dependency: ApiContext) extends Http4sDsl[Task] {
 	// DELETE  procedure/{id}       :: EntityId
 	// POST    procedure/{id}/exec
 
-	private val groupService = HttpService[Task] {
-		case GET -> Root / Group                   => list(groups)
-		case GET -> Root / Group / IntVar(id)      => find(groups, id)
-		case req@POST -> Root / Group              => insert(groups, req)
-		case req@POST -> Root / Group / IntVar(id) => update(groups, req, id)
-		case DELETE -> Root / Group / IntVar(id)   => delete(groups, id)
-	}
+	import io.knact.guard.{NodePath, ProcedurePath}
 
+	implicit def entityDecoderForAllA[A](implicit ev: Decoder[A]): EntityDecoder[Task, A] =
+		jsonOf[Task, A]
+
+	/*_*/
+	private val statService = HttpService[Task] {
+		case GET -> Root => Ok(
+			for {
+				ns <- nodes.list()
+				ps <- procedures.list()
+			} yield ServerStatus(
+				version = context.version,
+				nodes = ns.size, procedures = ps.size,
+				startTime = context.startTime).asJson
+		)
+	}
+	/*_*/
+
+	/*_*/
 	private val procedureService = HttpService[Task] {
-		case GET -> Root / Procedure                   => list(procedures)
-		case GET -> Root / Procedure / IntVar(id)      => find(procedures, id)
-		case req@POST -> Root / Procedure              => insert(procedures, req)
-		case req@POST -> Root / Procedure / IntVar(id) => update(procedures, req, id)
-		case DELETE -> Root / Procedure / IntVar(id)   => delete(procedures, id)
+		case GET -> Root / ProcedurePath                   => list(procedures)
+		case GET -> Root / ProcedurePath / IntVar(id)      => find(procedures, id)
+		case req@POST -> Root / ProcedurePath              => insert(procedures, req)
+		case req@POST -> Root / ProcedurePath / IntVar(id) => update(procedures, req, id)
+		case DELETE -> Root / ProcedurePath / IntVar(id)   => delete(procedures, id)
 
 		// TODO telemetry and log endpoints
 	}
+	/*_*/
 
+
+	implicit val zdtQueryParamDecoder: QueryParamDecoder[ZonedDateTime] = QueryParamDecoder[Long]
+		.map { epoch => ZonedDateTime.ofInstant(Instant.ofEpochMilli(epoch), ZoneOffset.UTC) }
+
+	object StartVar extends OptionalQueryParamDecoderMatcher[ZonedDateTime]("start")
+	object EndVar extends OptionalQueryParamDecoderMatcher[ZonedDateTime]("end")
+
+	/*_*/
 	private val nodeService = HttpService[Task] {
-		case GET -> Root / Node                   => list(nodes)
-		case GET -> Root / Node / IntVar(id)      => find(nodes, id)
-		case req@POST -> Root / Node              => insert(nodes, req)
-		case req@POST -> Root / Node / IntVar(id) => update(nodes, req, id)
-		case DELETE -> Root / Node / IntVar(id)   => delete(nodes, id)
+		case GET -> Root / NodePath                   => list(nodes)
+		case GET -> Root / NodePath / IntVar(id)      => find(nodes, id)
+		case req@POST -> Root / NodePath              => insert(nodes, req)
+		case req@POST -> Root / NodePath / IntVar(id) => update(nodes, req, id)
+		case DELETE -> Root / NodePath / IntVar(id)   => delete(nodes, id)
 
-		// TODO code CRUD
+		case GET -> Root / NodePath / IntVar(id) / "telemetry" :? StartVar(s) +& EndVar(e)  =>
+			nodes.telemetries(coerce(id))(Bound(s, e)).flatMap {
+				case None    => NotFound()
+				case Some(x) => Ok(x.asJson)
+			}
+		case GET -> Root / NodePath / IntVar(id) / "log" / path :? StartVar(s) +& EndVar(e) =>
+			nodes.logs(coerce(id))(path)(Bound(s, e)).flatMap {
+				case None    => NotFound()
+				case Some(x) => Ok(x.asJson)
+			}
+		case GET -> Root / NodePath / "events"                                              =>
+			import fs2._
+			import org.http4s.server.websocket._
+			import org.http4s.websocket.WebsocketBits._
 
+			val fs = for {
+				d <- fs2.Stream.eval(fs2.async.unboundedQueue[Task, WebSocketFrame])
+				_ <- fs2.Stream.eval(Task.apply {
+					nodes.ids
+						.mapTask(ns => d.enqueue1(Text(PoolChanged(ns).asJson.noSpaces)))
+						.subscribe()
+					// TODO technically, an event about pool invalidates any buffered node delta
+					Observable.merge(nodes.logDelta, nodes.telemetryDelta)
+						.bufferTimed(config.eventInterval)
+						.map{_.toSet}
+						.filter{_.nonEmpty}
+						.mapTask(ns => d.enqueue1(Text(NodeUpdated(ns.toSet).asJson.noSpaces)))
+						.subscribe()
+				})
+				v <- d.dequeue
+			} yield v
+			WebSocketBuilder[Task].build(fs, Sink(v => Task {
+				val summary = v match {
+					case Text(msg, _) => Ascii.truncate(msg, 80, "...")
+					case frame        => frame.getClass.toGenericString
+				}
+				logger.info(s"Client responded to listen only channel with $summary")
+			}))
 	}
+	/*_*/
 
 
-	lazy val services: HttpService[Task] = groupService <+> procedureService <+> nodeService
+	/*_*/
+	lazy val services: HttpService[Task] = statService <+>
+										   procedureService <+>
+										   nodeService
+	/*_*/
 
 }

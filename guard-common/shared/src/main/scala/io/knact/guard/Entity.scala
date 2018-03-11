@@ -2,6 +2,7 @@ package io.knact.guard
 
 import java.time.{Duration, ZonedDateTime}
 
+import cats.Eq
 import shapeless.tag
 import shapeless.tag.@@
 import io.circe.java8.time._
@@ -19,6 +20,8 @@ object Entity {
 	// refined id
 	type Id[A] = Long @@ A
 
+	implicit def idEq[A]: Eq[Id[A]] = _ == _
+
 	def id[T, B](id: B)(implicit ev: Numeric[B]): Id[T] = tag[T][Long](ev.toLong(id))
 
 	sealed trait Target {
@@ -27,8 +30,13 @@ object Entity {
 	}
 	case class SshPasswordTarget(host: String, port: Int,
 								 username: String, password: String) extends Target
-	case class SshKeyTarget(host: String, port: Int,
+	case class SshKeyTarget(host: String, port: Int, username: String,
 							key: Array[Byte]) extends Target
+
+
+	case class ServerStatus(version: String,
+							nodes: Int, procedures: Int,
+							startTime: ZonedDateTime)
 
 	type TimeSeries[A] = Map[ZonedDateTime, A]
 
@@ -37,7 +45,6 @@ object Entity {
 
 
 	case class Node(id: Id[Node],
-					group: Id[Group],
 					target: Target,
 					remark: String,
 					telemetries: TimeSeries[Option[Verdict]] = Map(),
@@ -55,12 +62,9 @@ object Entity {
 		override def withId(a: Procedure, that: Id[Procedure]): Procedure = a.copy(id = that)
 	}
 
-	case class Group(id: Id[Group],
-					 name: String,
-					 nodes: Seq[Id[Node]],
-					) extends Entity[Group] {
-		override def withId(a: Group, that: Id[Group]): Group = a.copy(id = that)
-	}
+	sealed trait Event
+	case class PoolChanged(pool: Set[Id[Node]]) extends Event
+	case class NodeUpdated(delta: Set[Id[Node]]) extends Event
 
 	sealed trait Outcome[+A]
 	case class Altered[A](altered: Id[A]) extends Outcome[A]
@@ -71,7 +75,10 @@ object Entity {
 	}
 
 	ensureCodec[Target]
-	ensureCodec[Group]
+	ensureCodec[Event]
+	ensureCodec[ServerStatus]
+	ensureCodec[LogSeries]
+	ensureCodec[TelemetrySeries]
 	ensureCodec[Node]
 	ensureCodec[Procedure]
 

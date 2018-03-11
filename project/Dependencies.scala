@@ -17,22 +17,29 @@ object Dependencies {
 	lazy val ScalaTest   = "org.scalatest" %% "scalatest" % "3.0.4"
 	lazy val MockitoCore = "org.mockito" % "mockito-core" % "2.10.0"
 
+	val http4sVersion = "0.18.0"
+	val circeVersion  = "0.9.1"
 
-	lazy val http4s = Seq(
+	lazy val http4sServer = Seq(
 		"org.http4s" %% "http4s-dsl",
 		"org.http4s" %% "http4s-blaze-server",
 		"org.http4s" %% "http4s-blaze-client",
 		"org.http4s" %% "http4s-circe",
-	).map {_ % "0.18.0"}
+	).map {_ % http4sVersion}
+
+	lazy val http4sClient = Seq(
+		"org.http4s" %% "http4s-blaze-client",
+		"org.http4s" %% "http4s-circe",
+	).map {_ % http4sVersion}
+
 
 	lazy val circe = Seq(
 		"io.circe" %% "circe-core",
 		"io.circe" %% "circe-generic",
 		"io.circe" %% "circe-parser",
-//		"io.circe" %% "circe-shapes",
 		"io.circe" %% "circe-refined",
 		"io.circe" %% "circe-java8",
-	).map {_ % "0.9.1"}
+	).map {_ % circeVersion}
 
 
 }
