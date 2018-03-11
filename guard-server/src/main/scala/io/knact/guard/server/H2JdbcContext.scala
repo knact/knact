@@ -1,6 +1,6 @@
 package io.knact.guard.server
 
-<<<<<<< HEAD
+
 import java.nio.file.{Path, Paths}
 import io.knact.guard._
 
@@ -20,11 +20,12 @@ import cats.implicits._
 
 class H2JdbcContext extends ApiContext {
 
-	// TODO write me
-	// TODO insert nodes, insert groups
-	// TODO defining procedure table
-	// TODO Create table uniquely on first call and keep
-	// TODO Define methods for modifying and inspecting the database
+	// DONE insert nodes
+	// DONE defining procedure table
+	// DONE Create table uniquely on first call and keep
+	// DONE Define methods for modifying and inspecting the database
+	// TODO Decide how to store logs.
+  // TODO Decide how to deal with telemetries
 
 	val dbPath = Paths.get(".test").toAbsolutePath
 
@@ -38,32 +39,67 @@ class H2JdbcContext extends ApiContext {
 	)
 
 	private val ddl = for {
-		nodes <-sql"""CREATE TABLE NODE(
-          id BIGINT AUTO_INCREMENT PRIMARY KEY,
-          groupID BIGINT NOT NULL, FOREIGN KEY (groupID) REFERENCES public.GROUP(id),
-          host VARCHAR NOT NULL,
-          port INT NOT NULL,
-          remark VARCHAR
-          // telemetries
-          //logs
-          )""".update.run
-		groups <- sql"""CREATE TABLE GROUP(
-      id BIGINT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR NOT NULL,
-      nodes BIGINT,
-      FOREIGN KEY (nodes) REFERENCES public.NODE(id)
-    )""".update.run
+    val nodes <-sql"""
+                    IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='NODE')
+                    BEGIN
+                      CREATE TABLE NODES(
+                      id BIGINT,
+                      host VARCHAR NOT NULL,
+                      port INT NOT NULL,
+                      remark VARCHAR
+                      )
+                    END
+            """.update.run
 
-		procedures <- sql"""CREATE TABLE PROCEDURE(
-      id BIGINT AUTO_INCREMENT PRIMARY KEY,
-      description VARCHAR,
-      code VARCHAR
-      //timeout Duration?
-
-    )""".update.run
-	} yield(nodes, groups, procedures)
+		val procedures <- sql"""
+                    IF NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='PROCEDURE')
+                    BEGIN
+                      CREATE TABLE PROCEDURES(
+                      id BIGINT,
+                      desc VARCHAR,
+                      code VARCHAR
+                      )
+                    END""".update.run // TODO: How best to stor duration
+	} yield(nodes, procedures)
 
 	//println(ddl.transact(xa).unsafeRunSync)
+
+  def upsertNode(node: Node): Update0 ={
+    val id, host, port, remark  = node.id, node.target.host, node.target.port, node.remark
+    sql"""if exists(select 1 from nodes where id=$id)
+            begin
+              update person set host=$host, port=$port, remark=$remark where id=$id
+            end
+          else
+            begin
+              insert into nodes (id, host, port, remark)
+              values            ($id, $host, $port, $remark)
+            end""".update
+  }
+
+  def upsertProcedure(proc: Procedure): Update0 = {
+    val id, desc, code = proc.id, proc.description, proc.code
+    sql"""if exists(select 1 from procedures where id=$id)
+            begin
+              update procedure set desc=$desc, code=$code where id=$id
+            end
+          else
+            begin
+              insert into procedures (desc, code)
+              values                 ($id, $desc, $code)
+            end""".update
+  }
+
+  def selectNodes():Query0[(Long, String, Int, String)] = {
+    sql"select id, host, port, remark from nodes".query[(Long, String, Int, String)]
+  }
+
+  def selectProcedures(): Query0[(Long, String, String)] = {
+    sql"select id, desc, code from procedures".query[(Long, String, String)]
+  }
+
+
+
 
 
 }
