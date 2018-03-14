@@ -25,6 +25,8 @@ class H2JdbcContext extends ApiContext {
 	// DONE Create table uniquely on first call and keep
 	// DONE Define methods for modifying and inspecting the database
 	// DONE Decide how to store logs.
+  // TOOD: Smart functions for data manipulation i.e joins etc
+  
 
 	val dbPath = Paths.get(".test").toAbsolutePath
 
