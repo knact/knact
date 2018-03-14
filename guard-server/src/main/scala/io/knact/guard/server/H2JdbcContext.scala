@@ -24,8 +24,7 @@ class H2JdbcContext extends ApiContext {
 	// DONE defining procedure table
 	// DONE Create table uniquely on first call and keep
 	// DONE Define methods for modifying and inspecting the database
-	// TODO Decide how to store logs.
-  // TODO Decide how to deal with telemetries
+	// DONE Decide how to store logs.
 
 	val dbPath = Paths.get(".test").toAbsolutePath
 
@@ -46,7 +45,8 @@ class H2JdbcContext extends ApiContext {
                       id BIGINT,
                       host VARCHAR NOT NULL,
                       port INT NOT NULL,
-                      remark VARCHAR
+                      remark VARCHAR,
+                      logs VARCHAR(MAX)
                       )
                     END
             """.update.run
@@ -57,45 +57,64 @@ class H2JdbcContext extends ApiContext {
                       CREATE TABLE PROCEDURES(
                       id BIGINT,
                       desc VARCHAR,
-                      code VARCHAR
+                      code VARCHAR,
+                      duration BIGINT
                       )
                     END""".update.run // TODO: How best to stor duration
 	} yield(nodes, procedures)
 
 	//println(ddl.transact(xa).unsafeRunSync)
 
-  def upsertNode(node: Node): Update0 ={
-    val id, host, port, remark  = node.id, node.target.host, node.target.port, node.remark
-    sql"""if exists(select 1 from nodes where id=$id)
-            begin
-              update person set host=$host, port=$port, remark=$remark where id=$id
-            end
-          else
-            begin
-              insert into nodes (id, host, port, remark)
-              values            ($id, $host, $port, $remark)
-            end""".update
+  def upsertNode(node: Node) = {
+    // Note: ID can be none
+    val id, host, port, remark, logs  =
+      node.id,
+      node.target.host,
+      node.target.port,
+      node.remark,
+      node.logs
+
+    id match {
+      case None =>
+        for {
+          id <- sql"""insert into nodes(id, host, port, remark, logs) values($host, $port, $remark, $logs)"""
+          .update
+          .withUniqueGeneratedKeys[Long] ("id")
+        } yield (id)
+      case _ =>
+        for {
+          _ <- sql"""update nodes set host=$host, port=$port, remark=$remark, logs=$logs where id=$id """
+        } yield()
+    }
   }
 
-  def upsertProcedure(proc: Procedure): Update0 = {
-    val id, desc, code = proc.id, proc.description, proc.code
-    sql"""if exists(select 1 from procedures where id=$id)
-            begin
-              update procedure set desc=$desc, code=$code where id=$id
-            end
-          else
-            begin
-              insert into procedures (desc, code)
-              values                 ($id, $desc, $code)
-            end""".update
+  def upsertProcedure(proc: Procedure) = {
+    val id, desc, code, duration =
+      proc.id,
+      proc.desc,
+      proc.code,
+      proc.duration
+
+    id match {
+      case None =>
+        for {
+          id <- sql"""insert into procedures(desc, code, duration) values($desc, $code, $duration)"""
+            .update
+            .withUniqueGeneratedKeys[Long]("id")
+        } yield (id)
+      case _ =>
+        for {
+          _ <- sql"""update procedures set desc=$desc, code=$code, duration=$duration where id=$id """.update
+        } yield ()
+    }
   }
 
-  def selectNodes():Query0[(Long, String, Int, String)] = {
-    sql"select id, host, port, remark from nodes".query[(Long, String, Int, String)]
+  def selectNodes():Query0[(Long, String, Int, String, String)] = {
+    sql"select id, host, port, remark, logs from nodes".query[(Long, String, Int, String, String)].to[List].transact(xa).unsafeRunSync
   }
 
-  def selectProcedures(): Query0[(Long, String, String)] = {
-    sql"select id, desc, code from procedures".query[(Long, String, String)]
+  def selectProcedures(): List[(Long, String, String, Long)] = {
+    sql"select id, desc, code, duration from procedures".query[(Long, String, String, Long)].to[List].transact(xa).unsafeRunSync
   }
 
 
