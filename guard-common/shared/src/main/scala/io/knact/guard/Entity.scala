@@ -7,8 +7,11 @@ import shapeless.tag
 import shapeless.tag.@@
 import io.circe.java8.time._
 import io.circe.generic.auto._
+import io.knact.guard._
 import io.knact.guard.Entity.Id
 import io.knact.guard.Telemetry.{Status, Verdict}
+
+import scala.collection.immutable.TreeMap
 
 sealed trait Entity[A] {
 	def id: Id[A]
@@ -28,6 +31,8 @@ object Entity {
 		def host: String
 		def port: Int
 	}
+
+
 	case class SshPasswordTarget(host: String, port: Int,
 								 username: String, password: String) extends Target
 	case class SshKeyTarget(host: String, port: Int, username: String,
@@ -36,18 +41,21 @@ object Entity {
 
 	case class ServerStatus(version: String,
 							nodes: Int, procedures: Int,
+							load: Percentage, memory: ByteSize,
 							startTime: ZonedDateTime)
 
-	type TimeSeries[A] = Map[ZonedDateTime, A]
+	type TimeSeries[+A] = TreeMap[ZonedDateTime, A]
 
-	case class TelemetrySeries(origin: Id[Node], series: TimeSeries[Status])
-	case class LogSeries(origin: Id[Node], series: TimeSeries[Seq[Line]])
+	case class TelemetrySeries(origin: Id[Node],
+							   series: TimeSeries[Status] = TreeMap.empty[ZonedDateTime, Status])
+	case class LogSeries(origin: Id[Node],
+						 series: TimeSeries[Seq[Line]] = TreeMap.empty[ZonedDateTime, Seq[Line]])
 
 
 	case class Node(id: Id[Node],
 					target: Target,
 					remark: String,
-					telemetries: TimeSeries[Option[Verdict]] = Map(),
+					status: Option[Status] = None,
 					logs: Map[Path, ByteSize] = Map(),
 				   ) extends Entity[Node] {
 		override def withId(a: Node, that: Id[Node]): Node = a.copy(id = that)
@@ -55,12 +63,22 @@ object Entity {
 
 
 	case class Procedure(id: Id[Procedure],
-						 description: String,
+						 name: String,
+						 remark: String,
 						 code: String,
 						 timeout: Duration,
 						) extends Entity[Procedure] {
 		override def withId(a: Procedure, that: Id[Procedure]): Procedure = a.copy(id = that)
 	}
+
+
+	//	sealed trait EventKind extends EnumEntry
+	//	object EventKind extends enumeratum.Enum[EventKind] {
+	//		case object PoolChanged extends EventKind
+	//		case object NodeUpdated extends EventKind
+	//		noinspection TypeAnnotation
+	//		val values = findValues
+	//	}
 
 	sealed trait Event
 	case class PoolChanged(pool: Set[Id[Node]]) extends Event
@@ -73,7 +91,7 @@ object Entity {
 	implicit class EitherOutcomeInstance[+A](a: Either[Failure, Id[A]]) {
 		def liftOutcome: Outcome[A] = a.fold(Failed, Altered(_))
 	}
-
+	ensureCodec[TreeMap[ZonedDateTime, String]]
 	ensureCodec[Target]
 	ensureCodec[Event]
 	ensureCodec[ServerStatus]

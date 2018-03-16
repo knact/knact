@@ -11,7 +11,7 @@ import io.knact.guard.Entity.{Procedure, id}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{EitherValues, FlatSpec, Matchers}
 
-class ServiceSpec extends FlatSpec with Matchers with EitherValues {
+class GuardServiceSpec extends FlatSpec with Matchers with EitherValues {
 
 
 }

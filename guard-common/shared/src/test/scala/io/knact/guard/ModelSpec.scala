@@ -27,12 +27,12 @@ class ModelSpec extends FlatSpec with Matchers with EitherValues {
 	"Procedure" should ExhibitJsonBijectiveProperties in {
 		forAll(Table(
 			("input", "expected"),
-			(Procedure(id(1), "", "", Duration.ZERO),
-				"""{"id":1,"description":"","code":"","timeout":"PT0S"}"""),
-			(Procedure(id(0), "foo", "bar", Duration.ofDays(365)),
-				"""{"id":0,"description":"foo","code":"bar","timeout":"PT8760H"}"""),
-			(Procedure(id(-1), Utf8Text, Utf8Text, Duration.ofNanos(10)),
-				s"""{"id":-1,"description":"$Utf8Text","code":"$Utf8Text","timeout":"PT0.00000001S"}""")
+			(Procedure(id(1), "", "", "", Duration.ZERO),
+				"""{"id":1,"name":"","remark":"","code":"","timeout":"PT0S"}"""),
+			(Procedure(id(0), "foo", "bar", "baz", Duration.ofDays(365)),
+				"""{"id":0,"name":"foo","remark":"bar","code":"baz","timeout":"PT8760H"}"""),
+			(Procedure(id(-1), Utf8Text, Utf8Text, Utf8Text, Duration.ofNanos(10)),
+				s"""{"id":-1,"name":"$Utf8Text","remark":"$Utf8Text","code":"$Utf8Text","timeout":"PT0.00000001S"}""")
 		))(shouldBeBijective[Procedure])
 	}
 

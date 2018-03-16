@@ -18,7 +18,7 @@ object Common {
 			"-Ywarn-dead-code",
 			"-Ywarn-numeric-widen",
 			"-Ywarn-value-discard",
-			"-Ywarn-unused",
+//			"-Ywarn-unused", // TODO turn this back on for prod
 			"-Ypartial-unification",
 //			"-Xlog-implicits",
 		),

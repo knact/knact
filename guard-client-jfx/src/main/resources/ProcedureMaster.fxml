@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane fx:id="root" dividerPositions="0.28" minWidth="600.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.controller.NodeMasterController">
+   <items>
+      <VBox SplitPane.resizableWithParent="false">
+         <children>
+            <fx:include fx:id="collectionBar" source="CollectionBar.fxml" />
+            <TableView fx:id="procedures" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true">
+               <columns>
+                  <TableColumn fx:id="id" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" text="#" />
+                  <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
+               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </VBox>
+      <StackPane fx:id="prodecurePane" />
+   </items>
+</SplitPane>

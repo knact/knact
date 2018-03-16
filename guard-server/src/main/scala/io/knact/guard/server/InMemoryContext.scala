@@ -4,6 +4,7 @@ import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicLong
 
 import cats.implicits._
+import io.knact.guard._
 import io.knact.guard.Entity._
 import io.knact.guard.Telemetry.{Online, Verdict}
 import io.knact.guard.server.InMemoryContext.MapBackedRepository
@@ -13,6 +14,7 @@ import monix.reactive.Observable
 import monix.reactive.subjects.ConcurrentSubject
 
 import scala.collection.concurrent.TrieMap
+import scala.collection.immutable.TreeMap
 import scala.collection.mutable
 
 /**
@@ -61,15 +63,16 @@ class InMemoryContext(override val version: String,
 						case IndexedSeq()           => Vector(time -> state)
 					}
 				}
+			entry.telemetries.series.lastOption
+
 			entry.node.copy(
-				telemetries = summarised.toMap,
-				// sum up all the lengths of the log lines
+				status = entry.telemetries.series.lastOption.map {_._2},
 				logs = entry.logs.mapValues {_.series.values.map {_.length.toLong}.sum}
 			)
 		}
 		override def resolve: Node => (Failure | NodeEntry) = node => buffer.get(node.id) match {
 			case Some(value) => Right(value.copy(node = node))
-			case None        => Right(NodeEntry(node, TelemetrySeries(node.id, Map()), Map()))
+			case None        => Right(NodeEntry(node, TelemetrySeries(node.id), Map()))
 		}
 
 		private val poolSubject      = ConcurrentSubject.publish[Set[Id[Node]]](scheduler)
@@ -90,6 +93,10 @@ class InMemoryContext(override val version: String,
 				case Bound(None, Some(end))        => s.filter { case (k, _) => k.isBefore(end) }
 				case Bound(None, None)             => s
 			}
+		}
+
+		override def meta(nid: Id[Node]): Task[Option[Node]] = {
+			find(nid).map {_.map {_.copy(status = None, logs = Map())}}
 		}
 
 		override def telemetries(nid: Id[Node])
@@ -135,7 +142,7 @@ class InMemoryContext(override val version: String,
 				// XXX use lens here
 				val updated = x.logs.get(path) match {
 					case Some(ls) => LogSeries(nid, ls.series + (time -> lines))
-					case None     => LogSeries(nid, Map(time -> lines))
+					case None     => LogSeries(nid, TreeMap(time -> lines))
 				}
 				buffer.update(nid, x.copy(logs = x.logs.updated(path, updated)))
 				logSubject.onNext(nid)

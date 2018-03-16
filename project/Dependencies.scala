@@ -17,6 +17,8 @@ object Dependencies {
 	lazy val ScalaTest   = "org.scalatest" %% "scalatest" % "3.0.4"
 	lazy val MockitoCore = "org.mockito" % "mockito-core" % "2.10.0"
 
+	lazy val Squants = "org.typelevel"  %% "squants"  % "1.3.0"
+
 	val http4sVersion = "0.18.0"
 	val circeVersion  = "0.9.1"
 
@@ -35,10 +37,11 @@ object Dependencies {
 
 	lazy val circe = Seq(
 		"io.circe" %% "circe-core",
-		"io.circe" %% "circe-generic",
 		"io.circe" %% "circe-parser",
 		"io.circe" %% "circe-refined",
 		"io.circe" %% "circe-java8",
+		"io.circe" %% "circe-generic",
+		"io.circe" %% "circe-generic-extras",
 	).map {_ % circeVersion}
 
 

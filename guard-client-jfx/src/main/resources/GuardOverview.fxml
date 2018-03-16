@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.AreaChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.controller.GuardOverviewController">
+    <children>
+        <SplitPane dividerPositions="0.5" orientation="VERTICAL" VBox.vgrow="ALWAYS">
+            <items>
+                <AreaChart fx:id="history" alternativeColumnFillVisible="true" animated="false" createSymbols="false" legendSide="TOP">
+                    <xAxis>
+                        <CategoryAxis side="BOTTOM" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis side="LEFT" />
+                    </yAxis>
+                </AreaChart>
+                <AreaChart fx:id="performance" alternativeColumnFillVisible="true" animated="false" createSymbols="false">
+                    <xAxis>
+                        <CategoryAxis side="TOP" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis side="LEFT" />
+                    </yAxis>
+                </AreaChart>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>

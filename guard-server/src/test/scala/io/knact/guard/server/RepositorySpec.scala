@@ -45,7 +45,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 		it should "insert discards id and relations" in SyncContext {
 			val ctx = f()
 			for {
-				id <- ctx.nodes.insert(Node(id(42), target, "bar", Map(), Map()))
+				id <- ctx.nodes.insert(Node(id(42), target, "bar", None, Map()))
 				found <- ctx.nodes.find(id.right.value)
 			} yield found contains Node(Entity.id(0), target, "bar")
 		}

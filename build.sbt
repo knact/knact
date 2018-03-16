@@ -46,6 +46,7 @@ lazy val guardCommonSettings = commonSettings ++ Seq(
 	libraryDependencies ++= circe ++ Seq(
 		Enumeratum,
 		Monix,
+		Squants,
 		ScalaTest % Test
 	)
 )
@@ -57,7 +58,9 @@ lazy val `guard-common-js` = project.in(file("guard-common/js"))
 lazy val `guard-common-jvm` = project.in(file("guard-common/jvm"))
 	.settings(
 		guardCommonSettings,
-		libraryDependencies ++= http4sClient
+		libraryDependencies ++= http4sClient ++ Seq(
+			"org.glassfish.tyrus.bundles" % "tyrus-standalone-client-jdk" % "1.13.1"
+		)
 	)
 
 lazy val `guard-server` = project.settings(
@@ -89,6 +92,7 @@ lazy val `guard-client-jfx` = project.settings(
 		ScalaLogging, Logback,
 		"org.scalafx" %% "scalafx" % "8.0.144-R12",
 		"org.scalafx" %% "scalafxml-core-sfx8" % "0.4",
+		"org.fxmisc.easybind" % "easybind" % "1.0.3",
 		"org.controlsfx" % "controlsfx" % "8.40.14",
 		ScalaTest % Test,
 	),

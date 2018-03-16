@@ -11,14 +11,15 @@ import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.syntax._
 import io.knact.guard
-import io.knact.guard.Entity.{Altered, Failed, Id, Node, NodeUpdated, PoolChanged, Procedure, ServerStatus, id => coerce}
-import io.knact.guard._
+import io.knact.guard.Entity.{Altered, Event, Failed, Id, Node, NodeUpdated, PoolChanged, Procedure, ServerStatus, id => coerce}
+import io.knact.guard.{NodePath, _}
 import io.knact.guard.server.Main.Config
 import monix.eval.Task
 import monix.reactive.Observable
 import org.http4s.{HttpService, _}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
+import org.http4s.server.middleware.AutoSlash
 
 
 class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] with LazyLogging {
@@ -86,7 +87,10 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 				ps <- procedures.list()
 			} yield ServerStatus(
 				version = context.version,
-				nodes = ns.size, procedures = ps.size,
+				nodes = ns.size,
+				procedures = ps.size,
+				load = MxMetric.processCpuLoad().getOrElse(0.0),
+				memory = MxMetric.processHeapMemory(),
 				startTime = context.startTime).asJson
 		)
 	}
@@ -104,7 +108,6 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 	}
 	/*_*/
 
-
 	implicit val zdtQueryParamDecoder: QueryParamDecoder[ZonedDateTime] = QueryParamDecoder[Long]
 		.map { epoch => ZonedDateTime.ofInstant(Instant.ofEpochMilli(epoch), ZoneOffset.UTC) }
 
@@ -113,11 +116,16 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 
 	/*_*/
 	private val nodeService = HttpService[Task] {
-		case GET -> Root / NodePath                   => list(nodes)
-		case GET -> Root / NodePath / IntVar(id)      => find(nodes, id)
-		case req@POST -> Root / NodePath              => insert(nodes, req)
-		case req@POST -> Root / NodePath / IntVar(id) => update(nodes, req, id)
-		case DELETE -> Root / NodePath / IntVar(id)   => delete(nodes, id)
+		case GET -> Root / NodePath                       => list(nodes)
+		case GET -> Root / NodePath / IntVar(id)          => find(nodes, id)
+		case GET -> Root / NodePath / IntVar(id) / "meta" =>
+			nodes.meta(coerce(id)).flatMap {
+				case None    => NotFound()
+				case Some(x) => Ok(x.asJson)
+			}
+		case req@POST -> Root / NodePath                  => insert(nodes, req)
+		case req@POST -> Root / NodePath / IntVar(id)     => update(nodes, req, id)
+		case DELETE -> Root / NodePath / IntVar(id)       => delete(nodes, id)
 
 		case GET -> Root / NodePath / IntVar(id) / "telemetry" :? StartVar(s) +& EndVar(e)  =>
 			nodes.telemetries(coerce(id))(Bound(s, e)).flatMap {
@@ -134,18 +142,20 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 			import org.http4s.server.websocket._
 			import org.http4s.websocket.WebsocketBits._
 
+			def asFrame(event: Event): WebSocketFrame = Text(event.asJson.noSpaces)
+
 			val fs = for {
 				d <- fs2.Stream.eval(fs2.async.unboundedQueue[Task, WebSocketFrame])
 				_ <- fs2.Stream.eval(Task.apply {
 					nodes.ids
-						.mapTask(ns => d.enqueue1(Text(PoolChanged(ns).asJson.noSpaces)))
+						.mapTask(ns => d.enqueue1(asFrame(PoolChanged(ns))))
 						.subscribe()
 					// TODO technically, an event about pool invalidates any buffered node delta
 					Observable.merge(nodes.logDelta, nodes.telemetryDelta)
 						.bufferTimed(config.eventInterval)
-						.map{_.toSet}
-						.filter{_.nonEmpty}
-						.mapTask(ns => d.enqueue1(Text(NodeUpdated(ns.toSet).asJson.noSpaces)))
+						.map {_.toSet}
+						.filter {_.nonEmpty}
+						.mapTask(ns => d.enqueue1(asFrame(NodeUpdated(ns))))
 						.subscribe()
 				})
 				v <- d.dequeue
@@ -162,9 +172,10 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 
 
 	/*_*/
-	lazy val services: HttpService[Task] = statService <+>
-										   procedureService <+>
-										   nodeService
+	// trailing slashes make no difference
+	lazy val services: HttpService[Task] = AutoSlash(statService <+>
+													 procedureService <+>
+													 nodeService)
 	/*_*/
 
 }

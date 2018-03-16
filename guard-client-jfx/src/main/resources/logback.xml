@@ -11,7 +11,7 @@
 
 
     <root  >
-        <appender-ref ref="CONSOLE" />
+        <!--<appender-ref ref="CONSOLE" />-->
     </root>
 
 </configuration>
