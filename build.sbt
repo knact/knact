@@ -94,6 +94,7 @@ lazy val `guard-client-jfx` = project.settings(
 		"org.scalafx" %% "scalafxml-core-sfx8" % "0.4",
 		"org.fxmisc.easybind" % "easybind" % "1.0.3",
 		"org.controlsfx" % "controlsfx" % "8.40.14",
+		"se.sawano.java" % "alphanumeric-comparator" % "1.4.1",
 		ScalaTest % Test,
 	),
 ).dependsOn(`guard-common-jvm`)

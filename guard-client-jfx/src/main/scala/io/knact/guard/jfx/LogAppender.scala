@@ -22,7 +22,7 @@ class LogAppender(val f: LogEntry => Unit) extends AppenderBase[ILoggingEvent] {
 	private val ctx : LoggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
 	private val root: Logger        = ctx.getLogger("ROOT")
 
-	root.setLevel(Level.ALL)
+	root.setLevel(Level.INFO)
 	root.addAppender(this)
 	setContext(ctx)
 

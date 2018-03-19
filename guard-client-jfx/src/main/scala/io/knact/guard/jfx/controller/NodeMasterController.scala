@@ -14,6 +14,7 @@ import io.knact.guard.jfx.Model.{AppContext, NodeError, NodeHistory, NodeItem, N
 import io.knact.guard.jfx.RichScalaFX._
 import io.knact.guard.jfx.Schedulers
 import io.knact.guard.{ClientError, ConnectionError, DecodeError, Found, NotFound, ServerError, Telemetry, _}
+import javafx.beans.binding.{Bindings, BooleanBinding}
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import monix.reactive.Observable
@@ -23,12 +24,17 @@ import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.collections.transformation.{FilteredBuffer, SortedBuffer}
+import scalafx.scene.Scene
 import scalafx.scene.chart._
+import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
-import scalafx.scene.layout.{StackPane, VBox}
+import scalafx.scene.layout.{Region, StackPane, VBox}
+import scalafx.stage.Stage
 import scalafx.{scene => sfxs}
 import scalafxml.core.{DependenciesByType, FXMLView}
 import scalafxml.core.macros.sfxml
+import se.sawano.java.text.AlphanumericComparator
+
 import scala.reflect.runtime.universe.typeOf
 
 
@@ -80,6 +86,10 @@ class NodeMasterController(private val root: SplitPane,
 	sorted.comparator <== nodeTable.comparator
 	nodeTable.items = sorted
 	nodeTable.sortOrder.setAll(id)
+	nodeTable.selectionModel().selectionMode = SelectionMode.Multiple
+
+	private final val alphaNum = new AlphanumericComparator()
+	Seq(cpu, mem, disk, netRx, netRx).foreach { c => c.comparator = alphaNum.compare(_, _) }
 
 
 	//	selected <== nodes.getSelectionModel.selectedItem.map { v => Option(v).map {_.id} }
@@ -95,6 +105,48 @@ class NodeMasterController(private val root: SplitPane,
 				case NodeHistory(id, target, remark, status, log) =>
 					s"$id${target.host}:${target.port}$remark$status$log"
 			}).toString.toLowerCase().contains(keyword.toLowerCase)
+		}
+	}
+
+
+	private val noContext   = context.service.isEqualTo(None)
+	private val noSelection = Bindings.isEmpty(nodeTable.selectionModel().selectedItems)
+	add.disable <== noContext
+	filter.disable <== noContext
+	delete.disable <== noSelection
+
+	add.onAction = handle {
+		val view = FXMLView(Resources.getResource("NodeEdit.fxml"),
+			new DependenciesByType(Map(typeOf[StageContext] -> context))
+		)
+		new Stage {
+			scene = new Scene(view)
+			title = "New node"
+		}.show()
+	}
+	delete.onAction = handle {
+		val selected = nodeTable.getSelectionModel.selectedItems
+		if (selected.isEmpty) {
+			new Alert(AlertType.Information,
+				"No node selected to delete",
+				ButtonType.OK).showAndWait()
+		} else {
+			new Alert(AlertType.Warning) {
+
+				dialogPane().content = new Label(
+					s"""Delete node ${selected.map { v => v.id }.mkString(", ")}?
+					   |You cannot undo this action, the associated history and logs of selected nodes will permanently deleted.""".stripMargin
+
+				) {
+					wrapText = true
+				}
+
+				buttonTypes = Seq(ButtonType.Cancel, ButtonType.OK)
+				dialogPane().maxWidth(400)
+			}.showAndWait() match {
+				case Some(ButtonType.OK)            => ???
+				case Some(ButtonType.Cancel) | None => //  no op
+			}
 		}
 	}
 
@@ -236,6 +288,7 @@ class NodeMasterController(private val root: SplitPane,
 		}
 	}
 
+
 	cpu.cellValueFactory = { v =>
 		ObjectProperty(mapStatus(v.value) { s => f"${s.telemetry.cpuPercent}%.1f%%" })
 	}
@@ -263,9 +316,10 @@ class NodeMasterController(private val root: SplitPane,
 		case Some(gs) =>
 
 			// Id -> NodeItem
-			type Outcome = Either[String, Map[Id[Node], NodeItem]]
+			type NodeItems = Map[Id[Node], NodeItem]
+			type Outcome = Either[String, NodeItems]
 
-			def pull(ids: Seq[Id[Node]]): Task[Map[Id[Node], NodeItem]] = {
+			def pull(ids: Seq[Id[Node]]): Task[NodeItems] = {
 				Task.wanderUnordered(ids) { id =>
 					gs.nodes().find(id).map {
 						case ConnectionError(e)  => NodeError(id, s"Connection failed: ${e.getMessage}")
@@ -284,30 +338,49 @@ class NodeMasterController(private val root: SplitPane,
 				}.map {_.toMap}
 			}
 
-			val xs: Task[Outcome] = for {
+			// TODO figure out scan : 30 minutes
+
+
+			//
+			//			val that = (Observable.fromTask(xs) ++ gs.events.flatMapLatest {
+			//				// TODO right side
+			//				case PoolChanged(pool)  => Observable.fromTask(pull(pool.toSeq).map {Right(_)})
+			//				case NodeUpdated(delta) => Observable.fromTask(pull(delta.toSeq).map {Right(_)})
+			//			}).scan(Left("Waiting for telemetry"): Either[String, NodeItems]) {
+			//				case (Right(p), Right(c)) => Right(p |+| c)
+			//				case (_, x)               => x
+			//			}
+
+			def retain[K, V](xs: Map[K, V], ks: Set[K]): Map[K, V] = xs.filterKeys(ks.contains)
+
+			gs.events.scanTask(for {
 				ids <- gs.nodes().list().map {_.toEither}
 				v <- ids match {
 					case Left(e)   => Task.pure(Left(e))
 					case Right(is) => pull(is).map {Right(_)}
 				}
-			} yield v
-
-
-			// TODO figure out scan : 30 minutes
-
-
-			(Observable.fromTask(xs) ++ gs.events.flatMapLatest {
-				case PoolChanged(pool)  => Observable.fromTask(pull(pool.toSeq).map {Right(_)})
-				case NodeUpdated(delta) => Observable.fromTask(pull(delta.toSeq).map {Right(_)})
-			}).scan(Left("Waiting for telemetry"): Outcome) {
-				case (Right(p), Right(c)) => Right(p |+| c)
-				case (_, x)               => x
+			} yield v) {
+				// TODO right side
+				case (Left(_), PoolChanged(pool))    => pull(pool.toSeq).map {Right(_)}
+				case (Left(_), NodeUpdated(delta))   => pull(delta.toSeq).map {Right(_)}
+				case (Right(xs), PoolChanged(pool))  => pull(pool.toSeq).map { ys =>
+//					val left = xs.keySet.intersect(ys.keySet).map { k => k -> xs(k) }.toMap
+					Right(retain(xs, ys.keySet) |+| ys)
+				}
+				case (Right(xs), NodeUpdated(delta)) => pull(delta.toSeq).map { ys => Right(xs |+| ys) }
 			}.observeOn(Schedulers.JavaFx)
 				.doOnError {_.printStackTrace()}
 				.foreach {
 					case Left(e)   => nodeTable.placeholder = new Label(e)
 					case Right(xs) =>
-						items.setAll(xs.values.toSeq: _*)
+						// save and restore selection upon update
+						val update = xs.values.toSeq
+						val selected = nodeTable.selectionModel().selectedItems.map {_.id}.toSet
+						items.setAll(update: _*)
+
+						update.filter { n => selected.contains(n.id) }.foreach {nodeTable.selectionModel().select(_)}
+
+
 				}
 
 		case None =>

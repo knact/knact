@@ -18,6 +18,8 @@ import squants.information._
 import scala.concurrent.duration._
 import java.util.UUID
 
+import scala.util.Random
+
 
 object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 
@@ -29,17 +31,28 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 		val wd = new Watchdog[Node, String](nodes.entities)
 		val rand = ThreadLocalRandom.current()
 
+		def randomIpAddress(): String = List.fill(4) {rand.nextInt(255)}.mkString(".")
+
 		logger.info("Monkey started")
-		Observable.interval(5 minutes).mapTask { tick =>
-			Task.wanderUnordered((0 to 10).toList) { i =>
+		Observable.interval(10 seconds).mapTask { tick =>
+			Task.wanderUnordered((0 to rand.nextInt(10)).toList) { i =>
 				nodes.insert(Node(
 					id(1),
-					SshKeyTarget(s"1_$i+$tick", 22, s"foo$i", Array(42)), "a"))
+					SshKeyTarget(randomIpAddress(), i + tick.toInt, s"foo$i", Array(42)), "a"))
 			}
 		}.dump("Add").executeWithFork.subscribe()
 
+		Observable.interval(10 seconds).mapTask { tick =>
+			for {
+				ids <- nodes.list()
+				removed <- Task.wanderUnordered(Random.shuffle(ids).take(rand.nextInt(10))) { i =>
+					nodes.delete(i)
+				}
+			} yield removed
+		}.dump("Remove").executeWithFork.subscribe()
+
 		wd.dispatchRepeated(0.5 second, Command[String, Telemetry.Status] { _ =>
-			Thread.sleep(rand.nextInt(350))
+			Thread.sleep(rand.nextInt(1))
 			rand.nextInt(10) match {
 				case 0 => Left(new UnknownHostException())
 				case 1 => Left(new SocketTimeoutException())
@@ -60,7 +73,7 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 
 					val nets = (0 to rand.nextInt(5)).map { i =>
 						s"inet$i" -> NetStat(
-							inet = List.fill(4) {rand.nextInt(255)}.mkString("."),
+							inet = randomIpAddress(),
 							mac = {
 								val bytes6 = new Array[Byte](6)
 								rand.nextBytes(bytes6)
@@ -108,7 +121,7 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 			.subscribe()(Scheduler.forkJoin(
 				name = "monkey",
 				parallelism = sys.runtime.availableProcessors(),
-				maxThreads = sys.runtime.availableProcessors()))
+				maxThreads = sys.runtime.availableProcessors() * 10))
 
 		()
 	}

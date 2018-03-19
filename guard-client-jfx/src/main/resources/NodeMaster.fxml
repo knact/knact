@@ -10,6 +10,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <SplitPane fx:id="root" dividerPositions="0.5" minWidth="600.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.controller.NodeMasterController">
@@ -48,6 +49,11 @@
                 </HBox>
             </children>
         </VBox>
-      <TabPane fx:id="nodeTabs" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="ALL_TABS" />
+      <StackPane>
+         <children>
+            <Label text="◀ Double click on any node for details" />
+            <TabPane fx:id="nodeTabs" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="ALL_TABS" />
+         </children>
+      </StackPane>
     </items>
 </SplitPane>
