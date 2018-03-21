@@ -26,7 +26,7 @@ class H2JdbcContext extends ApiContext {
 	// DONE Define methods for modifying and inspecting the database
 	// DONE Decide how to store logs.
   // TOOD: Smart functions for data manipulation i.e joins etc
-  
+
 
 	val dbPath = Paths.get(".test").toAbsolutePath
 
@@ -48,7 +48,11 @@ class H2JdbcContext extends ApiContext {
                       host VARCHAR NOT NULL,
                       port INT NOT NULL,
                       remark VARCHAR,
-                      logs VARCHAR(MAX)
+                      logLine BIGINT,
+                      telemetry BIGINT,
+                      PRIMARY KEY (id),
+                      FOREIGN KEY (logLine) REFERENCES LOGS(lineID)
+                      FOREIGN KEY (telemetry) REFERENCES TELEMETRY(id)
                       )
                     END
             """.update.run
@@ -63,7 +67,31 @@ class H2JdbcContext extends ApiContext {
                       duration BIGINT
                       )
                     END""".update.run // TODO: How best to stor duration
-	} yield(nodes, procedures)
+
+    val logs <- sql"""
+                   IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='LOGS')
+                   BEGIN
+                      CREATE TABLE LOGS(
+                      lineID BIGINT,
+                      lineVal VARCHAR,
+                      nodeID BIGINT,
+                      PRIMARY KEY(lineID),
+                      FOREIGN KEY (nodeID) REFERENCES NODE(id)
+                      )
+                   END   """.update.run
+
+    val telemetry <- sql"""
+                           IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA WHERE TABLE_NAME='TELEMETRY')
+                           BEGIN
+                              CREATE  TABLE TELEMETRY(
+                              id BIGINT,
+                              verdict VARCHAR,
+                              PRIMARY KEY(id),
+                              FOREIGN KEY (id) REFERENCES NODES(id)
+                              )
+                           END
+                           """.update.run
+	} yield(nodes, procedures, logs, telemetry)
 
 	//println(ddl.transact(xa).unsafeRunSync)
 
