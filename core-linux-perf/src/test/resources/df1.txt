@@ -1,0 +1,13 @@
+     Used    Avail Filesystem              Mounted on     Type
+        0 16162792 devtmpfs                /dev           devtmpfs
+   237880 15938320 tmpfs                   /dev/shm       tmpfs
+     2672 16173528 tmpfs                   /run           tmpfs
+        0 16176200 tmpfs                   /sys/fs/cgroup tmpfs
+ 16032036 32673980 /dev/mapper/fedora-root /              ext4
+    10836 16165364 tmpfs                   /tmp           tmpfs
+   188740   741768 /dev/nvme0n1p5          /boot          ext4
+236360292 39073024 /dev/mapper/fedora-home /home          ext4
+    41639    56665 /dev/nvme0n1p2          /boot/efi      vfat
+488218132   164328 /dev/sdb1               /mnt/BACKUP    fuseblk
+725652928  6918716 /dev/sda1               /mnt/SORA2     fuseblk
+       68  3235172 tmpfs                   /run/user/1000 tmpfs

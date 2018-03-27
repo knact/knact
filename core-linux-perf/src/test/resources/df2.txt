@@ -1,0 +1,12 @@
+   Used    Avail Filesystem     Mounted on                    Type
+      0   478332 udev           /dev                          devtmpfs
+   3640    97300 tmpfs          /run                          tmpfs
+4483956 90940228 /dev/sda1      /                             ext4
+    216   504472 tmpfs          /dev/shm                      tmpfs
+      4     5116 tmpfs          /run/lock                     tmpfs
+      0   504688 tmpfs          /sys/fs/cgroup                tmpfs
+  97772 90993596 /dev/sda4      /home                         ext4
+ 132052  4282132 /dev/sda2      /boot                         ext4
+     60   100880 tmpfs          /run/user/1000                tmpfs
+  56614        0 /dev/sr0       /media/osboxes/VBox_GAs_5.2.8 iso9660
+      0   102400 tmpfs          /mnt/foo bar                  tmpfs
