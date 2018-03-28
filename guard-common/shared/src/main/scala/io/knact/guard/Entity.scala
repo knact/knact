@@ -34,9 +34,15 @@ object Entity {
 
 
 	case class SshPasswordTarget(host: String, port: Int,
-								 username: String, password: String) extends Target
-	case class SshKeyTarget(host: String, port: Int, username: String,
-							key: Array[Byte]) extends Target
+								 username: String, password: String) extends Target {
+		override def toString: String = s"SshPasswordTarget($username@$host:$port)"
+	}
+
+	// TODO gotta be a better way of storing the key
+	case class SshKeyTarget(host: String, port: Int,
+							username: String, keyPath: String) extends Target {
+		override def toString: String = s"SshKeyTarget($username@$host:$port(key=$keyPath))"
+	}
 
 
 	case class ServerStatus(version: String,

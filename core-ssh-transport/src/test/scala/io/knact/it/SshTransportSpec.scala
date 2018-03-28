@@ -56,7 +56,7 @@ class SshTransportSpec extends FlatSpec with Matchers {
 
 		val s = sshInstance(new SshAuth[Unit] {
 			override def address(a: Unit): SshAddress = SshAddress(InetAddress.getLocalHost, Port)
-			override def credential(a: Unit): SshCredential = PasswordCredential("", "", pk.getPublic)
+			override def credential(a: Unit): SshCredential = PasswordCredential("", "", None)
 		})
 
 

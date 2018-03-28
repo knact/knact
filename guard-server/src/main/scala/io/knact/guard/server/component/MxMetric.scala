@@ -1,10 +1,11 @@
-package io.knact.guard.server
+package io.knact.guard.server.component
 
-import scala.util.Try
 import java.lang.management.ManagementFactory
+
 import javax.management._
 
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 
 object MxMetric {

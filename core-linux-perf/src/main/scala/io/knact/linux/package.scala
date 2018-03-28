@@ -32,7 +32,12 @@ package object linux {
 		}
 	}
 	private[knact] def sendAndReadUntilEOF(s: String)(implicit n: ConsoleNode): String = {
-		mkExpect(n.exec(s)).expect(eofWithFirstLineWorkaround()).getInput
+		val io = n.exec(s)
+		val expect = mkExpect(io)
+		val input = expect.expect(eofWithFirstLineWorkaround()).getInput
+		io.close()
+		expect.close()
+		input
 	}
 	//	private[knact] def sendAndReadUntilEnd(s: String)(implicit n: ConsoleNode): String =
 	//		mkExpect(n.io).sendLine(s"$s;echo '$EOT_CHAR'")

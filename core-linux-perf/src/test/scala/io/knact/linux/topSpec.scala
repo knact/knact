@@ -16,6 +16,7 @@ class topSpec extends FlatSpec with Matchers with EitherValues {
 		"top3.txt",
 		"top4.txt",
 		"top5.txt",
+		"top6.txt",
 	)
 
 	it should "parse sample corpus" in {

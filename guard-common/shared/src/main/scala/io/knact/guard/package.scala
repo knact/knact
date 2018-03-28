@@ -87,6 +87,7 @@ package object guard {
 		def telemetryDelta: Observable[Id[Entity.Node]]
 		def logDelta: Observable[Id[Entity.Node]]
 
+		def find(target: Target) : Task[Option[Node]]
 		def meta(nid: Id[Entity.Node]): Task[Option[Node]]
 		def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]]
 		def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]]

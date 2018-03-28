@@ -27,7 +27,9 @@ case class Telemetry(arch: String,
 	def diskPercent: Percentage = {
 		val totalFree = diskStats.values.map {_.free}.sum
 		val totalUsed = diskStats.values.map {_.used}.sum
-		totalUsed / (totalFree + totalUsed) * 100.0
+		val total = totalFree + totalUsed
+		if (total.toBytes == 0) 0
+		else totalUsed / total * 100.0
 	}
 	def netTx: Information = netStat.values.map {_.tx}.sum
 	def netRx: Information = netStat.values.map {_.rx}.sum
@@ -60,9 +62,7 @@ object Telemetry {
 					   mask: String,
 					   inet6: Option[String],
 					   scope: String, tx: Information, rx: Information) // tx/rx are cumulative not deltas
-	case class DiskStat(free: Information, used: Information){}
-
-
+	case class DiskStat(free: Information, used: Information) {}
 
 
 	sealed trait Verdict

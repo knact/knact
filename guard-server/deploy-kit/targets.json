@@ -1,0 +1,170 @@
+[
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.90.18",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.17.178",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.91.19",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.91.117",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.16.167",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.89.16",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.26.9",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.56.10",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.59.16",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.125.73",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.48.9",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.119.234",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.52.72",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.118.144",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.39.152",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.47.4",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.37.116",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.108.183",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.103.216",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.42.6",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  },
+  {
+    "SshKeyTarget" : {
+      "host" : "129.213.38.243",
+      "port" : 22,
+      "username" : "ubuntu",
+      "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
+    }
+  }
+]

@@ -13,7 +13,7 @@ import io.circe.syntax._
 import io.knact.guard
 import io.knact.guard.Entity.{Altered, Event, Failed, Id, Node, NodeUpdated, PoolChanged, Procedure, ServerStatus, id => coerce}
 import io.knact.guard.{NodePath, _}
-import io.knact.guard.server.Main.Config
+import io.knact.guard.server.component.MxMetric
 import monix.eval.Task
 import monix.reactive.Observable
 import org.http4s.{HttpService, _}

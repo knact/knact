@@ -4,12 +4,14 @@ import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicLong
 
 import cats.implicits._
+import com.typesafe.scalalogging.LazyLogging
 import io.knact.guard._
 import io.knact.guard.Entity._
 import io.knact.guard.Telemetry.{Online, Verdict}
 import io.knact.guard.server.InMemoryContext.MapBackedRepository
 import io.knact.guard.{Bound, Entity, Failure, Line, NodeRepository, Path, ProcedureRepository, Repository, Telemetry, |}
 import monix.eval.Task
+import monix.execution.Scheduler
 import monix.reactive.Observable
 import monix.reactive.subjects.ConcurrentSubject
 
@@ -21,7 +23,7 @@ import scala.collection.mutable
   * An in-memory implementation of all the repositories the API needs
   */
 class InMemoryContext(override val version: String,
-					  override val startTime: ZonedDateTime) extends ApiContext {
+					  override val startTime: ZonedDateTime)(implicit scheduler: Scheduler) extends ApiContext {
 
 	private final val idCounter: AtomicLong = new AtomicLong(0)
 
@@ -63,8 +65,6 @@ class InMemoryContext(override val version: String,
 						case IndexedSeq()           => Vector(time -> state)
 					}
 				}
-			entry.telemetries.series.lastOption
-
 			entry.node.copy(
 				status = entry.telemetries.series.lastOption.map {_._2},
 				logs = entry.logs.mapValues {_.series.values.map {_.length.toLong}.sum}
@@ -93,6 +93,10 @@ class InMemoryContext(override val version: String,
 				case Bound(None, Some(end))        => s.filter { case (k, _) => k.isBefore(end) }
 				case Bound(None, None)             => s
 			}
+		}
+
+		override def find(target: Target): Task[Option[Node]] = Task {
+			buffer.values.find(_.node.target == target).map(_.node)
 		}
 
 		override def meta(nid: Id[Node]): Task[Option[Node]] = {
@@ -168,6 +172,7 @@ class InMemoryContext(override val version: String,
 			notifyPoolChanged(super.delete(id))
 		override def update(id: Id[Node], f: Node => Node): Task[Failure | Id[Node]] =
 			notifyPoolChanged(super.update(id, f))
+
 	}
 
 }
@@ -178,7 +183,7 @@ object InMemoryContext {
 	  * @tparam E the entity type(where {{{ Id[K] }}} is the key of the map)
 	  * @tparam V the stored type(value of the map)
 	  */
-	trait MapBackedRepository[E <: Entity[E], V] extends Repository[E, Task] {
+	trait MapBackedRepository[E <: Entity[E], V] extends Repository[E, Task] with LazyLogging {
 		def buffer: mutable.Map[Id[E], V] //= mutable.Map()
 		// the unique id generator
 		def counter: AtomicLong
@@ -189,15 +194,23 @@ object InMemoryContext {
 		// given some entity, lift it into the stored type
 		def resolve: E => Failure | V
 		protected def notFound(id: Id[E]) = s"$entityName $id does not exist"
-		override def list(): Task[Seq[Id[E]]] = Task {buffer.keys.toSeq}
-		override def find(id: Id[E]): Task[Option[E]] = Task {buffer.get(id).map {extract}}
+		override def list(): Task[Seq[Id[E]]] = Task {
+//			logger.info(s"List all")
+			buffer.keys.toSeq
+		}
+		override def find(id: Id[E]): Task[Option[E]] = Task {
+//			logger.info(s"Find $id")
+			buffer.get(id).map {extract}
+		}
 		override def insert(a: E): Task[Failure | Id[E]] = Task {
+			logger.info(s"Inserting ${a.id}")
 			val created = a.withId(a, Entity.id(counter.getAndIncrement()))
 			val resolved = resolve(created)
 			resolved.foreach { x => buffer += (created.id -> x) } // XXX has side effect
 			resolved.map { _ => created.id }
 		}
 		override def delete(id: Id[E]): Task[Failure | Id[E]] = Task {
+			logger.info(s"Deleting ${id}")
 			buffer.get(id) match {
 				case None    => Left(notFound(id))
 				case Some(_) =>

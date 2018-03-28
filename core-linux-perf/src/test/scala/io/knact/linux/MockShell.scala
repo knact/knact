@@ -13,8 +13,8 @@ object MockShell {
 
 	private val service: ExecutorService = Executors.newSingleThreadExecutor()
 
-	def alwaysRespondWith(source: Source): Basic.ConsoleNode = {
-		(_: String) => {
+	def alwaysRespondWith(source: Source): Basic.ConsoleNode = new ConsoleNode {
+		override def exec(command: String): ConsoleIO = {
 			val _in = new PipedOutputStream()
 			val _err = new PipedInputStream()
 			val _out = new PipedInputStream()
@@ -38,7 +38,6 @@ object MockShell {
 			})
 			io
 		}
-
-
+		override def unsafeTerminate(): Unit = ???
 	}
 }

@@ -15,11 +15,22 @@ lazy val core = project.settings(
 lazy val `core-ssh-transport` = project.settings(
 	commonSettings,
 	libraryDependencies ++= Seq(
-		"com.hierynomus" % "sshj" % "0.23.0",
+		ScalaLogging,
+		"com.hierynomus" % "sshj" % "0.23.0"
+		exclude("org.bouncycastle", "bcprov-jdk15on")
+		exclude("org.bouncycastle", "bcpkix-jdk15on"),
+		// XXX this is needed because sshj has it as compile dependency
+//		"org.bouncycastle" % "bcprov-jdk15on" % "1.56" % Provided,
+//		"org.bouncycastle" % "bcpkix-jdk15on" % "1.56" % Provided,
 		"org.apache.sshd" % "sshd-core" % "1.6.0" % Test,
 		"com.google.jimfs" % "jimfs" % "1.1" % Test,
 		ScalaTest % Test
-	)
+	),
+	//	dependencyOverrides ++= Seq(
+	//		// XXX this is needed because sshj has it as compile dependency
+	//		"org.bouncycastle" % "bcprov-jdk15on" % "1.56" % Provided,
+	//		"org.bouncycastle" % "bcpkix-jdk15on" % "1.56" % Provided,
+	//	)
 ).dependsOn(core)
 
 
@@ -66,7 +77,9 @@ lazy val `guard-common-jvm` = project.in(file("guard-common/jvm"))
 lazy val `guard-server` = project.settings(
 	commonSettings,
 	libraryDependencies ++= http4sServer ++ Seq(
+		"com.github.scopt" %% "scopt" % "3.7.0",
 		Guava,
+		BetterFiles,
 		ScalaLogging, Logback,
 		ScalaTest % Test)
 ).dependsOn(

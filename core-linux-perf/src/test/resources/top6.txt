@@ -1,0 +1,443 @@
+top - 23:25:35 up 2 min,  1 user,  load average: 0.23, 0.11, 0.04
+Tasks: 207 total,   1 running, 206 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  2.2 us,  2.3 sy,  0.0 ni, 93.2 id,  2.2 wa,  0.0 hi,  0.1 si,  0.1 st
+KiB Mem :  7140680 total,  6827784 free,   139380 used,   173516 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.  6766124 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   38004   6032   3992 S   0.0  0.1   0:02.41 /sbin/init
+    2 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kthreadd]
+    3 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [ksoftirqd/0]
+    4 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:0]
+    5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:0H]
+    6 root      20   0       0      0      0 S   0.0  0.0   0:00.04 [kworker/u4:0]
+    7 root      20   0       0      0      0 S   0.0  0.0   0:00.05 [rcu_sched]
+    8 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [rcu_bh]
+    9 root      rt   0       0      0      0 S   0.0  0.0   0:00.01 [migration/0]
+   10 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 [watchdog/0]
+   11 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 [watchdog/1]
+   12 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 [migration/1]
+   13 root      20   0       0      0      0 S   0.0  0.0   0:00.01 [ksoftirqd/1]
+   14 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:0]
+   15 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:0H]
+   16 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kdevtmpfs]
+   17 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [netns]
+   18 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [perf]
+   19 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [khungtaskd]
+   20 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [writeback]
+   21 root      25   5       0      0      0 S   0.0  0.0   0:00.00 [ksmd]
+   22 root      39  19       0      0      0 S   0.0  0.0   0:00.00 [khugepaged]
+   23 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [crypto]
+   24 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kintegrityd]
+   25 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   26 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kblockd]
+   27 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ata_sff]
+   28 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [md]
+   29 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [devfreq_wq]
+   30 root      20   0       0      0      0 S   0.0  0.0   0:00.03 [kworker/u4:1]
+   31 root      20   0       0      0      0 S   0.0  0.0   0:00.06 [kworker/0:1]
+   32 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [kworker/1:1]
+   34 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kswapd0]
+   35 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [vmstat]
+   36 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [fsnotify_mark]
+   37 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [ecryptfs-kthrea]
+   53 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kthrotld]
+   54 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [acpi_thermal_pm]
+   55 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   56 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   57 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   58 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   59 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   60 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   61 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   62 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   63 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_0]
+   64 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_tmf_0]
+   65 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_1]
+   66 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_tmf_1]
+   67 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/u4:2]
+   71 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ipv6_addrconf]
+   84 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [deferwq]
+   85 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [charger_manager]
+  135 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  136 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  137 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  138 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  139 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  140 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  141 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  142 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  144 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ixgbevf]
+  145 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kpsmoused]
+  174 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:2]
+  248 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [raid5wq]
+  274 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [iscsi_eh]
+  287 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_2]
+  288 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_tmf_2]
+  289 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [iscsi_q_2]
+  290 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_wq_2]
+  295 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  298 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  313 root      20   0       0      0      0 S   0.0  0.0   0:00.04 [kworker/u4:3]
+  315 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  345 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [jbd2/sda1-8]
+  346 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ext4-rsv-conver]
+  404 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:2]
+  405 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:1H]
+  406 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:3]
+  428 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_addr]
+  429 root      20   0   35272   3460   3144 S   0.0  0.0   0:00.19 /lib/systemd/systemd-journald
+  430 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_mcast]
+  431 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_nl_sa_wq]
+  432 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_cm]
+  433 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [iw_cm_wq]
+  435 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [rdma_cm]
+  445 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kauditd]
+  469 root      20   0   94772   1700   1524 S   0.0  0.0   0:00.00 /sbin/lvmetad -f
+  499 root      20   0   44776   4228   3060 S   0.0  0.1   0:00.12 /lib/systemd/systemd-udevd
+  565 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kvm-irqfd-clean]
+  736 systemd+  20   0   96092   2352   2184 S   0.0  0.0   0:00.02 /lib/systemd/systemd-timesyncd
+  749 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:3]
+  935 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:1H]
+  978 root      20   0    5220    144     36 S   0.0  0.0   0:00.00 /sbin/iscsid
+  979 root      10 -10   14536   4316   2680 S   0.0  0.1   0:00.00 /sbin/iscsid
+  990 syslog    20   0  256392   3292   2760 S   0.0  0.0   0:00.02 /usr/sbin/rsyslogd -n
+  993 root      20   0  274488   8280   5556 S   0.0  0.1   0:00.03 /usr/lib/accountsservice/accounts-daemon
+  995 root      20   0   27728   2984   2716 S   0.0  0.0   0:00.00 /usr/sbin/cron -f
+ 1001 root      20   0   95368   3504   1324 S   0.0  0.0   0:00.00 /usr/bin/lxcfs /var/lib/lxcfs/
+ 1004 root      20   0   28544   3100   2788 S   0.0  0.0   0:00.03 /lib/systemd/systemd-logind
+ 1006 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:4]
+ 1017 message+  20   0   42900   3776   3360 S   0.0  0.1   0:00.09 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+ 1018 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:4]
+ 1034 daemon    20   0   26044   2124   1928 S   0.0  0.0   0:00.00 /usr/sbin/atd -f
+ 1039 root      20   0  165192  27112  15224 S   0.0  0.4   0:00.13 /usr/lib/snapd/snapd
+ 1045 root      20   0   65508   6276   5556 S   0.0  0.1   0:00.02 /usr/sbin/sshd -D
+ 1046 root      20   0    4396   1284   1200 S   0.0  0.0   0:00.00 /usr/sbin/acpid
+ 1076 root      20   0   13372    164     20 S   0.0  0.0   0:00.00 /sbin/mdadm --monitor --pid-file /run/mdadm/monitor.pid --daemonise --scan --syslog
+ 1079 root      20   0  277176   6164   5496 S   0.0  0.1   0:00.02 /usr/lib/policykit-1/polkitd --no-debug
+ 1118 root      20   0   19472    228      0 S   0.0  0.0   0:00.00 /usr/sbin/irqbalance --pid=/var/run/irqbalance.pid
+ 1137 root      20   0   14656   1776   1648 S   0.0  0.0   0:00.00 /sbin/agetty --noclear tty1 linux
+ 1139 root      20   0   14472   2116   1980 S   0.0  0.0   0:00.00 /sbin/agetty --keep-baud 115200 38400 9600 ttyS0 vt220
+ 1155 root      20   0   92796   6972   6044 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1169 ubuntu    20   0   45276   4576   3876 S   0.0  0.1   0:00.00 /lib/systemd/systemd --user
+ 1174 ubuntu    20   0   61456   2152      0 S   0.0  0.0   0:00.00 (sd-pam)
+ 1227 ubuntu    20   0   92796   4296   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1232 root      20   0   92796   6760   5832 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1263 ubuntu    20   0   92796   4024   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1268 root      20   0   92796   6860   5932 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1299 ubuntu    20   0   92796   4288   3356 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1304 root      20   0   92796   6884   5956 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1335 ubuntu    20   0   92796   4232   3300 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1340 root      20   0   92796   6680   5752 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1371 ubuntu    20   0   92796   3908   2980 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1376 root      20   0   92796   6672   5744 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1407 ubuntu    20   0   92796   4056   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1412 root      20   0   92796   6924   6000 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1443 ubuntu    20   0   92796   4140   3180 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1448 root      20   0   92796   6888   5964 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1479 ubuntu    20   0   92796   4012   3084 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1484 root      20   0   92796   6960   6032 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1515 ubuntu    20   0   92796   4172   3228 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1520 root      20   0   92796   6892   5964 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1551 ubuntu    20   0   92796   4188   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1556 root      20   0   92796   6856   5932 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1587 ubuntu    20   0   92796   4316   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1592 root      20   0   92796   6824   5896 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1623 ubuntu    20   0   92796   4036   3084 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1628 root      20   0   92796   6896   5968 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1659 ubuntu    20   0   92796   4300   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1664 root      20   0   92796   6880   5952 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1695 ubuntu    20   0   92796   4328   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1700 root      20   0   92796   6832   5904 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1731 ubuntu    20   0   92796   4044   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1736 root      20   0   92796   6916   5992 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1767 ubuntu    20   0   92796   4244   3284 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1772 root      20   0   92796   6688   5760 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1803 ubuntu    20   0   92796   4016   3088 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1808 root      20   0   92796   6880   5952 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1839 ubuntu    20   0   92796   4172   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1844 root      20   0   92796   6972   6048 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1875 ubuntu    20   0   92796   4172   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1882 root      20   0   92796   6924   5996 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1913 ubuntu    20   0   92796   4120   3184 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1918 root      20   0   92796   6840   5916 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1949 ubuntu    20   0   92796   4184   3232 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1954 root      20   0   92796   6920   5992 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1985 ubuntu    20   0   92796   4172   3244 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1990 root      20   0   92796   6904   5976 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2021 ubuntu    20   0   92796   4168   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2028 root      20   0   92796   6624   5696 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2059 ubuntu    20   0   92796   4056   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2064 root      20   0   92796   6820   5896 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2095 ubuntu    20   0   92796   4084   3160 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2101 root      20   0   92796   6808   5884 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2132 ubuntu    20   0   92796   4036   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2137 root      20   0   92796   6792   5864 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2168 ubuntu    20   0   92796   3916   2988 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2173 root      20   0   92796   6644   5720 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2204 ubuntu    20   0   92796   4040   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2209 root      20   0   92796   6776   5852 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2240 ubuntu    20   0   92796   3916   2988 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2245 root      20   0   92796   6620   5692 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2276 ubuntu    20   0   92796   4016   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2281 root      20   0   92796   6928   6004 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2312 ubuntu    20   0   92796   4080   3120 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2317 root      20   0   92796   6964   6040 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2348 ubuntu    20   0   92796   4180   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2353 root      20   0   92796   6776   5848 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2384 ubuntu    20   0   92796   4200   3236 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2389 root      20   0   92796   6776   5848 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2420 ubuntu    20   0   92796   4028   3088 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2425 root      20   0   92796   6800   5872 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2456 ubuntu    20   0   92796   4088   3160 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2459 root      20   0   92796   6908   5980 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2492 ubuntu    20   0   92796   3244   2320 S   0.0  0.0   0:00.00 sshd: ubuntu@pts/0
+ 2493 root      20   0   92796   6924   6000 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2495 ubuntu    20   0   21328   5128   3260 S   0.0  0.1   0:00.04 -bash
+ 2536 ubuntu    20   0   92796   4252   3296 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2541 root      20   0   92796   6804   5876 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2572 ubuntu    20   0   92796   4024   3088 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2577 root      20   0   92796   6856   5932 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2608 ubuntu    20   0   92796   4324   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2613 root      20   0   92796   6700   5772 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2644 ubuntu    20   0   92796   4040   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2649 root      20   0   92796   6852   5924 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2680 ubuntu    20   0   92796   4320   3356 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2685 root      20   0   92796   6836   5916 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2716 ubuntu    20   0   92796   4156   3232 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2721 root      20   0   92796   6648   5720 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2752 ubuntu    20   0   92796   3932   2980 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2757 root      20   0   92796   6884   5960 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2788 ubuntu    20   0   92796   4228   3292 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2793 root      20   0   65508   5996   5288 S   0.0  0.1   0:00.00 sshd: [accepted]
+ 2794 sshd      20   0   65508   3208   2480 S   0.0  0.0   0:00.00 sshd: [net]
+ 2795 ubuntu    20   0   40520   3736   3124 R   0.0  0.1   0:00.00 top -b -n1 -w512 -c
+ubuntu@virtualnode-8742:~$ top -b -n1 -w512 -c > topN.txt
+ubuntu@virtualnode-8742:~$ less topN.txt
+ubuntu@virtualnode-8742:~$ scp top-bash: warning: setlocale: LC_CTYPE: cannot change locale (en_GB.UTF-8)
+-bash: warning: setlocale: LC_CTYPE: cannot change locale (en_GB.UTF-8)
+less topN.txt^C
+ubuntu@virtualnode-8742:~$ ^C
+ubuntu@virtualnode-8742:~$ cat topN.txt
+top - 23:25:46 up 2 min,  1 user,  load average: 0.18, 0.11, 0.04
+Tasks: 215 total,   1 running, 214 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  2.1 us,  2.2 sy,  0.0 ni, 93.5 id,  2.0 wa,  0.0 hi,  0.1 si,  0.1 st
+KiB Mem :  7140680 total,  6818332 free,   147748 used,   174600 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.  6756752 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+    1 root      20   0   38004   6032   3992 S   0.0  0.1   0:02.42 /sbin/init
+    2 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kthreadd]
+    3 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [ksoftirqd/0]
+    4 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:0]
+    5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:0H]
+    6 root      20   0       0      0      0 S   0.0  0.0   0:00.04 [kworker/u4:0]
+    7 root      20   0       0      0      0 S   0.0  0.0   0:00.05 [rcu_sched]
+    8 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [rcu_bh]
+    9 root      rt   0       0      0      0 S   0.0  0.0   0:00.01 [migration/0]
+   10 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 [watchdog/0]
+   11 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 [watchdog/1]
+   12 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 [migration/1]
+   13 root      20   0       0      0      0 S   0.0  0.0   0:00.01 [ksoftirqd/1]
+   14 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:0]
+   15 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:0H]
+   16 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kdevtmpfs]
+   17 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [netns]
+   18 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [perf]
+   19 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [khungtaskd]
+   20 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [writeback]
+   21 root      25   5       0      0      0 S   0.0  0.0   0:00.00 [ksmd]
+   22 root      39  19       0      0      0 S   0.0  0.0   0:00.00 [khugepaged]
+   23 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [crypto]
+   24 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kintegrityd]
+   25 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   26 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kblockd]
+   27 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ata_sff]
+   28 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [md]
+   29 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [devfreq_wq]
+   30 root      20   0       0      0      0 S   0.0  0.0   0:00.03 [kworker/u4:1]
+   31 root      20   0       0      0      0 S   0.0  0.0   0:00.06 [kworker/0:1]
+   32 root      20   0       0      0      0 S   0.0  0.0   0:00.02 [kworker/1:1]
+   34 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kswapd0]
+   35 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [vmstat]
+   36 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [fsnotify_mark]
+   37 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [ecryptfs-kthrea]
+   53 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kthrotld]
+   54 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [acpi_thermal_pm]
+   55 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   56 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   57 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   58 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   59 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   60 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   61 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   62 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+   63 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_0]
+   64 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_tmf_0]
+   65 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_1]
+   66 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_tmf_1]
+   67 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/u4:2]
+   71 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ipv6_addrconf]
+   84 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [deferwq]
+   85 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [charger_manager]
+  135 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  136 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  137 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  138 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  139 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  140 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  141 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  142 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  144 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ixgbevf]
+  145 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kpsmoused]
+  174 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:2]
+  248 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [raid5wq]
+  274 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [iscsi_eh]
+  287 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [scsi_eh_2]
+  288 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_tmf_2]
+  289 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [iscsi_q_2]
+  290 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [scsi_wq_2]
+  295 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  298 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  313 root      20   0       0      0      0 S   0.0  0.0   0:00.04 [kworker/u4:3]
+  315 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [bioset]
+  345 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [jbd2/sda1-8]
+  346 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ext4-rsv-conver]
+  404 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:2]
+  405 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:1H]
+  406 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:3]
+  428 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_addr]
+  429 root      20   0   35272   3460   3144 S   0.0  0.0   0:00.20 /lib/systemd/systemd-journald
+  430 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_mcast]
+  431 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_nl_sa_wq]
+  432 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [ib_cm]
+  433 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [iw_cm_wq]
+  435 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [rdma_cm]
+  445 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kauditd]
+  469 root      20   0   94772   1700   1524 S   0.0  0.0   0:00.00 /sbin/lvmetad -f
+  499 root      20   0   44776   4228   3060 S   0.0  0.1   0:00.12 /lib/systemd/systemd-udevd
+  565 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kvm-irqfd-clean]
+  736 systemd+  20   0   96092   2352   2184 S   0.0  0.0   0:00.02 /lib/systemd/systemd-timesyncd
+  749 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:3]
+  935 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:1H]
+  978 root      20   0    5220    144     36 S   0.0  0.0   0:00.00 /sbin/iscsid
+  979 root      10 -10   14536   4316   2680 S   0.0  0.1   0:00.00 /sbin/iscsid
+  990 syslog    20   0  256392   3292   2760 S   0.0  0.0   0:00.02 /usr/sbin/rsyslogd -n
+  993 root      20   0  274488   8280   5556 S   0.0  0.1   0:00.03 /usr/lib/accountsservice/accounts-daemon
+  995 root      20   0   27728   2984   2716 S   0.0  0.0   0:00.00 /usr/sbin/cron -f
+ 1001 root      20   0   95368   3504   1324 S   0.0  0.0   0:00.00 /usr/bin/lxcfs /var/lib/lxcfs/
+ 1004 root      20   0   28544   3104   2788 S   0.0  0.0   0:00.04 /lib/systemd/systemd-logind
+ 1006 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:4]
+ 1017 message+  20   0   42900   3776   3360 S   0.0  0.1   0:00.10 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation
+ 1018 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [kworker/1:4]
+ 1034 daemon    20   0   26044   2124   1928 S   0.0  0.0   0:00.00 /usr/sbin/atd -f
+ 1039 root      20   0  165192  27112  15224 S   0.0  0.4   0:00.13 /usr/lib/snapd/snapd
+ 1045 root      20   0   65508   6276   5556 S   0.0  0.1   0:00.02 /usr/sbin/sshd -D
+ 1046 root      20   0    4396   1284   1200 S   0.0  0.0   0:00.00 /usr/sbin/acpid
+ 1076 root      20   0   13372    164     20 S   0.0  0.0   0:00.00 /sbin/mdadm --monitor --pid-file /run/mdadm/monitor.pid --daemonise --scan --syslog
+ 1079 root      20   0  277176   6164   5496 S   0.0  0.1   0:00.03 /usr/lib/policykit-1/polkitd --no-debug
+ 1118 root      20   0   19472    228      0 S   0.0  0.0   0:00.00 /usr/sbin/irqbalance --pid=/var/run/irqbalance.pid
+ 1137 root      20   0   14656   1776   1648 S   0.0  0.0   0:00.00 /sbin/agetty --noclear tty1 linux
+ 1139 root      20   0   14472   2116   1980 S   0.0  0.0   0:00.00 /sbin/agetty --keep-baud 115200 38400 9600 ttyS0 vt220
+ 1155 root      20   0   92796   6972   6044 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1169 ubuntu    20   0   45276   4576   3876 S   0.0  0.1   0:00.00 /lib/systemd/systemd --user
+ 1174 ubuntu    20   0   61456   2152      0 S   0.0  0.0   0:00.00 (sd-pam)
+ 1227 ubuntu    20   0   92796   4296   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1232 root      20   0   92796   6760   5832 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1263 ubuntu    20   0   92796   4024   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1268 root      20   0   92796   6860   5932 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1299 ubuntu    20   0   92796   4288   3356 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1304 root      20   0   92796   6884   5956 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1335 ubuntu    20   0   92796   4232   3300 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1340 root      20   0   92796   6680   5752 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1371 ubuntu    20   0   92796   3908   2980 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1376 root      20   0   92796   6672   5744 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1407 ubuntu    20   0   92796   4056   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1412 root      20   0   92796   6924   6000 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1443 ubuntu    20   0   92796   4140   3180 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1448 root      20   0   92796   6888   5964 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1479 ubuntu    20   0   92796   4012   3084 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1484 root      20   0   92796   6960   6032 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1515 ubuntu    20   0   92796   4172   3228 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1520 root      20   0   92796   6892   5964 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1551 ubuntu    20   0   92796   4188   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1556 root      20   0   92796   6856   5932 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1587 ubuntu    20   0   92796   4316   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1592 root      20   0   92796   6824   5896 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1623 ubuntu    20   0   92796   4036   3084 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1628 root      20   0   92796   6896   5968 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1659 ubuntu    20   0   92796   4300   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1664 root      20   0   92796   6880   5952 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1695 ubuntu    20   0   92796   4328   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1700 root      20   0   92796   6832   5904 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1731 ubuntu    20   0   92796   4044   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1736 root      20   0   92796   6916   5992 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1767 ubuntu    20   0   92796   4244   3284 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1772 root      20   0   92796   6688   5760 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1803 ubuntu    20   0   92796   4016   3088 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1808 root      20   0   92796   6880   5952 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1839 ubuntu    20   0   92796   4172   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1844 root      20   0   92796   6972   6048 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1875 ubuntu    20   0   92796   4172   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1882 root      20   0   92796   6924   5996 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1913 ubuntu    20   0   92796   4120   3184 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1918 root      20   0   92796   6840   5916 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1949 ubuntu    20   0   92796   4184   3232 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1954 root      20   0   92796   6920   5992 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 1985 ubuntu    20   0   92796   4172   3244 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 1990 root      20   0   92796   6904   5976 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2021 ubuntu    20   0   92796   4168   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2028 root      20   0   92796   6624   5696 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2059 ubuntu    20   0   92796   4056   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2064 root      20   0   92796   6820   5896 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2095 ubuntu    20   0   92796   4084   3160 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2101 root      20   0   92796   6808   5884 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2132 ubuntu    20   0   92796   4036   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2137 root      20   0   92796   6792   5864 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2168 ubuntu    20   0   92796   3916   2988 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2173 root      20   0   92796   6644   5720 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2204 ubuntu    20   0   92796   4040   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2209 root      20   0   92796   6776   5852 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2240 ubuntu    20   0   92796   3916   2988 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2245 root      20   0   92796   6620   5692 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2276 ubuntu    20   0   92796   4016   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2281 root      20   0   92796   6928   6004 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2312 ubuntu    20   0   92796   4080   3120 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2317 root      20   0   92796   6964   6040 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2348 ubuntu    20   0   92796   4180   3240 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2353 root      20   0   92796   6776   5848 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2384 ubuntu    20   0   92796   4200   3236 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2389 root      20   0   92796   6776   5848 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2420 ubuntu    20   0   92796   4028   3088 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2425 root      20   0   92796   6800   5872 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2456 ubuntu    20   0   92796   4088   3160 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2459 root      20   0   92796   6908   5980 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2492 ubuntu    20   0   92796   3244   2320 S   0.0  0.0   0:00.01 sshd: ubuntu@pts/0
+ 2493 root      20   0   92796   6924   6000 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2495 ubuntu    20   0   21328   5160   3256 S   0.0  0.1   0:00.04 -bash
+ 2536 ubuntu    20   0   92796   4252   3296 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2541 root      20   0   92796   6804   5876 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2572 ubuntu    20   0   92796   4024   3088 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2577 root      20   0   92796   6856   5932 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2608 ubuntu    20   0   92796   4324   3364 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2613 root      20   0   92796   6700   5772 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2644 ubuntu    20   0   92796   4040   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2649 root      20   0   92796   6852   5924 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2680 ubuntu    20   0   92796   4320   3356 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2685 root      20   0   92796   6836   5916 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2716 ubuntu    20   0   92796   4156   3232 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2721 root      20   0   92796   6648   5720 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2752 ubuntu    20   0   92796   3932   2980 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2757 root      20   0   92796   6884   5960 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2788 ubuntu    20   0   92796   4228   3292 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2793 root      20   0   92796   6880   5952 S   0.0  0.1   0:00.01 sshd: ubuntu [priv]
+ 2825 ubuntu    20   0   92796   4236   3304 S   0.0  0.1   0:00.01 sshd: ubuntu@notty
+ 2830 root      20   0   92796   6888   5960 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2861 ubuntu    20   0   92796   4240   3292 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2866 root      20   0   92796   6812   5884 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2897 ubuntu    20   0   92796   4028   3080 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2902 root      20   0   92796   6648   5720 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2933 ubuntu    20   0   92796   4020   3092 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2938 root      20   0   92796   6692   5764 S   0.0  0.1   0:00.00 sshd: ubuntu [priv]
+ 2969 ubuntu    20   0   92796   3920   2992 S   0.0  0.1   0:00.00 sshd: ubuntu@notty
+ 2971 ubuntu    20   0   40520   3696   3180 R   0.0  0.1   0:00.00 top -b -n1 -w512 -c

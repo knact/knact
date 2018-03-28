@@ -1,13 +1,16 @@
-package io.knact.guard.server
+package io.knact.guard.server.service
 
 import java.net.{SocketTimeoutException, UnknownHostException}
 import java.time.ZonedDateTime
+import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
 
 import com.google.common.base.Throwables
 import com.typesafe.scalalogging.LazyLogging
 import io.knact.guard.Entity.{Node, SshKeyTarget, id}
 import io.knact.guard.Telemetry.{DiskStat, MemoryStat, NetStat, ThreadStat}
+import io.knact.guard.server.Config
+import io.knact.guard.server._
 import io.knact.guard.{NodeRepository, Telemetry}
 import io.knact.{Command, Connectable, Watchdog}
 import monix.eval.Task
@@ -16,16 +19,14 @@ import monix.reactive.Observable
 import squants.information._
 
 import scala.concurrent.duration._
-import java.util.UUID
-
 import scala.util.Random
 
 
-object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
+object MonkeyService extends LazyLogging {
 
 	implicit val monkeyInstance: Connectable[Node, String] = (a: Node) => Task.pure(a.toString)
 
-	override def apply(nodes: NodeRepository): Task[Unit] = Task {
+	 def apply(config: Config, nodes: NodeRepository): Task[Unit] = Task {
 		nodes.ids.subscribe()
 
 		val wd = new Watchdog[Node, String](nodes.entities)
@@ -34,11 +35,11 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 		def randomIpAddress(): String = List.fill(4) {rand.nextInt(255)}.mkString(".")
 
 		logger.info("Monkey started")
-		Observable.interval(10 seconds).mapTask { tick =>
+		Observable.interval(1 seconds).mapTask { tick =>
 			Task.wanderUnordered((0 to rand.nextInt(10)).toList) { i =>
 				nodes.insert(Node(
 					id(1),
-					SshKeyTarget(randomIpAddress(), i + tick.toInt, s"foo$i", Array(42)), "a"))
+					SshKeyTarget(randomIpAddress(), i + tick.toInt, s"foo$i", "foo"), "a"))
 			}
 		}.dump("Add").executeWithFork.subscribe()
 
@@ -51,8 +52,8 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 			} yield removed
 		}.dump("Remove").executeWithFork.subscribe()
 
-		wd.dispatchRepeated(0.5 second, Command[String, Telemetry.Status] { _ =>
-			Thread.sleep(rand.nextInt(1))
+		wd.dispatchRepeated(config.eventInterval, Command[String, Telemetry.Status] { _ =>
+			Thread.sleep(rand.nextLong(10))
 			rand.nextInt(10) match {
 				case 0 => Left(new UnknownHostException())
 				case 1 => Left(new SocketTimeoutException())
@@ -92,8 +93,8 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 						reason = Some(UUID.randomUUID.toString),
 						telemetry = Telemetry(
 							arch = "Foo",
-							uptime = java.time.Duration.ofSeconds(rand.nextInt(65536)),
-							users = rand.nextInt(10),
+							uptime = java.time.Duration.ofSeconds(rand.nextLong(65536)),
+							users = rand.nextLong(10),
 							processorCount = 4,
 							loadAverage = rand.nextDouble(),
 							memoryStat = MemoryStat(
@@ -102,9 +103,9 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 								used = usedRam,
 								cache = cachedRam),
 							threadStat = ThreadStat(
-								running = rand.nextInt(100),
-								sleeping = rand.nextInt(100),
-								stopped = rand.nextInt(100),
+								running = rand.nextLong(100),
+								sleeping = rand.nextLong(100),
+								stopped = rand.nextLong(100),
 								zombie = 4),
 							netStat = nets, diskStats = disks)
 					))
@@ -117,11 +118,11 @@ object MonkeyModule extends (NodeRepository => Task[Unit]) with LazyLogging {
 				case Left(e)                         => Telemetry.Error(Throwables.getStackTraceAsString(e))
 				case Right(value)                    => value
 			})
-		}.executeWithFork
+		}.executeAsync
 			.subscribe()(Scheduler.forkJoin(
 				name = "monkey",
 				parallelism = sys.runtime.availableProcessors(),
-				maxThreads = sys.runtime.availableProcessors() * 10))
+				maxThreads = config.commandMaxThread))
 
 		()
 	}

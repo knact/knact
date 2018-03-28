@@ -16,7 +16,10 @@ object Basic {
 						 isEof: () => Boolean,
 						 close: () => Unit)
 
-	trait ConsoleNode {def exec(command: String): ConsoleIO}
+	trait ConsoleNode {
+		def exec(command: String): ConsoleIO
+		def unsafeTerminate() : Unit
+	}
 
 
 	implicit def shInstance[A]: Connectable[A, ConsoleNode] = (_: A) => Task {
@@ -30,6 +33,7 @@ object Basic {
 				isEof = process.isAlive,
 				close = () => {process.destroy()})
 			override def exec(command: String): ConsoleIO = ???
+			override def unsafeTerminate(): Unit = ???
 		}
 	}
 
