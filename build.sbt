@@ -20,8 +20,8 @@ lazy val `core-ssh-transport` = project.settings(
 		exclude("org.bouncycastle", "bcprov-jdk15on")
 		exclude("org.bouncycastle", "bcpkix-jdk15on"),
 		// XXX this is needed because sshj has it as compile dependency
-//		"org.bouncycastle" % "bcprov-jdk15on" % "1.56" % Provided,
-//		"org.bouncycastle" % "bcpkix-jdk15on" % "1.56" % Provided,
+		"org.bouncycastle" % "bcprov-jdk15on" % "1.56" ,
+		"org.bouncycastle" % "bcpkix-jdk15on" % "1.56" ,
 		"org.apache.sshd" % "sshd-core" % "1.6.0" % Test,
 		"com.google.jimfs" % "jimfs" % "1.1" % Test,
 		ScalaTest % Test
