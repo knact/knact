@@ -57,13 +57,13 @@ class ApiService(context: ApiContext, config: Config) extends Http4sDsl[Task] wi
 
 	// GET 	   / 		      :: Stat
 
-	// GET     group/node/        :: Seq[Id]full
-	// GET     group/node/{id}    :: Node
-	// POST    group/node/        :: Node => Id
-	// POST    group/node/{id}    :: Node => Id
-	// DELETE  group/node/{id}    :: Id
-	// GET     group/node/{id}/telemetry/&+{bound}   :: TelemetrySeries
-	// GET     group/node/{id}/log/{file}/&+{bound}  :: LogSeries
+	// GET     node/        :: Seq[Id]full
+	// GET     node/{id}    :: Node
+	// POST    node/        :: Node => Id
+	// POST    node/{id}    :: Node => Id
+	// DELETE  node/{id}    :: Id
+	// GET     node/{id}/telemetry/&+{bound}   :: TelemetrySeries
+	// GET     node/{id}/log/{file}/&+{bound}  :: LogSeries
 
 	// GET     procedure/           :: Seq[Id]
 	// GET     procedure/{id}       :: Procedure

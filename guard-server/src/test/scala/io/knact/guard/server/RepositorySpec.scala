@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 
 import io.circe._
 import io.knact.guard.{Bound, Entity, Line, Telemetry}
-import io.knact.guard.Entity._
+import io.knact.guard.Entity.{Node, _}
 import io.knact.guard.Telemetry.Status
 import io.knact.guard.server.TaskAssertions.SyncContext
 import jdk.nashorn.internal.ir.annotations.Immutable
@@ -243,16 +243,36 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 		/*
 		* 		def find(id: Id[A]): F[Option[A]]
 		* */
-		it should "find inserted items" in SyncContext {
+		it should "find inserted items I" in SyncContext {
 			val ctx = f()
+			val nodes = List.fill(10) {Node(id(42), target, "foo")}
+			val anId = Entity.id[Entity.Node, Int](6)
 			for {
-				id <- ctx.nodes.insert(Node(id(42), target, "foo"))
-				found <- ctx.nodes.find(id.right.value)
-			} yield found contains Node(Entity.id(0), target, "foo")
+				ids <- Task.traverse(nodes)(ctx.nodes.insert)
+				//anId <- Entity.id[Entity.Node, Int](6)
+				found <- ctx.nodes.find(anId)
+			} yield found contains Node(Entity.id(5), target, "foo")
 		}
 
 		/*
-		* 		def list(): Task[Seq[Id[A]]] // TODO Seq or Set?
+		* 		def find(target: Target) : Task[Option[Node]]
+		* */
+		it should "find inserted items II" in SyncContext {
+			val ctx = f()
+
+			val nodes = List(1 to 20:_*)
+  			.map(p => SshPasswordTarget("a", p, "a", "a"))
+  			.map(t => Node(id(42), t, "remark"))
+
+			val target = SshPasswordTarget("a", 13, "a", "a")
+			for {
+				ids <- Task.traverse(nodes)(ctx.nodes.insert)
+				found <-ctx.nodes.find(target)
+			} yield found contains Node(id(12), target, "remark")
+		}
+
+		/*
+		* 		def list(): Task[Seq[Id[A]]]
 		* */
 		it should "list all ids in any order" in SyncContext {
 			val ctx = f()
@@ -289,7 +309,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 		/*
 		*		def delete(id: Id[A]): F[Failure | Id[A]]
 		* */
-		it should "Delete an existing node" in {
+		it should "Delete an existing node" in SyncContext {
 			val ctx = f()
 			val nodes = List.fill(10) {Node(id(42), target, "foo")}
 			for {
@@ -299,7 +319,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 			} yield !(n contains Node(id.right.value, target, "foo"))
 		}
 
-		it should "fail deleting a non existing node" in {
+		it should "fail deleting a non existing node" in SyncContext {
 			val ctx = f()
 			val nodes = List.fill(10) {Node(id(42), target, "foo")}
 			for {
@@ -307,15 +327,16 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 				fail <- ctx.nodes.delete(id(15))
 			} yield fail contains "Node 15 does not exist"
 		}
+
 /*
-		it should "List all the ids stored" in {
+		it should "List all the ids stored" in SyncContext {
 			val ctx = f()
 			val nodes = List.fill(10) {Node(id(42), target, "foo")}
+			val observ = ctx.nodes.ids
 			for {
-				observ <- ctx.nodes.ids
 				ids <- Task.traverse(nodes)(ctx.nodes.insert)
-				observ.
-			} yield fail contains "Node 15 does not exist"
+				o <- observ.subscribe
+			} yield o should contain Node(id(42), target, "foo")
 		}*/
 	}
 
