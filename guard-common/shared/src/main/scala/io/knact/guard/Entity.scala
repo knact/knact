@@ -24,6 +24,7 @@ object Entity {
 	type Id[A] = Long @@ A
 
 	implicit def idEq[A]: Eq[Id[A]] = _ == _
+	implicit def idOrd[A] : Ordering[Id[A]] = _ compareTo _
 
 	def id[T, B](id: B)(implicit ev: Numeric[B]): Id[T] = tag[T][Long](ev.toLong(id))
 
