@@ -3,7 +3,7 @@ package io.knact
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
-import cats.{Contravariant, FgtlatMap, Monad}
+import cats.{Contravariant, FlatMap, Monad}
 import enumeratum.EnumEntry
 import io.circe._
 import io.knact.guard.Entity._
