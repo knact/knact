@@ -39,13 +39,17 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 			for {
 				a <- ctx.nodes.insert(node)
 				b <- ctx.nodes.insert(node)
+				c <- ctx.nodes.insert(node)
+				d <- ctx.nodes.insert(node)
 			} yield {
 				a.right.value shouldBe id(0)
 				b.right.value shouldBe id(1)
+				c.right.value shouldBe id(2)
+				d.right.value shouldBe id(3)
 			}
 		}
 
-		it should "insert discards id and relations" in SyncContext {
+		it should "Insert discards id" in SyncContext {
 			val ctx = f()
 			for {
 				id <- ctx.nodes.insert(Node(id(42), target, "bar", None, Map()))
@@ -78,20 +82,19 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 			for {
 				a <- ctx.nodes.insert(node1)
 				b <- ctx.nodes.insert(node2)
-				ls1 <- (ctx.nodes.telemetries(id(0))(Bound()))
-				ls2 <- (ctx.nodes.telemetries(id(1))(Bound()))
+				ls1 <- (ctx.nodes.logs(id(0))("/")(Bound()))
+				ls2 <- (ctx.nodes.logs(id(1))("/")(Bound()))
 			} yield {
-				ls1 contains TelemetrySeries(id(0))
-				ls2 contains TelemetrySeries(id(1))
+				ls1 contains LogSeries(id(0))
+				ls2 contains LogSeries(id(1))
 			}
 		}
 
 		it should "return the correct telemetries when some telemetries are given" in SyncContext {
 			val ctx = f()
-			//val lines : Seq[String] = Seq("foo", "bar")
 			val status : Telemetry.Status = Telemetry.Offline
 
-			val timeSeries : Entity.TimeSeries[Telemetry.Status] = TreeMap((ZonedDateTime.parse(
+			val timeSeries = TreeMap((ZonedDateTime.parse(
 				"2007-12-03T10:15:30+01:00[Europe/Paris]"),
 				status))
 
@@ -132,12 +135,12 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 
 		it should "return the correct telemetries when some telemetries and bounds are given" in SyncContext {
 			val ctx = f()
-			val status : Telemetry.Status = Telemetry.Offline
+			val status = Telemetry.Offline
 
-			val timeSeries1 : Entity.TimeSeries[Telemetry.Status] = TreeMap((ZonedDateTime.parse(
+			val timeSeries1 = TreeMap((ZonedDateTime.parse(
 				"2007-12-03T10:15:30+01:00[Europe/Paris]"),
 				status))
-			val timeSeries2 : Entity.TimeSeries[Telemetry.Status] = TreeMap((ZonedDateTime.parse(
+			val timeSeries2 = TreeMap((ZonedDateTime.parse(
 				"2009-12-03T10:15:30+01:00[Europe/Paris]"),
 				status))
 
@@ -200,9 +203,9 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 
 		it should "return the correct logs when some logs and bounds are given" in SyncContext {
 			val ctx = f()
-			val lines : Seq[String] = Seq("foo", "bar")
+			val lines = Seq("foo", "bar")
 
-			val timeSeries : Entity.TimeSeries[Seq[Line]] = TreeMap((ZonedDateTime.parse(
+			val timeSeries = TreeMap((ZonedDateTime.parse(
 				"2007-12-03T10:15:30+01:00[Europe/Paris]"),
 				lines))
 
@@ -216,7 +219,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 					"path",
 					lines)
 				logs1 <- ctx.nodes.logs(id(0))("path")(Bound())
-			} yield logs1 contains Entity.LogSeries(id(0), timeSeries)
+			} yield logs1 contains  Entity.LogSeries(id(0), timeSeries)
 		}
 
 		/*
@@ -226,7 +229,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 		* 		lines: Seq[Line]): Task[Failure | Id[Entity.Node]]
 		*
 		* */
-		it should "return the correct id when persist is invoked I" in SyncContext {
+		it should "return the correct id when persist is invoked" in SyncContext {
 			val ctx = f()
 			val lines : Seq[String] = Seq("foo")
 			val node = Node(id(42), target, "foo")
@@ -249,7 +252,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 			val anId = Entity.id[Entity.Node, Int](6)
 			for {
 				ids <- Task.traverse(nodes)(ctx.nodes.insert)
-				//anId <- Entity.id[Entity.Node, Int](6)
+
 				found <- ctx.nodes.find(anId)
 			} yield found contains Node(Entity.id(5), target, "foo")
 		}
@@ -282,6 +285,7 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 				gs <- ctx.nodes.list()
 			} yield gs should contain theSameElementsAs ids.map {_.right.value}
 		}
+
 		/*
 		*		def update(id: Id[A], f: A => A): F[Failure | Id[A]]
 		* */
@@ -328,16 +332,6 @@ class RepositorySpec extends FlatSpec with Matchers with EitherValues {
 			} yield fail contains "Node 15 does not exist"
 		}
 
-/*
-		it should "List all the ids stored" in SyncContext {
-			val ctx = f()
-			val nodes = List.fill(10) {Node(id(42), target, "foo")}
-			val observ = ctx.nodes.ids
-			for {
-				ids <- Task.traverse(nodes)(ctx.nodes.insert)
-				o <- observ.subscribe
-			} yield o should contain Node(id(42), target, "foo")
-		}*/
 	}
 
 }
