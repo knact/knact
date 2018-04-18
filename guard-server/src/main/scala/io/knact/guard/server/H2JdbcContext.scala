@@ -77,14 +77,14 @@ class H2JdbcContext extends ApiContext {
            |);""".update.run
 
     logs <-
-      sql"""
-           				 |CREATE TABLE IF NOT EXISTS LOGS(
-           				 |  lineID BIGINT,
-           				 |  lineVal VARCHAR,
-           				 |  nodeID BIGINT,
-           				 |  PRIMARY KEY(lineID),
-           				 |  FOREIGN KEY (nodeID) REFERENCES NODES(id)
-           				 |);""".update.run//TODO
+    sql"""
+           |CREATE TABLE IF NOT EXISTS LOGS(
+           |id BIGINT,
+           |path VARCHAR,
+           |byteSize BIGINT,
+           |PRIMARY KEY(id),
+           |FOREIGN KEY (id)  REFERENCES  NODES(id)
+           |);""".update.run
 
 
     telemetry <-
@@ -193,85 +193,61 @@ class H2JdbcContext extends ApiContext {
 
   def upsertProcedure(proc: Procedure): Task[Id[Procedure]] = {
     val Procedure(procId, name, remark, code, timeout) = proc
-    sql"""insert into procedures(name, remark, code, timeout) values ($name , $remark, $code, $timeout)"""
-      .update
-      .withUniqueGeneratedKeys[Id[Procedure]]("id").transact(xa)
-//    procId match {
-//      case None =>
-//        sql"""insert into procedures(name,remark, code, timeout)values($name, $remark, $code, $timeout)"""
-//              .update
-//              .withUniqueGeneratedKeys[Id[Procedure]]("id").transact(xa)
-//      case Some(id) =>
-//        sql"""update procedures set name=$name, remark=$remark, code=$code, timeout=$timeout where id=$id """
-//              .update
-//              .withUniqueGeneratedKeys[Id[Procedure]]("id")
-//              .transact(xa)
-//    }
+    sql"""
+          | MERGE INTO PROCEDURES KEY(id) VALUES($name, $remark, $code, $timeout
+          |);""".update.withUniqueGeneratedKeys[Id[Procedure]]("id").transact(xa)
   }
 
-//  def selectProcedures(): Task[Seq[Procedure]] = {
-//    sql"select id, name, remark, code, timeout from procedures".
-//      query[Procedure].
-//      to[Seq].transact(xa)
-//  }
-  //
-  //	class Procedures  extends ProcedureRepository {
-  //
-  //		def list(): Task[Seq[Entity.Id[Procedure]]] = {
-  //			sql"select * from PROCEDURES"
-  //				.query[Id[Procedure]]
-  //				.to[Seq]
-  //				.transact(xa)
-  //		}
-  //
-  //		def find(id: Entity.Id[Procedure]): Task[Option[Procedure]] = {
-  //			sql"select id, desc, code, duration from PROCEDURES where id=$id"
-  //				.query[Procedure]
-  //				.to[Option]
-  //				.transact(xa)
-  //		}
-  //
-  //		def delete(id: Entity.Id[Procedure]): Task[Entity.Id[Procedure]] = {
-  //			sql"delete from procedures where id"
-  //				.query[Procedure]
-  //				.to[Entity.Id]
-  //				.transact(xa)
-  //		}
-  //
-  //		def insert(p: Procedure): Entity.Id[Procedure] = {
-  //			upsertProcedure(Entity(p)).to[List].head
-  //		}
-  //
-  //		def update(id: Id[Procedure], f: Procedure => Procedure): Task[Id[Procedure]] = {
-  //			upsertProcedure(id)
-  //		}
-  //
-  //	}
-  //
-  //
-  //
-  //
-  //	/** Nodes **/
+  def selectProcedures(): Task[Seq[Procedure]] = {
+    sql"select id, name, remark, code, timeout from procedures".
+      query[Procedure].
+      to[Seq].transact(xa)
+  }
+
+  class Procedures  extends ProcedureRepository {
+
+    def list(): Task[Seq[Entity.Id[Procedure]]] = {
+      sql"select * from PROCEDURES"
+        .query[Procedure]
+        .to[Seq].map(l => Entity.id(l.head))
+        .transact(xa)
+    }
+
+    def find(id: Entity.Id[Procedure]): Task[Option[Procedure]] = {
+      sql"select 1 from PROCEDURES where id=$id"
+        .query[Procedure]
+        .to[List].map(p => Option(p.head))
+        .transact(xa)
+    }
+
+		def delete(id: Entity.Id[Procedure]): Task[Entity.Id[Procedure]] = {
+			sql"delete from procedures where id=$id"
+				.query[Procedure]
+        .to[List].map( x => Entity.id(x.head))
+				.transact(xa)
+		}
+
+    def insert(p: Procedure): Entity.Id[Procedure] = {
+      upsertProcedure(p).to[List].last
+    }
+
+    def update(id: Id[Procedure], f: Procedure => Procedure): Task[Id[Procedure]] = {
+      val id_val = id.toLong
+      sql"""select * from PROCEDURES where id=$id""".query[Procedure].map(f).map(p => Entity.Id(p)).transact(xa)
+    }
+
+	}
+
+
+
+
+	/** Nodes **/
   	def upsertNode(node: Node): Task[Id[Node]] = {
   		// Note: ID can be none
     val Node(idOp, target, remark, status, logs) = node
     sql"""insert into nodes(remark) values ($remark)"""
       .update
       .withUniqueGeneratedKeys[Id[Node]]("id").transact(xa).map(id => id)
-//  		val Node(idOp, target, remark, _, logs) = node
-//  		val host = target.host
-//  		val port = target.port
-//  		(idOp) match {
-//  			case None     =>
-//  				sql"""insert into nodes(host, port, remark, logs) values ($host, $port, $remark, $logs)"""
-//  					.update
-//  					.withUniqueGeneratedKeys[Id[Node]]("id").transact(xa).map(id => id)
-//  			case Some(id) =>
-//  				sql"""update nodes set host=$host, port=$port, remark=$remark, logs=$logs where id=$id """
-//  					.update
-//  					.withUniqueGeneratedKeys[Id[Node]]("id")
-//  					.transact(xa)
-//  		}
   	}
 
   //
