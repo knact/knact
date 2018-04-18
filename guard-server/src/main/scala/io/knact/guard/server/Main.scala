@@ -56,6 +56,7 @@ object Main extends StreamApp[Task] with LazyLogging {
 			case Left(e)                     => Stream.raiseError(e)
 			case Right((config, targetFile)) =>
 
+				logger.info(s"Using target $targetFile and configuration $config")
 				implicit val scheduler: Scheduler = Scheduler.forkJoin(
 					name = "guard-server",
 					parallelism = sys.runtime.availableProcessors(),

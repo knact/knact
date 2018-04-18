@@ -14,7 +14,7 @@ import io.knact.guard.{NodeRepository, Telemetry}
 import io.knact.ssh.{PasswordCredential, PublicKeyCredential, SshAddress, SshAuth, SshCredential, _}
 import io.knact.{Watchdog, ssh}
 import monix.eval.Task
-import monix.execution.Scheduler
+import monix.execution.{Scheduler, UncaughtExceptionReporter}
 
 // TODO needs info about AWS
 object LinuxSshPerfService extends LazyLogging {
@@ -43,10 +43,13 @@ object LinuxSshPerfService extends LazyLogging {
 					}
 				)
 			}.executeAsync
-			.subscribe()(Scheduler.forkJoin(
+			.subscribe()(Scheduler.cached(
 				name = "perf-ssh",
-				parallelism = sys.runtime.availableProcessors(),
-				maxThreads = config.commandMaxThread))
+				minThreads = 1,
+				maxThreads = config.commandMaxThread,
+				reporter = UncaughtExceptionReporter(logger.error("Command thread crashed", _))
+			)
+			)
 
 		()
 	}.onErrorHandle(_.printStackTrace())
