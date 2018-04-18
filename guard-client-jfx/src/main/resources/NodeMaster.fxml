@@ -21,8 +21,8 @@
                     <children>
                         <HBox spacing="4.0">
                             <children>
-                                <Button fx:id="add" mnemonicParsing="false" text="+" />
-                                <Button fx:id="delete" mnemonicParsing="false" text="-" />
+                                <Button fx:id="add" mnemonicParsing="false" text="+" managed="false"/>
+                                <Button fx:id="delete" mnemonicParsing="false" text="-" managed="false" />
                                 <TextField fx:id="filter" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>

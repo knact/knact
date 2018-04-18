@@ -2,12 +2,14 @@ package io.knact.guard.jfx.controller
 
 import java.time
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
-import cats.data.EitherT
+import cats._
+import cats.implicits._
 import io.knact.guard
 import io.knact.guard.{Bound, ClientError, ConnectionError, DecodeError, Entity, Found, NotFound, Path, Percentage, ServerError, Telemetry}
 import io.knact.guard.Entity.{Id, Node, NodeUpdated, TelemetrySeries, TimeSeries}
-import io.knact.guard.Telemetry._
+import io.knact.guard.Telemetry.{Status, _}
 import io.knact.guard.jfx.Model.{AppContext, NodeError, NodeHistory, NodeItem, StatusEntry}
 import io.knact.guard.jfx.RichScalaFX._
 import io.knact.guard.jfx.Schedulers
@@ -140,7 +142,44 @@ class NodeDetailController(private val root: StackPane,
 
 	}
 
-	def updateHistorySeries(series: TimeSeries[Status]) = {}
+	private final val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("mm:ss")
+
+	final val Limit = 500
+
+
+	def mkSeries(series: TimeSeries[Status], _name: String, f: Telemetry => Number) = {
+		def mkData(e: (ZonedDateTime, Status))(default: => Number) = {
+			val (zdt, s) = e
+			XYChart.Data(zdt.format(formatter), (s match {
+				case Online(_, _, telem) => Some(f(telem))
+				case _                   => None
+			}).getOrElse(default))
+		}
+		new XYChart.Series[String, Number] {
+			name = _name
+			data = series.map {mkData(_)(0)}.takeRight(Limit).toSeq
+		}
+	}
+
+
+	def updateHistorySeries(series: TimeSeries[Status]) = {
+		performanceSeries.data = Seq(
+//			mkSeries(series, "Load average", _.loadAverage),
+			mkSeries(series, "Running", _.threadStat.running),
+			mkSeries(series, "Sleeping", _.threadStat.sleeping),
+			mkSeries(series, "Zombie", _.threadStat.zombie)
+		).map {_.delegate}
+
+
+		memorySeries.data = Seq(
+			mkSeries(series, "Cached(byte)", _.memoryStat.cache.toBytes),
+			mkSeries(series, "Free(byte)", _.memoryStat.free.toBytes),
+			mkSeries(series, "Used(byte)", _.memoryStat.used.toBytes)
+		).map {_.delegate}
+
+
+
+	}
 	def updateLogs(series: TimeSeries[Status]) = {}
 	def updateAnalytic(series: TimeSeries[Status]) = {
 		val entries = series.map { case (time, s) =>
@@ -151,7 +190,7 @@ class NodeDetailController(private val root: StackPane,
 				case Timeout                  => StatusEntry(time, "Timeout", "N/A")
 				case Error(error)             => StatusEntry(time, "Error", error)
 			}
-		}.toSeq
+		}.toSeq.reverse // newest on top
 		analyticTable.items = ObservableBuffer(entries)
 		analyticTime.cellValueFactory = { v => ObjectProperty(v.value.time) }
 		analyticEvent.cellValueFactory = { v => StringProperty(v.value.event) }
@@ -184,25 +223,23 @@ class NodeDetailController(private val root: StackPane,
 					case NodeUpdated(ns) => ns.contains(node.id)
 					case _               => false
 				}.map { _ => () }
-				source.scanTask(pull(None)) { case ((last, _), _) => pull(Some(last)) }
+				source.scanTask(pull(None)) { case ((last, prev), _) =>
+					pull(Some(last)).map { case (t, next) => t -> (prev |+| next) }
+				}
 					.map {_._2}
 					.observeOn(Schedulers.JavaFx)
 					.doOnError {_.printStackTrace()}
-					.foreach { v =>
-						v match {
-							case ConnectionError(e)  =>
-							case ServerError(reason) =>
-							case ClientError(reason) =>
-							case DecodeError(reason) =>
-							case NotFound            =>
-							case Found(result)       => println("!!" + result.series)
-								result.series.lastOption.map {_._2}.foreach(updateStatus)
-								updateHistorySeries(result.series)
-								updateLogs(result.series)
-								updateAnalytic(result.series)
-
-						}
-
+					.foreach {
+						case ConnectionError(e)  =>
+						case ServerError(reason) =>
+						case ClientError(reason) =>
+						case DecodeError(reason) =>
+						case NotFound            =>
+						case Found(result)       =>
+							result.series.lastOption.map {_._2}.foreach(updateStatus)
+							updateHistorySeries(result.series)
+							updateLogs(result.series)
+							updateAnalytic(result.series)
 
 					}
 

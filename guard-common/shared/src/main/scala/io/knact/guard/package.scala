@@ -3,7 +3,8 @@ package io.knact
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME
 
-import cats.{Contravariant, FlatMap, Monad}
+import cats.kernel.Semigroup
+import cats.{Contravariant, FlatMap, Monad, Monoid}
 import enumeratum.EnumEntry
 import io.circe._
 import io.knact.guard.Entity._
@@ -87,7 +88,7 @@ package object guard {
 		def telemetryDelta: Observable[Id[Entity.Node]]
 		def logDelta: Observable[Id[Entity.Node]]
 
-		def find(target: Target) : Task[Option[Node]]
+		def find(target: Target): Task[Option[Node]]
 		def meta(nid: Id[Entity.Node]): Task[Option[Node]]
 		def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]]
 		def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]]
@@ -109,6 +110,8 @@ package object guard {
 	sealed trait RemoteResult[+A] {
 		def toEither: Either[String, A]
 	}
+
+
 	case class ConnectionError(e: Throwable) extends RemoteResult[Nothing] {
 		override def toEither: Either[String, Nothing] = Left(e.getMessage)
 	}
@@ -127,6 +130,15 @@ package object guard {
 	case class Found[+A](a: A) extends RemoteResult[A] {
 		override def toEither: Either[String, A] = Right(a)
 	}
+
+	implicit def remoteResultSemigroup[A](implicit ev: Semigroup[A]): Semigroup[RemoteResult[A]] =
+		Semigroup.instance { (l, r) =>
+			(l, r) match {
+				case (Found(x), Found(y)) => Found(ev.combine(x, y))
+				case (_, Found(y))        => Found(y)
+				case (_, e)               => e // new error wins
+			}
+		}
 
 	implicit val remoteResultInstance: Monad[RemoteResult] = new Monad[RemoteResult] {
 		override def pure[A](x: A): RemoteResult[A] = Found(x)

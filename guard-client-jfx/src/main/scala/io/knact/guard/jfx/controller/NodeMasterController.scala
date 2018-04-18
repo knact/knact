@@ -24,6 +24,7 @@ import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.collections.transformation.{FilteredBuffer, SortedBuffer}
+import scalafx.geometry.Side
 import scalafx.scene.Scene
 import scalafx.scene.chart._
 import scalafx.scene.control.Alert.AlertType
@@ -177,7 +178,8 @@ class NodeMasterController(private val root: SplitPane,
 			.map {_.trim}
 			.filterNot(_.isEmpty)
 			.take(1)
-			.map {Ascii.truncate(_, 80, "...")}.mkString("")
+//			.map {Ascii.truncate(_, 80, "...")}
+			.mkString("")
 
 		val (styleClasses, description) = status.lastOption.map {_._2} match {
 			case Some(Online(Ok, r, _))       => Seq("online", "ok") -> s"Ok${r.fold("") {":" + truncate(_)}}"
@@ -202,8 +204,10 @@ class NodeMasterController(private val root: SplitPane,
 					prefHeight = 50
 					minWidth = 50
 					animated = false
-					legendVisible = false
+					legendVisible = true
+					legendSide = Side.Left
 					createSymbols = false
+
 					animated = false
 					data = Seq(new XYChart.Series[String, Number] {
 						name = "CPU"
