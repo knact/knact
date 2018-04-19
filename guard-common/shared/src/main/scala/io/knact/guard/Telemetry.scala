@@ -54,9 +54,7 @@ object Telemetry {
 		else InformationUnitsOfMeasures((Math.log10(information.toBytes) / Math.log10(1000)).toInt)
 	}
 
-	case class MemoryStat(total: Information, free: Information, used: Information, cache: Information){
-		def toLegacy = (total.toBytes, free.toBytes, used.toBytes, cache.toBytes)
-	}
+	case class MemoryStat(total: Information, free: Information, used: Information, cache: Information)
 	case class ThreadStat(running: Long, sleeping: Long, stopped: Long, zombie: Long){
 	}
 	case class NetStat(mac: String,
@@ -68,10 +66,10 @@ object Telemetry {
 	case class DiskStat(free: Information, used: Information) {}
 
 
-	sealed trait Verdict
-	case object Ok extends Verdict
-	case object Warning extends Verdict
-	case object Critical extends Verdict
+	sealed trait Verdict{override def toString = ""}
+	case object Ok extends Verdict       {override def toString: String = "Ok"      }
+	case object Warning extends Verdict  {override def toString: String = "Warning" }
+	case object Critical extends Verdict {override def toString: String = "Critical"}
 
 	sealed trait Status
 	case object Offline extends Status{override def toString = "Offline"}

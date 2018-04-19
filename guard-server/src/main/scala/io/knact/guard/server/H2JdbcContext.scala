@@ -66,15 +66,14 @@ class H2JdbcContext extends ApiContext {
            |CREATE TABLE IF NOT EXISTS NETSTAT(
            |id BIGINT,
            |iface VARCHAR,
+           |mac VARCHAR,
            |inet LONGVARCHAR,
            |bcast LONGVARCHAR,
            |mask  LONGVARCHAR,
            |inet6 LONGVARCHAR,
            |scope LONGVARCHAR,
            |tx1    BIGINT,
-           |tx2    BIGINT,
            |rx1    BIGINT,
-           |rx2    BIGINT,
            |PRIMARY KEY (id),
            |);""".update.run
 
@@ -82,14 +81,10 @@ class H2JdbcContext extends ApiContext {
       sql"""
            |CREATE TABLE IF NOT EXISTS MEMORYSTAT(
            |id BIGINT,
-           |totalVal BIGINT,
-           |totalUnit BIGINT,
-           |freeVal  BIGINT,
-           |freeUnit BIGINT,
-           |usedVal BIGINT,
-           |usedUnit BIGINT,
-           |cacheVal BIGINT,
-           |cacheUnit BIGINT,
+           |total BIGINT,
+           |free  BIGINT,
+           |used  BIGINT,
+           |cache BIGINT,
            |PRIMARY KEY (id),
            |);""".update.run
 
@@ -97,6 +92,7 @@ class H2JdbcContext extends ApiContext {
       sql"""
            |CREATE TABLE IF NOT EXISTS DISKSTAT(
            |id BIGINT,
+           |path VARCHAR,
            |freeVal BIGINT,
            |freeUnits BIGINT,
            |PRIMARY KEY (id)
@@ -108,18 +104,11 @@ class H2JdbcContext extends ApiContext {
            |CREATE TABLE IF NOT EXISTS TELEMETRY(
            |id BIGINT,
            |arch VARCHAR,
+           |duration BIGINT,
            |users BIGINT,
            |processorCount BIGINT,
            |loadAverage    BIGINT,
-           |memoryStatId   BIGINT,
-           |threadStatId   BIGINT,
-           |ifaceToNetStat VARCHAR,
-           |pathToDiskStat VARCHAR,
            |PRIMARY KEY (id),
-           |FOREIGN KEY (memoryStatId) REFERENCES MEMORYSTAT(id),
-           |FOREIGN KEY (threadStatId) REFERENCES THREADSTAT(id),
-           |FOREIGN KEY (ifaceToNetStat) REFERENCES NETSTAT(iface),
-           |FOREIGN KEY (pathToDiskStat) REFERENCES MEMORYSTAT(id)
            |);""".update.run
 
     status <-
@@ -130,9 +119,7 @@ class H2JdbcContext extends ApiContext {
            | error VARCHAR,
            | verdict VARCHAR,
            | reason VARCHAR,
-           | telemetry BIGINT,
            | PRIMARY KEY(id),
-           | FOREIGN KEY (telemetry) REFERENCES TELEMETRY(id)
            | );""".update.run
 
 
@@ -220,134 +207,170 @@ class H2JdbcContext extends ApiContext {
 
   implicit def infoMeta  : Meta[Information] = Meta[Double].xmap(Information.apply(_).get, _.toBytes)
   implicit def optionMeta: Meta[Option[String]] = Meta[String].xmap(Option.apply(_), _.get)
-  implicit def nodeMeta  : Meta[Id[Node]] = Meta[Long].xmap(Entity.id(_), _.toLong)
+  //implicit def nodeMeta  : Meta[Id[Node]] = Meta[Long].xmap(Entity.id(_), _.toLong)
+  implicit def verdictMeta : Meta[Verdict] = Meta[String].xmap(Verdict.fromString(_), _.toString )
+  object Verdict{
+    def fromString(s:String) : Telemetry.Verdict = {
+      s match {
+        case "Ok"       => Telemetry.Ok
+        case "Warning"  => Telemetry.Warning
+        case "Critical" => Telemetry.Critical
+      }
+    }
+  }
+
   /** Nodes **/
   def upsertNode(node: Node): Task[Id[Node]] = {
     // Note: ID can be none
     val Node(idOp, target, remark, status, logs) = node
     val target_host = target.host
     val target_port = target.port
-    var diskStat, netStat, memoryStat, threadStat = ()
     val stat = status.getOrElse(None) match {
-      case onl: Online  =>
-        diskStat   = onl.telemetry.diskStats
-        netStat    = onl.telemetry.netStat
-        memoryStat = onl.telemetry.memoryStat
-        threadStat = onl.telemetry.threadStat
-        onl.telemetry
-
+      case onl: Online  => onl
       case err: Error   => err
       case None         => None
       case _            => status.toString
     }
 
 
-    for{
 
-      _ <- logs.foreach( l =>{
-        val p = l._1
-        val b = l._2
-        sql"""
-             | MERGE INTO LOGS KEY(id) VALUES($idOp, $p, $b)
-           """.update.run
-      })
+    logs.map( l =>{
+      val p = l._1
+      val b = l._2
+      sql"""
+           | MERGE INTO LOGS KEY(id) VALUES($idOp, $p, $b)
+         """.update.run
+    })
 
-      _ <- stat match {
-        case None => None
-        case s : String => sql""" | MERGE INTO STATUS KEY(id) VALUES ($idOp, $s, NULL, NULL, NULL, NULL)""".update.run
-        case err: Error => val err_string = err.error; sql""" | MERGE INTO STATUS KEY(id) VALUES ($idOp, 'Error'. $err_string, NULL, NULL, NULL)""".update.run
-//        case onl : Online => {
-//          // Telemetry
-//
-//        }
+    stat match {
+      case None => None
+
+      case s : String => sql""" | MERGE INTO STATUS KEY(id) VALUES ($idOp, $s, NULL, NULL, NULL)""".update.run
+
+      case err: Error =>
+        val err_string = err.error;
+
+        sql""" | MERGE INTO STATUS KEY(id) VALUES ($idOp, 'Error', $err_string, NULL, NULL);""".update.run
+
+      case onl : Online => {
+        val Online(verdict, reason, telemetry) = onl
+        val Telemetry(arch, uptime, users,
+                      processorCount, loadAverage, memoryStat,
+                      threadStat, netStats, diskStats) = telemetry
+        // Note netStats and diskStats are Map[String, T]
+        val ThreadStat(running, sleeping, stopped, zombie) = threadStat
+        sql"""|MERGE INTO THREADSTAT KEY(id) VALUES ($idOp, $running, $sleeping, $stopped, $zombie);""".update.run
+
+        val MemoryStat(total, free, used, cached) = memoryStat
+        sql"""|MERGE INTO MEMORYSTAT KEY(id) VALUES ($idOp, $total, $free, $used, $cached);""".update.run
+
+        netStats.map(m =>{
+          val iface = m._1
+          val NetStat(mac: String,
+            inet: String,
+            bcast: String,
+            mask: String,
+            inet6: Option[String],
+            scope: String, tx: Information, rx: Information) = m._2
+          sql""" | MERGE INTO NETSTAT KEY(id) VALUES ( $idOp, $iface, $mac, $inet, $bcast, $mask, $inet6, $scope, $tx, $rx);""".update.run})
+
+        diskStats.map(m =>{
+          val path = m._1
+          val DiskStat(free, used) = m._2
+          sql"""|MERGE INTO DISKSTAT KEY(id) values ($idOp, $path, $free, $used)""".update.run
+        })
+
+
+        sql"""|MERGE INTO TELEMETRY KEY(id) VALUES ($idOp, $arch, $uptime, $users, $processorCount, $loadAverage);""".update.run
+
+        sql"""|MERGE INTO STATUS KEY(id) VALUES ($idOp, 'Online', NULL, $verdict, $reason);""".update.run
       }
+    }
 
 
-      ret <- sql"""
-           | MERGE INTO NODES KEY(id) VALUES($idOp, $target_host, $target_port, $remark);
-      """.update.withUniqueGeneratedKeys[Id[Node]]("id").transact(xa)
+    sql"""
+         | MERGE INTO NODES KEY(id) VALUES($idOp, $target_host, $target_port, $remark);
+    """.update.withUniqueGeneratedKeys[Id[Node]]("id").transact(xa)
 
-
-    } yield ret
   }
 
+//
+//  def selectNodes(): Task[Seq[Node]] = {
+//    sql"select * from nodes"
+//      .query[Node]
+//      .to[Seq].transact(xa)
+//  }
+//
+//  class Nodes extends NodeRepository {
+//
+//    def list(): Task[Seq[Id[Node]]] = {
+//      sql"SELECT id FROM nodes"
+//        .query[Node]
+//        .to[Seq].map(p => Seq(p.head.id))
+//        .transact(xa)
+//    }
+//
+//    def find(id: Entity.Id[Node]): Task[Option[Node]] = {
+//      sql"SELECT id, desc, code, duration FROM nodes WHERE id=$id"
+//        .query[Node]
+//        .to[Option].transact(xa)
+//    }
+//
+//    def delete(id: Id[Entity.Node]): Task[Entity.Id[Node]] = {
+//      sql"DELETE FROM nodes WHERE id=$id"
+//        .query[Node]
+//        .to[Entity.Id].transact(xa)
+//    }
+//
+//    def insert(n: Node): Entity.Id[Node] = {
+//      upsertNode(Entity(n)).to[List].head
+//    }
+//
+//    def update(id: Id[Node], f: Node => Node): Task[Id[Node]] = {
+//      upsertNode(id.)
+//    }
+//
+//    def ids: Observable[Set[Id[Node]]] = {
+//      sql"SELECT id FROM nodes"
+//        .query[Id[Node]]
+//        .to[Set].transact(xa).to[Observable]
+//    }
 
-  def selectNodes(): Task[Seq[Node]] = {
-    sql"select * from nodes"
-      .query[Node]
-      .to[Seq].transact(xa)
-  }
-
-  class Nodes extends NodeRepository {
-
-    def list(): Task[Seq[Id[Node]]] = {
-      sql"select id from nodes"
-        .query[Node]
-        .to[Seq].map(p => Seq(p.head.id))
-        .transact(xa)
-    }
-
-    def find(id: Entity.Id[Node]): Task[Option[Node]] = {
-      sql"select id, desc, code, duration from nodes where id=$id"
-        .query[Node]
-        .to[Option].transact(xa)
-    }
-
-    def delete(id: Id[Entity.Node]): Task[Entity.Id[Node]] = {
-      sql"delete from nodes where id=$id"
-        .query[Node]
-        .to[Entity.Id].transact(xa)
-    }
-
-    def insert(n: Node): Entity.Id[Node] = {
-      upsertNode(Entity(n)).to[List].head
-    }
-
-    def update(id: Id[Node], f: Node => Node): Task[Id[Node]] = {
-      upsertNode(id)
-    }
-
-    def ids: Observable[Set[Id[Node]]] = {
-      sql"select id from nodes"
-        .query[Id[Node]]
-        .to[Set].transact(xa).to[Observable]
-    }
-  //
-  //		def telemetries(nid: Id[Node]): Task[Option[TelemetrySeries]] = {
-  //			val n = nid.toLong
-  //			sql"select verdict from telemetry where id=$n"
-  //				.query[TelemetrySeries]
-  //				.to[Option].transact(xa)
-  //		}
-  //
-  //		def logs(nid: Id[Node]): Task[Option[LogSeries]] = {
-  //			val n = nid.toLong
-  //			sql"select lineID, lineVal from logs where nodeID=$n"
-  //				.query[LogSeries]
-  //				.to[Option].transact(xa)
-  //		}
-  //
-  //		//TODO: def meta(nid: Id[Entity.Node]): Task[Option[Node]]
-  //		//TODO: def telemetryDelta: Observable[Id[Entity.Node]]
-  //		//TODO: def logDelta: Observable[Id[Entity.Node]]
-  //		/*TODO:
-  //		def entities: Observable[Set[Node]] = ids
-  //			.switchMap { ns => Observable.fromTask(Task.traverse(ns)(find)) }
-  //			.map {_.flatten.toSet}
-  //
-  //		def persist(nid: Id[Entity.Node],
-  //					time: ZonedDateTime,
-  //					status: Status): Task[Failure | Id[Entity.Node]]
-  //		def persist(nid: Id[Entity.Node],
-  //					time: ZonedDateTime,
-  //					path: Path,
-  //					lines: Seq[Line]): Task[Failure | Id[Entity.Node]]
-  //			*/
-  //
-  //
-  //	}
+    //
+    //		def telemetries(nid: Id[Node]): Task[Option[TelemetrySeries]] = {
+    //			val n = nid.toLong
+    //			sql"select verdict from telemetry where id=$n"
+    //				.query[TelemetrySeries]
+    //				.to[Option].transact(xa)
+    //		}
+    //
+    //		def logs(nid: Id[Node]): Task[Option[LogSeries]] = {
+    //			val n = nid.toLong
+    //			sql"select lineID, lineVal from logs where nodeID=$n"
+    //				.query[LogSeries]
+    //				.to[Option].transact(xa)
+    //		}
+    //
+    //		//TODO: def meta(nid: Id[Entity.Node]): Task[Option[Node]]
+    //		//TODO: def telemetryDelta: Observable[Id[Entity.Node]]
+    //		//TODO: def logDelta: Observable[Id[Entity.Node]]
+    //		/*TODO:
+    //		def entities: Observable[Set[Node]] = ids
+    //			.switchMap { ns => Observable.fromTask(Task.traverse(ns)(find)) }
+    //			.map {_.flatten.toSet}
+    //
+    //		def persist(nid: Id[Entity.Node],
+    //					time: ZonedDateTime,
+    //					status: Status): Task[Failure | Id[Entity.Node]]
+    //		def persist(nid: Id[Entity.Node],
+    //					time: ZonedDateTime,
+    //					path: Path,
+    //					lines: Seq[Line]): Task[Failure | Id[Entity.Node]]
+    //			*/
+    //
+    //
+    //	}
 
 
-
-
+  //}
 }
