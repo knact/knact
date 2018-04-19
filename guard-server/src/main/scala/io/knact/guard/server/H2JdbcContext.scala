@@ -41,70 +41,13 @@ class H2JdbcContext extends ApiContext {
   )
 
   private val ddl = for {
-
-    node <-
-      sql"""
-           |CREATE TABLE IF NOT EXISTS NODES(
-           |id BIGINT,
-           |remark VARCHAR,
-           |status BIGINT,
-           |logs VARCHAR,
-           |PRIMARY KEY (id),
-           |FOREIGN KEY (status) REFERENCES STATUS (id),
-           |FOREIGN KEY (logs) REFERENCES LOGS(id)
-           |);""".update.run
-
-    target <-
-      sql"""
-           |CREATE TABLE IF NOT EXISTS TARGET(
-           |id BIGINT,
-           				|host VARCHAR,
-           |target BIGINT,
-           |PRIMARY KEY(id),
-           |FOREIGN KEY(id) REFERENCES (nodes)
-           |);""".update.run
-
-
-    procedures <-
-      sql"""
-           |CREATE TABLE IF NOT EXISTS PROCEDURES(
-           |id BIGINT,
-           |name VARCHAR,
-           |remark VARCHAR,
-           |code VARCHAR,
-           |timeout BIGINT,
-           |PRIMARY KEY (id)
-           |);""".update.run
-
     logs <-
-    sql"""
+      sql"""
            |CREATE TABLE IF NOT EXISTS LOGS(
            |id BIGINT,
            |path VARCHAR,
            |byteSize BIGINT,
            |PRIMARY KEY(id),
-           |FOREIGN KEY (id)  REFERENCES  NODES(id)
-           |);""".update.run
-
-
-    telemetry <-
-      sql"""
-           |CREATE TABLE IF NOT EXISTS TELEMETRY(
-           |id BIGINT,
-           |arch VARCHAR,
-           |users BIGINT,
-           |processorCount BIGINT,
-           |loadAverage    BIGINT,
-           |memoryStatId   BIGINT,
-           |threadStatId   BIGINT,
-           |ifaceToNetStat VARCHAR,
-           |pathToDiskStat VARCHAR,
-           |PRIMARY KEY (id),
-           |FOREIGN KEY (id) REFERENCES NODES(id),
-           |FOREIGN KEY (memoryStatId) REFERENCES MEMORYSTAT(id),
-           |FOREIGN KEY (threadStatId) REFERENCES THREADSTAT(id),
-           |FOREIGN KEY (ifaceToNetStat) REFERENCES NETSTAT(iface),
-           |FOREIGN KEY (pathToDiskStat) REFERENCES MEMORYSTAT(id)
            |);""".update.run
 
     threadStat <-
@@ -116,7 +59,6 @@ class H2JdbcContext extends ApiContext {
            |stopped BIGINT,
            |zombie  BIGINT,
            |PRIMARY KEY (id),
-           |FOREIGN KEY (id) REFERENCES NODES(id)
            |);""".update.run
 
     netStat <-
@@ -133,8 +75,7 @@ class H2JdbcContext extends ApiContext {
            |tx2    BIGINT,
            |rx1    BIGINT,
            |rx2    BIGINT,
-           |PRIMARY KEY (iface),
-           |FOREIGN KEY (id) REFERENCES NODES(id)
+           |PRIMARY KEY (id),
            |);""".update.run
 
     memoryStat <-
@@ -150,7 +91,6 @@ class H2JdbcContext extends ApiContext {
            |cacheVal BIGINT,
            |cacheUnit BIGINT,
            |PRIMARY KEY (id),
-           |FOREIGN KEY (id) REFERENCES NODES(id)
            |);""".update.run
 
     diskStat <-
@@ -159,8 +99,27 @@ class H2JdbcContext extends ApiContext {
            |id BIGINT,
            |freeVal BIGINT,
            |freeUnits BIGINT,
+           |PRIMARY KEY (id)
+           |);""".update.run
+
+
+    telemetry <-
+      sql"""
+           |CREATE TABLE IF NOT EXISTS TELEMETRY(
+           |id BIGINT,
+           |arch VARCHAR,
+           |users BIGINT,
+           |processorCount BIGINT,
+           |loadAverage    BIGINT,
+           |memoryStatId   BIGINT,
+           |threadStatId   BIGINT,
+           |ifaceToNetStat VARCHAR,
+           |pathToDiskStat VARCHAR,
            |PRIMARY KEY (id),
-           |FOREIGN KEY (id) REFERENCES NODES(id)
+           |FOREIGN KEY (memoryStatId) REFERENCES MEMORYSTAT(id),
+           |FOREIGN KEY (threadStatId) REFERENCES THREADSTAT(id),
+           |FOREIGN KEY (ifaceToNetStat) REFERENCES NETSTAT(iface),
+           |FOREIGN KEY (pathToDiskStat) REFERENCES MEMORYSTAT(id)
            |);""".update.run
 
     status <-
@@ -171,15 +130,34 @@ class H2JdbcContext extends ApiContext {
            | error VARCHAR,
            | verdict VARCHAR,
            | reason VARCHAR,
+           | telemetry BIGINT,
            | PRIMARY KEY(id),
-           | FOREIGN KEY (id) REFERENCES NODES(id),
            | FOREIGN KEY (telemetry) REFERENCES TELEMETRY(id)
            | );""".update.run
 
 
+    nodes <-
+      sql"""
+           |CREATE TABLE IF NOT EXISTS NODES(
+           |id BIGINT,
+           |targetHost VARCHAR,
+           |targetPort BIGINT,
+           |remark VARCHAR,
+           |PRIMARY KEY (id),
+           |);""".update.run
 
+    procedures <-
+      sql"""
+           |CREATE TABLE IF NOT EXISTS PROCEDURES(
+           |id BIGINT,
+           |name VARCHAR,
+           |remark VARCHAR,
+           |code VARCHAR,
+           |timeout BIGINT,
+           |PRIMARY KEY (id)
+           |);""".update.run
 
-  } yield (nodes, procedures, logs, telemetry, threadStat, netStat, memoryStat, diskStat, target, status)
+  } yield (nodes, procedures, logs, telemetry, threadStat, netStat, memoryStat, diskStat,  status)
 
 
 
@@ -194,7 +172,7 @@ class H2JdbcContext extends ApiContext {
   def upsertProcedure(proc: Procedure): Task[Id[Procedure]] = {
     val Procedure(procId, name, remark, code, timeout) = proc
     sql"""
-          | MERGE INTO PROCEDURES KEY(id) VALUES($name, $remark, $code, $timeout
+          | MERGE INTO PROCEDURES KEY(id) VALUES($procId, $name, $remark, $code, $timeout
           |);""".update.withUniqueGeneratedKeys[Id[Procedure]]("id").transact(xa)
   }
 
@@ -209,7 +187,7 @@ class H2JdbcContext extends ApiContext {
     def list(): Task[Seq[Entity.Id[Procedure]]] = {
       sql"select * from PROCEDURES"
         .query[Procedure]
-        .to[Seq].map(l => Entity.id(l.head))
+        .to[Seq].map(p => Seq(p.head.id))
         .transact(xa)
     }
 
@@ -220,73 +198,120 @@ class H2JdbcContext extends ApiContext {
         .transact(xa)
     }
 
-		def delete(id: Entity.Id[Procedure]): Task[Entity.Id[Procedure]] = {
+		def delete(id: Entity.Id[Procedure]): Task[ Failure | Entity.Id[Procedure]] = {
 			sql"delete from procedures where id=$id"
 				.query[Procedure]
-        .to[List].map( x => Entity.id(x.head))
+        .to[List].map( x => Right(x.head.id))
 				.transact(xa)
 		}
 
-    def insert(p: Procedure): Entity.Id[Procedure] = {
-      upsertProcedure(p).to[List].last
+    def insert(p: Procedure): Task[ Failure | Entity.Id[Procedure]] = {
+      upsertProcedure(p).map(f => Right(f))
     }
 
-    def update(id: Id[Procedure], f: Procedure => Procedure): Task[Id[Procedure]] = {
-      val id_val = id.toLong
-      sql"""select * from PROCEDURES where id=$id""".query[Procedure].map(f).map(p => Entity.Id(p)).transact(xa)
+    def update(id: Id[Procedure], f: Procedure => Procedure): Task[ Failure | Id[Procedure]] = {
+      sql"""select * from PROCEDURES where id=$id"""
+        .query[Procedure]
+        .to[List]
+        .map(p => Right((f (p.head)).id)).transact(xa)
     }
 
 	}
 
-
-
-
-	/** Nodes **/
-  	def upsertNode(node: Node): Task[Id[Node]] = {
-  		// Note: ID can be none
+  implicit def infoMeta  : Meta[Information] = Meta[Double].xmap(Information.apply(_).get, _.toBytes)
+  implicit def optionMeta: Meta[Option[String]] = Meta[String].xmap(Option.apply(_), _.get)
+  implicit def nodeMeta  : Meta[Id[Node]] = Meta[Long].xmap(Entity.id(_), _.toLong)
+  /** Nodes **/
+  def upsertNode(node: Node): Task[Id[Node]] = {
+    // Note: ID can be none
     val Node(idOp, target, remark, status, logs) = node
-    sql"""insert into nodes(remark) values ($remark)"""
-      .update
-      .withUniqueGeneratedKeys[Id[Node]]("id").transact(xa).map(id => id)
-  	}
+    val target_host = target.host
+    val target_port = target.port
+    var diskStat, netStat, memoryStat, threadStat = ()
+    val stat = status.getOrElse(None) match {
+      case onl: Online  =>
+        diskStat   = onl.telemetry.diskStats
+        netStat    = onl.telemetry.netStat
+        memoryStat = onl.telemetry.memoryStat
+        threadStat = onl.telemetry.threadStat
+        onl.telemetry
 
-  //
-  //	def selectNodes(): Task[Seq[(Long, String, Int, String, String)]] = {
-  //		sql"select id, host, port, remark, logs from nodes"
-  //			.query[(Long, String, Int, String, String)]
-  //			.to[Seq].transact(xa)
-  //	}
-  //	class Nodes extends NodeRepository {
-  //
-  //		def list(): Task[Seq[Id[Node]]] = {
-  //			sql"select id from nodes".query[Entity.Id[Node]].to[Seq].transact(xa)
-  //		}
-  //
-  //		def find(id: Entity.Id[Node]): Task[Option[Node]] = {
-  //			sql"select id, desc, code, duration from nodes where id=$id"
-  //				.query[Node]
-  //				.to[Option].transact(xa)
-  //		}
-  //
-  //		def delete(id: Id[Entity.Node]): Task[Entity.Id[Node]] = {
-  //			sql"delete from nodes where id=$id"
-  //				.query[Node]
-  //				.to[Entity.Id].transact(xa)
-  //		}
-  //
-  //		def insert(n: Node): Entity.Id[Node] = {
-  //			upsertNode(Entity(n)).to[List].head
-  //		}
-  //
-  //		def update(id: Id[Node], f: Node => Node): Task[Id[Node]] = {
-  //			upsertNode(id)
-  //		}
-  //
-  //		def ids: Observable[Set[Id[Node]]] = {
-  //			sql"select id from nodes"
-  //				.query[Id[Node]]
-  //				.to[Set].transact(xa).to[Observable]
-  //		}
+      case err: Error   => err
+      case None         => None
+      case _            => status.toString
+    }
+
+
+    for{
+
+      _ <- logs.foreach( l =>{
+        val p = l._1
+        val b = l._2
+        sql"""
+             | MERGE INTO LOGS KEY(id) VALUES($idOp, $p, $b)
+           """.update.run
+      })
+
+      _ <- stat match {
+        case None => None
+        case s : String => sql""" | MERGE INTO STATUS KEY(id) VALUES ($idOp, $s, NULL, NULL, NULL, NULL)""".update.run
+        case err: Error => val err_string = err.error; sql""" | MERGE INTO STATUS KEY(id) VALUES ($idOp, 'Error'. $err_string, NULL, NULL, NULL)""".update.run
+//        case onl : Online => {
+//          // Telemetry
+//
+//        }
+      }
+
+
+      ret <- sql"""
+           | MERGE INTO NODES KEY(id) VALUES($idOp, $target_host, $target_port, $remark);
+      """.update.withUniqueGeneratedKeys[Id[Node]]("id").transact(xa)
+
+
+    } yield ret
+  }
+
+
+  def selectNodes(): Task[Seq[Node]] = {
+    sql"select * from nodes"
+      .query[Node]
+      .to[Seq].transact(xa)
+  }
+
+  class Nodes extends NodeRepository {
+
+    def list(): Task[Seq[Id[Node]]] = {
+      sql"select id from nodes"
+        .query[Node]
+        .to[Seq].map(p => Seq(p.head.id))
+        .transact(xa)
+    }
+
+    def find(id: Entity.Id[Node]): Task[Option[Node]] = {
+      sql"select id, desc, code, duration from nodes where id=$id"
+        .query[Node]
+        .to[Option].transact(xa)
+    }
+
+    def delete(id: Id[Entity.Node]): Task[Entity.Id[Node]] = {
+      sql"delete from nodes where id=$id"
+        .query[Node]
+        .to[Entity.Id].transact(xa)
+    }
+
+    def insert(n: Node): Entity.Id[Node] = {
+      upsertNode(Entity(n)).to[List].head
+    }
+
+    def update(id: Id[Node], f: Node => Node): Task[Id[Node]] = {
+      upsertNode(id)
+    }
+
+    def ids: Observable[Set[Id[Node]]] = {
+      sql"select id from nodes"
+        .query[Id[Node]]
+        .to[Set].transact(xa).to[Observable]
+    }
   //
   //		def telemetries(nid: Id[Node]): Task[Option[TelemetrySeries]] = {
   //			val n = nid.toLong
