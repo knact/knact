@@ -55,8 +55,7 @@ object Telemetry {
 	}
 
 	case class MemoryStat(total: Information, free: Information, used: Information, cache: Information)
-	case class ThreadStat(running: Long, sleeping: Long, stopped: Long, zombie: Long){
-	}
+	case class ThreadStat(running: Long, sleeping: Long, stopped: Long, zombie: Long)
 	case class NetStat(mac: String,
 					   inet: String,
 					   bcast: String,
