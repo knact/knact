@@ -2,7 +2,7 @@ package io.knact.guard
 
 import java.time.{Duration, ZonedDateTime}
 
-import cats.Eq
+import cats.{Eq, Semigroup}
 import shapeless.tag
 import shapeless.tag.@@
 import io.circe.java8.time._
@@ -24,7 +24,7 @@ object Entity {
 	type Id[A] = Long @@ A
 
 	implicit def idEq[A]: Eq[Id[A]] = _ == _
-	implicit def idOrd[A] : Ordering[Id[A]] = _ compareTo _
+	implicit def idOrd[A]: Ordering[Id[A]] = _ compareTo _
 
 	def id[T, B](id: B)(implicit ev: Numeric[B]): Id[T] = tag[T][Long](ev.toLong(id))
 
@@ -55,9 +55,19 @@ object Entity {
 
 	case class TelemetrySeries(origin: Id[Node],
 							   series: TimeSeries[Status] = TreeMap.empty[ZonedDateTime, Status])
+
+
+	implicit val telemetrySeriesSemigroup: Semigroup[TelemetrySeries] = Semigroup.instance { (l, r) =>
+		TelemetrySeries(r.origin, l.series ++ r.series)
+	}
+
+
 	case class LogSeries(origin: Id[Node],
 						 series: TimeSeries[Seq[Line]] = TreeMap.empty[ZonedDateTime, Seq[Line]])
 
+	implicit val logSeriesSemigroup: Semigroup[LogSeries] = Semigroup.instance { (l, r) =>
+		LogSeries(r.origin, l.series ++ r.series)
+	}
 
 	case class Node(id: Id[Node],
 					target: Target,

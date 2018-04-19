@@ -47,7 +47,7 @@ object JsonNodeTargetService extends LazyLogging {
 					} yield {
 						val keep: Seq[Node] = search.collect { case (_, Some(n)) => n }
 						val add: Seq[Target] = search.collect { case (t, None) => t }
-						val remove: Seq[Id[Node]] = ids.diff(keep)
+						val remove: Seq[Id[Node]] = ids.diff(keep.map{_.id})
 						logger.info(s"keeping  $keep")
 						logger.info(s"removing $remove")
 						logger.info(s"adding $add")
