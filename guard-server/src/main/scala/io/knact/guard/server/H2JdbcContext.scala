@@ -6,7 +6,7 @@ import java.time.{Duration, ZonedDateTime}
 
 import doobie._
 import doobie.implicits._
-import io.knact.guard.Entity.{Id, LogSeries, Node, Procedure, SshKeyTarget, SshPasswordTarget, TelemetrySeries, TimeSeries}
+import io.knact.guard.Entity.{Id, LogSeries, Node, Procedure, SshKeyTarget, SshPasswordTarget, TargetGen, TelemetrySeries, TimeSeries}
 import io.knact.guard._
 import io.knact.guard.Telemetry.{Critical, DiskStat, Error, Iface, MemoryStat, NetStat, Offline, Ok, Online, Status, ThreadStat, Timeout, Verdict, Warning}
 import monix.reactive.Observable
@@ -129,10 +129,13 @@ class H2JdbcContext extends ApiContext {
            |id BIGINT,
            |targetHost VARCHAR,
            |targetPort BIGINT,
+           |targetUsername VARCHAR,
+           |targetKeyPath VARCHAR,
+           |targetPassword VARCHAR,
            |remark VARCHAR,
            |PRIMARY KEY (id),
            |);""".update.run
-
+      // Note passwords stored in plaintext because I'm a bad programmer
     procedures <-
       sql"""
            |CREATE TABLE IF NOT EXISTS PROCEDURES(
@@ -161,12 +164,6 @@ class H2JdbcContext extends ApiContext {
     sql"""
           | MERGE INTO PROCEDURES KEY(id) VALUES($procId, $name, $remark, $code, $timeout
           |);""".update.withUniqueGeneratedKeys[Id[Procedure]]("id").transact(xa)
-  }
-
-  def selectProcedures(): Task[Seq[Procedure]] = {
-    sql"select id, name, remark, code, timeout from procedures".
-      query[Procedure].
-      to[Seq].transact(xa)
   }
 
   class Procedures  extends ProcedureRepository {
@@ -207,7 +204,6 @@ class H2JdbcContext extends ApiContext {
 
   implicit def infoMeta  : Meta[Information] = Meta[Double].xmap(Information.apply(_).get, _.toBytes)
   implicit def optionMeta: Meta[Option[String]] = Meta[String].xmap(Option.apply(_), _.get)
-  //implicit def nodeMeta  : Meta[Id[Node]] = Meta[Long].xmap(Entity.id(_), _.toLong)
   implicit def verdictMeta : Meta[Verdict] = Meta[String].xmap(Verdict.fromString(_), _.toString )
   object Verdict{
     def fromString(s:String) : Telemetry.Verdict = {
@@ -225,6 +221,16 @@ class H2JdbcContext extends ApiContext {
     val Node(idOp, target, remark, status, logs) = node
     val target_host = target.host
     val target_port = target.port
+    var targetUsername = target.username
+    var targetKeyPath  = ""
+    var targetPassword = "" // Real bad. REALLY BAD
+    target match{
+      case t: SshKeyTarget =>
+        targetKeyPath  = t.keyPath
+      case t: SshPasswordTarget =>
+        targetPassword = t.password
+    }
+
     val stat = status.getOrElse(None) match {
       case onl: Online  => onl
       case err: Error   => err
@@ -289,88 +295,95 @@ class H2JdbcContext extends ApiContext {
 
 
     sql"""
-         | MERGE INTO NODES KEY(id) VALUES($idOp, $target_host, $target_port, $remark);
+         | MERGE INTO NODES KEY(id) VALUES($idOp, $target_host, $target_port, $targetUsername, $targetKeyPath, $targetPassword, $remark);
     """.update.withUniqueGeneratedKeys[Id[Node]]("id").transact(xa)
 
   }
 
-//
-//  def selectNodes(): Task[Seq[Node]] = {
-//    sql"select * from nodes"
-//      .query[Node]
-//      .to[Seq].transact(xa)
-//  }
-//
-//  class Nodes extends NodeRepository {
-//
-//    def list(): Task[Seq[Id[Node]]] = {
-//      sql"SELECT id FROM nodes"
-//        .query[Node]
-//        .to[Seq].map(p => Seq(p.head.id))
-//        .transact(xa)
-//    }
-//
-//    def find(id: Entity.Id[Node]): Task[Option[Node]] = {
-//      sql"SELECT id, desc, code, duration FROM nodes WHERE id=$id"
-//        .query[Node]
-//        .to[Option].transact(xa)
-//    }
-//
-//    def delete(id: Id[Entity.Node]): Task[Entity.Id[Node]] = {
-//      sql"DELETE FROM nodes WHERE id=$id"
-//        .query[Node]
-//        .to[Entity.Id].transact(xa)
-//    }
-//
-//    def insert(n: Node): Entity.Id[Node] = {
-//      upsertNode(Entity(n)).to[List].head
-//    }
-//
-//    def update(id: Id[Node], f: Node => Node): Task[Id[Node]] = {
-//      upsertNode(id.)
-//    }
-//
-//    def ids: Observable[Set[Id[Node]]] = {
-//      sql"SELECT id FROM nodes"
-//        .query[Id[Node]]
-//        .to[Set].transact(xa).to[Observable]
-//    }
+  implicit def nodeMeta: Meta[Node] = Meta[(Long, String)].xmap(Node.fromLegacy, _.toLegacy)
+  object Node {
+    def fromLegacy(l : (Long, String)): Entity.Node = {
+      Node(l._1, None, l._2, None, None )
+    }
+  }
 
-    //
-    //		def telemetries(nid: Id[Node]): Task[Option[TelemetrySeries]] = {
-    //			val n = nid.toLong
-    //			sql"select verdict from telemetry where id=$n"
-    //				.query[TelemetrySeries]
-    //				.to[Option].transact(xa)
-    //		}
-    //
-    //		def logs(nid: Id[Node]): Task[Option[LogSeries]] = {
-    //			val n = nid.toLong
-    //			sql"select lineID, lineVal from logs where nodeID=$n"
-    //				.query[LogSeries]
-    //				.to[Option].transact(xa)
-    //		}
-    //
-    //		//TODO: def meta(nid: Id[Entity.Node]): Task[Option[Node]]
-    //		//TODO: def telemetryDelta: Observable[Id[Entity.Node]]
-    //		//TODO: def logDelta: Observable[Id[Entity.Node]]
-    //		/*TODO:
-    //		def entities: Observable[Set[Node]] = ids
-    //			.switchMap { ns => Observable.fromTask(Task.traverse(ns)(find)) }
-    //			.map {_.flatten.toSet}
-    //
-    //		def persist(nid: Id[Entity.Node],
-    //					time: ZonedDateTime,
-    //					status: Status): Task[Failure | Id[Entity.Node]]
-    //		def persist(nid: Id[Entity.Node],
-    //					time: ZonedDateTime,
-    //					path: Path,
-    //					lines: Seq[Line]): Task[Failure | Id[Entity.Node]]
-    //			*/
-    //
-    //
-    //	}
+  implicit def targetGenMeta : Meta[TargetGen] = Meta[(String, Int, String, String, String)].xmap(TargetGen.fromLegacy, _.toLegacy)
+  object TargetGen{
+    def fromLegacy(l : (String, Int, String, String, String)) : TargetGen = {
+      TargetGen(l._1, l._2, l._3, l._4, l._5)
+    }
+  }
+  // TODO: Meta[Telemetry], Meta[Stat],
+  implicit def statusGenMeta : Meta[Telemetry.StatusGen] = Meta[(String, String, String, String)].xmap(StatusGen.fromLegacy, _.toLegacy)
+  object StatusGen {
+    def fromLegacy(l : (String, String, String, String)) : Telemetry.StatusGen = {
+      StatusGen(l._1, l._2, l._3, l._4)
+    }
+  }
+
+  class Nodes extends NodeRepository {
 
 
-  //}
+
+    def findMemStat   (id: Id[Node]): MemoryStat          = ???
+    def findThreadStat(id: Id[Node]): ThreadStat          = ???
+    def findNetStat   (id: Id[Node]): Map[Iface, NetStat] = ???
+    def findDiskStat  (id: Id[Node]): Map[Path, DiskStat] = ???
+
+    def findTelemetry(id: Id[Node]):Telemetry = {
+      sql"""select arch, duration, users, processorCount, loadAverage from telemetry where id=$id"""
+        .query[Telemetry]
+        .map(f => f)
+        .unique.run
+    }
+    def findStatus(id : Id[Node]): Option[Telemetry.Status] = {
+      sql"""select statMessage, error, verdict, reason from status where id=$id"""
+        .query[Telemetry.StatusGen]
+        .map(f =>Option( {
+          f.statMessage match {
+            case "Offline" => Offline
+            case "Timeout" => Timeout
+            case "Error"   => Error(f.error)
+            case "Online"  =>
+              val verdict = f.verdict match {
+                case "Ok"       =>  Ok
+                case "Warning"  => Warning
+                case "Critical" => Critical
+              }
+              Online(verdict, Option(f.reason), findTelemetry(id))
+          }
+        }))
+        .unique.run
+    }
+
+    def findTarget(id: Id[Node]): Entity.Target = {
+      sql"""select targetHost, targetPort, targetUsername, targetKeyPath, targetPassword from nodes where id=$id"""
+        .query[TargetGen]
+        .map(f => {
+          f.password match {
+            case "" => SshKeyTarget(f.host, f.port, f.username, f.keyPath)
+            case _  => SshPasswordTarget(f.host, f.port, f.username, f.password)
+          }} )
+        .unique.run
+    }
+
+    def list(): Task[Seq[Id[Node]]] = {
+      sql"""
+           |select id from nodes"""
+        .query[Id[Node]].to[Seq].transact(xa)
+    }
+
+    def find(id: Id[Node]): Task[Option[Node]] = {
+
+      val target:Entity.Target = findTarget(id)
+      val status: Option[Status] = ???
+
+      sql"""
+        | select id, remark from node where id=$id
+        """.query[Node].map(f => {
+
+      })
+    }
+
+  }
 }

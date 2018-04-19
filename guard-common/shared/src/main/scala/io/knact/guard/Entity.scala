@@ -31,8 +31,13 @@ object Entity {
 	sealed trait Target {
 		def host: String
 		def port: Int
+		def username: String
 	}
 
+	// Generic target path for database
+	case class TargetGen(host: String, port: Int, username: String, keyPath: String, password: String) extends Target{
+		def toLegacy = (host, port, username, keyPath, password)
+	}
 
 	case class SshPasswordTarget(host: String, port: Int,
 								 username: String, password: String) extends Target {
@@ -76,6 +81,7 @@ object Entity {
 					logs: Map[Path, ByteSize] = Map(),
 				   ) extends Entity[Node] {
 		override def withId(a: Node, that: Id[Node]): Node = a.copy(id = that)
+		def toLegacy = (id.toLong, remark)
 	}
 
 
