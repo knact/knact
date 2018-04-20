@@ -7,23 +7,22 @@ import java.time.{Duration, ZonedDateTime}
 import doobie._
 import doobie.implicits._
 import doobie.util.log.Success
-import io.knact.guard.Entity.{Id, LogSeries, Node, Procedure, SshKeyTarget, SshPasswordTarget, TargetGen, TelemetrySeries, TimeSeries}
-import io.knact.guard._
+import io.knact.guard.Entity.{Id, LogSeries, Node, Procedure, SshKeyTarget, SshPasswordTarget, Target, TargetGen, TelemetrySeries, TimeSeries}
+import io.knact.guard.{Failure, _}
 import io.knact.guard.Telemetry.{Critical, DiskStat, Error, Iface, MemoryStat, NetStat, Offline, Ok, Online, Status, ThreadStat, Timeout, Verdict, Warning}
 import monix.reactive.Observable
 import squants.information.{Information, InformationUnit}
 // In order to evaluate tasks, we'll need a Scheduler
-import monix.execution.Scheduler.Implicits.global
+//import monix.execution.Scheduler.Implicits.global
+//import monix.execution.CancelableFuture
 // Task is in monix.eval
-import monix.execution.CancelableFuture
 import cats.implicits._
 import monix.eval.Task
-import scala.util.{Success, Failure}
 
 class H2JdbcContext extends ApiContext {
 
   //DONE: Telemetry base
-  //TODO: Entitity mappings
+  //DONE: Entitity mappings
   //TODO: Relevant entitity and SQL commands
   override def version: String = ???
 
@@ -304,44 +303,73 @@ class H2JdbcContext extends ApiContext {
   }
 
   class Nodes extends NodeRepository {
+
     def findThreadStat(id: Id[Node]): Task[List[ThreadStat]] = {
       sql"""select running, sleeping, stopped, zombie from threadStat where id=$id"""
         .query[ThreadStat]
         .map(f => f).to[List].transact(xa)
     }
+
     def findMemStat   (id: Id[Node]): Task[List[MemoryStat]] = {
       sql"""select total, free, used, cache from memoryStat where id=$id"""
         .query[MemoryStat]
         .map(f => f).to[List].transact(xa)
     }
 
-    def findNetStat   (id: Id[Node]): Task[List[Map[Iface, NetStat]]] = {
+    def findNetStat   (id: Id[Node]): Task[List[(Iface, NetStat)]] = {
       sql"""select iface, mac, inet, bcast, mask, inet6, scope, tx1, rx1 from netStat where id=$id"""
         .query[(Iface, NetStat)]
-        .map(f => Map((f._1, f._2)))
+        .map(f => (f._1, f._2))
         .to[List].transact(xa)
     }
 
-    def findDiskStat  (id: Id[Node]): Task[List[Map[Path, DiskStat]]] = {
+    def findDiskStat  (id: Id[Node]): Task[List[(Path, DiskStat)]] = {
       sql"""select path, freeVal, freeUnits from diskStat where id=$id"""
         .query[(Path, DiskStat)]
-        .map(f => Map((f._1, f._2))).to[List].transact(xa)
+        .map(f => (f._1, f._2)).to[List].transact(xa)
     }
 
     def findTelemetry(id: Id[Node]): Task[List[Telemetry]] = {
 
-      var memStat =    (); findMemStat(id).runAsync.foreach(f => {memStat = f.head})
-      var threadStat = (); findThreadStat(id).runAsync.foreach(f => {threadStat = f.head})
-      var netStat =    (); findNetStat(id).runAsync.foreach(f => {netStat = f.head})
-      var diskStat =   (); findDiskStat(id).runAsync.foreach(f => {diskStat = f.head})
+      var memStat: MemoryStat = MemoryStat(
+        Information.apply(-1).get,
+        Information.apply(-1).get,
+        Information.apply(-1).get,
+        Information.apply(-1).get)
+      findMemStat(id)
+        .runAsync
+        .foreach(f => {
+          memStat = f.head
+        })
+      var threadStat: ThreadStat = ThreadStat(-1, -1, -1, -1 )
+      findThreadStat(id)
+        .runAsync
+        .foreach(f => {
+          threadStat = f.head
+        })
+      var netStat = Map[Iface, NetStat]();
+      findNetStat(id)
+        .runAsync
+        .foreach(f => {
+          netStat.updated(f.head._1, f.head._2)
+        })
+      var diskStat =  Map[Path, DiskStat]();
+      findDiskStat(id)
+        .runAsync
+        .foreach(f => {
+          diskStat.updated(f.head._1, f.head._2)
+        })
+
+
       sql"""select arch, duration, users, processorCount, loadAverage from telemetry where id=$id"""
         .query[(String, Duration, Long, Int, Double)]
         .map(f => {
-          //TODO: Telemetry(f._1, f._2, f._3, f._4, f._5, findMemStat(id), findThreadStat(id), findNetStat(id), findDiskStat(id))
+          Telemetry(f._1, f._2, f._3, f._4, f._5, memStat, threadStat, netStat, diskStat)
         })
         .to[List].transact(xa)
     }
-    def findStatus(id : Id[Node]): Task[List[Option[Telemetry.Status]] = {
+
+    def findStatus(id : Id[Node]): Task[List[Option[Telemetry.Status]]] = {
       sql"""select statMessage, error, verdict, reason from status where id=$id"""
         .query[Telemetry.StatusGen]
         .map(f =>Option( {
@@ -351,12 +379,23 @@ class H2JdbcContext extends ApiContext {
             case "Error"   => Error(f.error)
             case "Online"  =>
               val verdict = f.verdict match {
-                case "Ok"       =>  Ok
+                case "Ok"       => Ok
                 case "Warning"  => Warning
                 case "Critical" => Critical
               }
-              val telemetry = findTelemetry(id)
-              //TODO: Online(verdict, Option(f.reason), telemetry)
+              var telemetry: Telemetry = Telemetry(
+                "",
+                Duration.ZERO,
+                -1,
+                -1,
+                -1,
+                MemoryStat(Information.apply(-1).get, Information.apply(-1).get, Information.apply(-1).get, Information.apply(-1).get),
+                ThreadStat(-1, -1, -1, -1 ),
+                Map[Iface, NetStat](),
+                Map[Path, DiskStat]()
+              )
+              findTelemetry(id).runAsync.foreach(f => {telemetry = f.head})
+              Online(verdict, Option(f.reason), telemetry)
           }
         }))
         .to[List].transact(xa)
@@ -373,10 +412,10 @@ class H2JdbcContext extends ApiContext {
         .to[List].transact(xa)
     }
 
-    def findLogs(id : Id[Node]): Task[List[Map[Path, ByteSize]]] = {
+    def findLogs(id : Id[Node]): Task[List[(Path, ByteSize)]] = {
       sql""" select path, byteSize from logs where id=$id"""
         .query[(Path, ByteSize)]
-        .map(f => Map((f._1, f._2)))
+        .map(f => (f._1, f._2))
         .to[List].transact(xa)
     }
 
@@ -388,22 +427,48 @@ class H2JdbcContext extends ApiContext {
 
     def find(id: Id[Node]): Task[Option[Node]] = {
 
-      val target = findTarget(id)
-      val status = findStatus(id)
-      val logs   = findLogs(id)
+      var target: Entity.Target    = SshKeyTarget("", -1, "", "")
+      findTarget(id).runAsync.foreach(f => {target = f.head})
+      var status: Option[Telemetry.Status] = Option.empty
+      findStatus(id).runAsync.foreach(f => {status = f.head})
+      var logs: Map[Path, ByteSize]= Map[Path, ByteSize]()
+      findLogs(id).runAsync.foreach(f => logs.updated(f.head._1, f.head._2))
+
       sql"""
         | select id, remark from node where id=$id
         """
         .query[(Id[Node], String)]
         .map(f => {
-          //TODO: Entity.Node(f._1, target, f._2, status, logs)
+          Entity.Node(f._1, target, f._2, status, logs)
         })
-        .to[Option].transact(xa)
+        .to[List]
+        .map(f => {
+          f.headOption
+        })
+        .transact(xa)
     }
 
     def insert(n: Node): Task[Failure | Id[Node]] = ???
-    def update(id: Id[Node]): Task[Failure | Id[Node]] = ???
-    def delete(id: Id[Node], f: Node => Node): Task[Failure | Id[Node]] = ???
+    def update(id: Id[Node], f:Node=>Node): Task[Failure | Id[Node]] = ???
+    def delete(id: Id[Node]): Task[Failure | Id[Node]] = ???
+
+    def ids: Observable[Set[Id[Entity.Node]]] = ???
+    def telemetryDelta: Observable[Id[Entity.Node]] = ???
+    def logDelta: Observable[Id[Entity.Node]] = ???
+
+    def find(target: Target): Task[Option[Node]] = ???
+    def meta(nid: Id[Entity.Node]): Task[Option[Node]] = ???
+    def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]] = ???
+    def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]] = ???
+    def execute(nid: Id[Entity.Node])(pid: Id[Procedure]): Task[Failure | String] = ???
+
+    def persist(nid: Id[Entity.Node],
+                time: ZonedDateTime,
+                status: Status): Task[Failure | Id[Entity.Node]] = ???
+    def persist(nid: Id[Entity.Node],
+                time: ZonedDateTime,
+                path: Path,
+                lines: Seq[Line]): Task[Failure | Id[Entity.Node]] = ???
 
   }
 }
