@@ -221,8 +221,8 @@ class H2JdbcContext extends ApiContext {
 
     def execute(pid: Id[Entity.Procedure]): Task[Failure | String] =
       delete(pid).map(f => f match{
-        case _:Right[Failure, Procedure] => Right("Procedure executed")
-        case l:Left[Failure, Procedure]  => Left(l.value)
+        case r:Right[Failure, Id[Procedure]] => Right("Procedure executed")
+        case l:Left [Failure, Id[Procedure]] => Left(l.value)
       })
 
 	}
@@ -539,10 +539,10 @@ class H2JdbcContext extends ApiContext {
       return ret
     }
 
-    def execute(nid: Id[Entity.Node]): Task[Failure | String] =
+    def execute(nid: Id[Entity.Node])(pid: Id[Entity.Procedure]): Task[Failure | String] =
       delete(nid).map(f => f match{
-        case _:Right[Failure, Node] => Right("Node executed")
-        case l:Left[Failure, Node]  => Left(l.value)
+        case r:Right[Failure, Id[Node]] => Right("Node executed")
+        case l:Left [Failure, Id[Node]] => Left(l.value)
     })
 
     def persist(nid: Id[Entity.Node],

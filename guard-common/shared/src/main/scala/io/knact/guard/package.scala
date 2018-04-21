@@ -78,9 +78,7 @@ package object guard {
 		def insert(a: A): F[Failure | Id[A]]
 		def update(id: Id[A], f: A => A): F[Failure | Id[A]]
 	}
-	trait ProcedureRepository extends Repository[Procedure, Task] {
-    def execute(pid: Id[Procedure]): Task[Failure | String]
-  }
+	trait ProcedureRepository extends Repository[Procedure, Task] {}
 	trait NodeRepository extends Repository[Entity.Node, Task] {
 
 		def ids: Observable[Set[Id[Entity.Node]]]
@@ -94,7 +92,7 @@ package object guard {
 		def meta(nid: Id[Entity.Node]): Task[Option[Node]]
 		def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]]
 		def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]]
-		def execute(nid: Id[Entity.Node]): Task[Failure | String]
+		def execute(nid: Id[Entity.Node])(pid: Id[Entity.Procedure]): Task[Failure | String]
 
 		def persist(nid: Id[Entity.Node],
 					time: ZonedDateTime,
