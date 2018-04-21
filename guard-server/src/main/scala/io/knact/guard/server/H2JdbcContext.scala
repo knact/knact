@@ -23,17 +23,14 @@ import monix.eval.Task
 
 class H2JdbcContext extends ApiContext {
 
-  //DONE: Telemetry base
-  //DONE: Entitity mappings
-  //TODO: Relevant entitity and SQL commands
-  override def version: String = ???
+  override def version: String = "1.1"
 
-  override def repos: (NodeRepository, ProcedureRepository) = ???
+  override def repos: (NodeRepository, ProcedureRepository) = (new Nodes, new Procedures)
 
-  override def startTime: ZonedDateTime = ???
+  override def startTime: ZonedDateTime = ZonedDateTime.now()
 
 
-  private val dbPath = Paths.get("mem:test").toAbsolutePath
+  private val dbPath = Paths.get(".test").toAbsolutePath
 
   override def nodes: NodeRepository = ??? //new Nodes()
   override def procedures: ProcedureRepository = ??? //new Procedures()
