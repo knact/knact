@@ -12,6 +12,8 @@ import io.knact.guard.{Failure, _}
 import io.knact.guard.Telemetry.{Critical, DiskStat, Error, Iface, MemoryStat, NetStat, Offline, Ok, Online, Status, ThreadStat, Timeout, Verdict, Warning}
 import monix.reactive.Observable
 import squants.information.{Information, InformationUnit}
+
+import scala.collection.immutable.TreeMap
 // In order to evaluate tasks, we'll need a Scheduler
 //import monix.execution.Scheduler.Implicits.global
 //import monix.execution.CancelableFuture
@@ -185,22 +187,43 @@ class H2JdbcContext extends ApiContext {
     }
 
 		def delete(id: Entity.Id[Procedure]): Task[ Failure | Entity.Id[Procedure]] = {
-			sql"delete from procedures where id=$id"
-				.query[Procedure]
-        .to[List].map( x => Right(x.head.id))
-				.transact(xa)
+      find(id).attempt.map(f => f match {
+        case l: Left [Throwable, Option[Procedure]] => Left(l.value.toString)
+        case r: Right[Throwable, Option[Procedure]] =>
+          r.value.getOrElse(None) match{
+            case None         => Left("No procedure matches id")
+            case p: Procedure =>
+              sql"""delete from procedures where id=$id""".update.run.transact(xa)
+              Right(id)
+          }
+      })
 		}
 
     def insert(p: Procedure): Task[ Failure | Entity.Id[Procedure]] = {
-      upsertProcedure(p).map(f => Right(f))
+      upsertProcedure(p).attempt.map(f => f match{
+        case l: Left [Throwable, Id[Procedure]]  => Left(l.value.toString)
+        case r: Right[Throwable, Id[Procedure]] => Right(r.value)
+      })
     }
 
     def update(id: Id[Procedure], f: Procedure => Procedure): Task[ Failure | Id[Procedure]] = {
-      sql"""select * from PROCEDURES where id=$id"""
-        .query[Procedure]
-        .to[List]
-        .map(p => Right((f (p.head)).id)).transact(xa)
+      find(id).attempt.map(m => m match {
+        case l: Left [Throwable, Option[Procedure]] => Left(l.value.toString)
+        case r: Right[Throwable, Option[Procedure]] =>
+          r.value.getOrElse(None) match{
+            case None         => Left("No procedure matches id")
+            case p: Procedure =>
+              upsertProcedure(f(p)).runAsync
+              Right(id)
+          }
+      })
     }
+
+    def execute(pid: Id[Entity.Procedure]): Task[Failure | String] =
+      delete(pid).map(f => f match{
+        case _:Right[Failure, Procedure] => Right("Procedure executed")
+        case l:Left[Failure, Procedure]  => Left(l.value)
+      })
 
 	}
 
@@ -304,32 +327,32 @@ class H2JdbcContext extends ApiContext {
 
   class Nodes extends NodeRepository {
 
-    def findThreadStat(id: Id[Node]): Task[List[ThreadStat]] = {
+    private def findThreadStat(id: Id[Node]): Task[List[ThreadStat]] = {
       sql"""select running, sleeping, stopped, zombie from threadStat where id=$id"""
         .query[ThreadStat]
         .map(f => f).to[List].transact(xa)
     }
 
-    def findMemStat   (id: Id[Node]): Task[List[MemoryStat]] = {
+    private def findMemStat(id: Id[Node]): Task[List[MemoryStat]] = {
       sql"""select total, free, used, cache from memoryStat where id=$id"""
         .query[MemoryStat]
         .map(f => f).to[List].transact(xa)
     }
 
-    def findNetStat   (id: Id[Node]): Task[List[(Iface, NetStat)]] = {
+    private def findNetStat(id: Id[Node]): Task[List[(Iface, NetStat)]] = {
       sql"""select iface, mac, inet, bcast, mask, inet6, scope, tx1, rx1 from netStat where id=$id"""
         .query[(Iface, NetStat)]
         .map(f => (f._1, f._2))
         .to[List].transact(xa)
     }
 
-    def findDiskStat  (id: Id[Node]): Task[List[(Path, DiskStat)]] = {
+    private def findDiskStat(id: Id[Node]): Task[List[(Path, DiskStat)]] = {
       sql"""select path, freeVal, freeUnits from diskStat where id=$id"""
         .query[(Path, DiskStat)]
         .map(f => (f._1, f._2)).to[List].transact(xa)
     }
 
-    def findTelemetry(id: Id[Node]): Task[List[Telemetry]] = {
+    private def findTelemetry(id: Id[Node]): Task[List[Telemetry]] = {
 
       var memStat: MemoryStat = MemoryStat(
         Information.apply(-1).get,
@@ -369,7 +392,7 @@ class H2JdbcContext extends ApiContext {
         .to[List].transact(xa)
     }
 
-    def findStatus(id : Id[Node]): Task[List[Option[Telemetry.Status]]] = {
+    private def findStatus(id : Id[Node]): Task[List[Option[Telemetry.Status]]] = {
       sql"""select statMessage, error, verdict, reason from status where id=$id"""
         .query[Telemetry.StatusGen]
         .map(f =>Option( {
@@ -401,7 +424,7 @@ class H2JdbcContext extends ApiContext {
         .to[List].transact(xa)
     }
 
-    def findTarget(id: Id[Node]): Task[List[Entity.Target]] = {
+    private def findTarget(id: Id[Node]): Task[List[Entity.Target]] = {
       sql"""select targetHost, targetPort, targetUsername, targetKeyPath, targetPassword from nodes where id=$id"""
         .query[Entity.TargetGen]
         .map(f => {
@@ -412,7 +435,7 @@ class H2JdbcContext extends ApiContext {
         .to[List].transact(xa)
     }
 
-    def findLogs(id : Id[Node]): Task[List[(Path, ByteSize)]] = {
+    private def findLogs(id : Id[Node]): Task[List[(Path, ByteSize)]] = {
       sql""" select path, byteSize from logs where id=$id"""
         .query[(Path, ByteSize)]
         .map(f => (f._1, f._2))
@@ -448,23 +471,84 @@ class H2JdbcContext extends ApiContext {
         .transact(xa)
     }
 
-    def insert(n: Node): Task[Failure | Id[Node]] = ???
-    def update(id: Id[Node], f:Node=>Node): Task[Failure | Id[Node]] = ???
-    def delete(id: Id[Node]): Task[Failure | Id[Node]] = ???
+    def insert(n: Node): Task[Failure | Id[Node]] = {
+      upsertNode(n).attempt.map(f => f match{
+        case l: Left [Throwable, Id[Node]]  => Left(l.value.toString)
+        case r: Right[Throwable, Id[Node]] => Right(r.value)
+      })
+    }
 
-    def ids: Observable[Set[Id[Entity.Node]]] = ???
-    def telemetryDelta: Observable[Id[Entity.Node]] = ???
-    def logDelta: Observable[Id[Entity.Node]] = ???
+    def update(id: Id[Node], f:Node=>Node): Task[Failure | Id[Node]] =  {
+      find(id).attempt.map(m => m match {
+          case l: Left [Throwable, Option[Node]] => Left(l.value.toString)
+          case r: Right[Throwable, Option[Node]] =>
+            r.value.getOrElse(None) match{
+              case None    => Left("No node matches id")
+              case n: Node =>
+                upsertNode(f(n)).runAsync
+                Right(id)
+            }
+        })
+    }
 
-    def find(target: Target): Task[Option[Node]] = ???
-    def meta(nid: Id[Entity.Node]): Task[Option[Node]] = ???
-    def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]] = ???
-    def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]] = ???
-    def execute(nid: Id[Entity.Node])(pid: Id[Procedure]): Task[Failure | String] = ???
+
+    def delete(id: Id[Node]): Task[Failure | Id[Node]] = {
+      find(id).attempt.map(f => f match {
+        case l: Left [Throwable, Option[Node]] => Left(l.value.toString)
+        case r: Right[Throwable, Option[Node]] =>
+          r.value.getOrElse(None) match{
+            case None    => Left("No node matches id")
+            case n: Node =>
+              sql"""delete from nodes where id=$id""".update.run.transact(xa)
+              Right(id)
+          }
+      })
+    }
+
+    def telemetries(nid: Id[Entity.Node])(bound: Bound): Task[Option[TelemetrySeries]] = {
+      var series = TreeMap.empty
+      find(nid).map({ f =>
+        val status = findStatus(nid).runSyncUnsafe(scala.concurrent.duration.Duration(1, scala.concurrent.duration.HOURS)).head.get
+        Option(TelemetrySeries(f.get.id, series.insert(ZonedDateTime.now(), status)))
+      })
+    }
+
+    def logs(nid: Id[Entity.Node])(path: Path)(bound: Bound): Task[Option[LogSeries]] = {
+      var series = TreeMap.empty
+      findLogs(nid).map(f => {
+        var seq = Seq("")
+        f.foreach(f => {seq = seq :+ f.toString()})
+        Option(LogSeries(nid, series.insert(ZonedDateTime.now(), seq)))
+      })
+    }
+    def meta(nid: Id[Entity.Node]): Task[Option[Node]] = find(nid)
+
+    def ids: Observable[Set[Id[Entity.Node]]] = {
+      Observable.fromTask(list().map(f => f.toSet))
+    }
+
+    def telemetryDelta: Observable[Id[Entity.Node]] = ids.map(f => f.head) // ??
+    def logDelta: Observable[Id[Entity.Node]] = ids.map(f => f.head)
+
+    def find(target: Target): Task[Option[Node]] = {
+      val username = target.username
+      var ret: Task[Option[Node]] = Task.apply(Option.empty)
+      val id = sql"""select id from nodes where targetUsername=$username"""
+      .query[Id[Node]].unique.transact(xa).runAsync.foreach(f => ret = find(f))
+
+      return ret
+    }
+
+    def execute(nid: Id[Entity.Node]): Task[Failure | String] =
+      delete(nid).map(f => f match{
+        case _:Right[Failure, Node] => Right("Node executed")
+        case l:Left[Failure, Node]  => Left(l.value)
+    })
 
     def persist(nid: Id[Entity.Node],
                 time: ZonedDateTime,
                 status: Status): Task[Failure | Id[Entity.Node]] = ???
+
     def persist(nid: Id[Entity.Node],
                 time: ZonedDateTime,
                 path: Path,
