@@ -547,12 +547,41 @@ class H2JdbcContext extends ApiContext {
 
     def persist(nid: Id[Entity.Node],
                 time: ZonedDateTime,
-                status: Status): Task[Failure | Id[Entity.Node]] = ???
+                status: Status): Task[Failure | Id[Entity.Node]] = {
+
+      find(nid).attempt.map(m => m match {
+        case l: Left[Throwable, Option[Node]] => Left(l.value.toString)
+        case r: Right[Throwable, Option[Node]] =>
+          r.value.getOrElse(None) match {
+            case None => Left("Node persist failure, no node found" + time.toString)
+            case n: Node =>
+              var Node(id, target, remark, _, logs) = n
+              val pn = Node(id, target, remark, Option(status), logs)
+              upsertNode(pn).runAsync
+              Right(nid)
+          }
+      })
+    }
 
     def persist(nid: Id[Entity.Node],
                 time: ZonedDateTime,
                 path: Path,
-                lines: Seq[Line]): Task[Failure | Id[Entity.Node]] = ???
+                lines: Seq[Line]): Task[Failure | Id[Entity.Node]] = {
+      find(nid).attempt.map(m => m match {
+        case l: Left[Throwable, Option[Node]] => Left(l.value.toString)
+        case r: Right[Throwable, Option[Node]] =>
+          r.value.getOrElse(None) match {
+            case None => Left("Node persist failure, no node found" + time.toString)
+            case n: Node =>
+              var l = n.logs
+              l.updated(path, lines.toString)
+              var Node(id, target, remark, status, _) = n
+              val pn = Node(id, target, remark, status, l)
+              upsertNode(pn).runAsync
+              Right(nid)
+          }
+      })
+    }
 
   }
 }
