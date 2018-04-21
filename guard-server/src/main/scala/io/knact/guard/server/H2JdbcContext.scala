@@ -237,7 +237,6 @@ class H2JdbcContext extends ApiContext {
     }
   }
 
-  /** Nodes **/
   def upsertNode(node: Node): Task[Id[Node]] = {
     // Note: ID can be none
     val Node(idOp, target, remark, status, logs) = node
