@@ -13,6 +13,7 @@ import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder, Json, _}
+import io.knact.guard
 import io.knact.guard.Entity.{Event, Id, LogSeries, Node, NodeUpdated, Outcome, PoolChanged, Procedure, ServerStatus, Target, TelemetrySeries, TimeSeries}
 import io.knact.guard.GuardService.{NodeError, NodeHistory, NodeItem, NodeService, ProcedureService, send}
 import io.knact.guard.Telemetry.Status
@@ -116,7 +117,20 @@ class GuardService private(val baseUri: Uri,
 				case (Right(xs), NodeUpdated(delta)) => pull(delta.toSeq).map { ys => Right(xs |+| ys) }
 			}.doOnError {_.printStackTrace()}
 		}
-
+		override def observeSingle(id: Id[Node]): Observable[RemoteResult[TelemetrySeries]] = {
+			def pull(start: Option[ZonedDateTime]): Task[(ZonedDateTime, guard.RemoteResult[Entity.TelemetrySeries])] = {
+				for {
+					now <- Task.eval {ZonedDateTime.now()}
+					result <- nodes().telemetry(id, Bound(start))
+				} yield now -> result
+			}
+			(Observable.now(()) ++ events.filter {
+				case NodeUpdated(ns) => ns.contains(id)
+				case _               => false
+			}.map { _ => () }).scanTask(pull(None)) { case ((last, prev), _) =>
+				pull(Some(last)).map { case (t, next) => t -> (prev |+| next) }
+			}.map {_._2}
+		}
 	}
 	abstract class Http4sEntityService[A <: Entity[A]](implicit
 													   encoder: Encoder[A],
@@ -169,6 +183,7 @@ object GuardService {
 		def telemetry(id: Id[Node], bound: Bound): ResultF[TelemetrySeries]
 		def log(id: Id[Node], path: Path, bound: Bound): ResultF[LogSeries]
 		def observe(): Observable[Either[String, Map[Id[Node], NodeItem]]]
+		def observeSingle(id: Id[Node]): Observable[RemoteResult[TelemetrySeries]]
 	}
 
 	trait ProcedureService extends EntityService[Procedure] {

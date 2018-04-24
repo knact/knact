@@ -75,9 +75,9 @@ object Telemetry {
 	case object Critical extends Verdict {override def toString: String = "Critical"}
 
 	sealed trait Status
-	case class StatusGen(statMessage: String, error: String, verdict: String, reason: String) extends (Status) {
-		def toLegacy = (statMessage, error, verdict, reason)
-	}
+//	case class StatusGen(statMessage: String, error: String, verdict: String, reason: String) extends (Status) {
+//		def toLegacy = (statMessage, error, verdict, reason)
+//	}
 	case object Offline extends Status {override def toString = "Offline"}
 	case object Timeout extends Status {override def toString = "Timeout"}
 	case class Error(error: String) extends Status

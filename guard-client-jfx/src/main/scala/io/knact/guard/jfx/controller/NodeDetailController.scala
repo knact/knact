@@ -165,7 +165,7 @@ class NodeDetailController(private val root: StackPane,
 
 	def updateHistorySeries(series: TimeSeries[Status]) = {
 		performanceSeries.data = Seq(
-//			mkSeries(series, "Load average", _.loadAverage),
+			//			mkSeries(series, "Load average", _.loadAverage),
 			mkSeries(series, "Running", _.threadStat.running),
 			mkSeries(series, "Sleeping", _.threadStat.sleeping),
 			mkSeries(series, "Zombie", _.threadStat.zombie)
@@ -177,7 +177,6 @@ class NodeDetailController(private val root: StackPane,
 			mkSeries(series, "Free(byte)", _.memoryStat.free.toBytes),
 			mkSeries(series, "Used(byte)", _.memoryStat.used.toBytes)
 		).map {_.delegate}
-
 
 
 	}
@@ -211,24 +210,7 @@ class NodeDetailController(private val root: StackPane,
 				infoRemark.text = remark
 
 
-				type R = guard.RemoteResult[Entity.TelemetrySeries]
-
-				def pull(start: Option[ZonedDateTime]): Task[(ZonedDateTime, guard.RemoteResult[Entity.TelemetrySeries])] = {
-					for {
-						now <- Task.eval {ZonedDateTime.now()}
-						result <- gs.nodes().telemetry(id, Bound(start)).map { v => println(start + "->" + (v.asInstanceOf[Found[TelemetrySeries]].a.series.keys)); v }
-					} yield now -> result
-				}
-
-				val source: Observable[Unit] = Observable.now(()) ++ gs.events.filter {
-					case NodeUpdated(ns) => ns.contains(node.id)
-					case _               => false
-				}.map { _ => () }
-				source.scanTask(pull(None)) { case ((last, prev), _) =>
-					pull(Some(last)).map { case (t, next) => t -> (prev |+| next) }
-				}
-					.map {_._2}
-					.observeOn(Schedulers.JavaFx)
+				gs.nodes().observeSingle(id).observeOn(Schedulers.JavaFx)
 					.doOnError {_.printStackTrace()}
 					.foreach {
 						case ConnectionError(e)  =>
@@ -243,10 +225,7 @@ class NodeDetailController(private val root: StackPane,
 							updateAnalytic(result.series)
 
 					}
-
-
 		}
-
 
 	}
 

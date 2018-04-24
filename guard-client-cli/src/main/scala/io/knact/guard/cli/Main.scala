@@ -61,12 +61,9 @@ object Main extends App with LazyLogging {
 		val current = Credential(url.getText)
 		GuardService(current.url) match {
 			case Left(value)  =>
-				new MessageDialogBuilder()
-					.setTitle("Login failed")
-					.setText(Throwables.getStackTraceAsString(value))
+				Lanterna.mkErrorDialog("Login failed", value)
 					.addButton(MessageDialogButton.Retry)
-					.build()
-					.showDialog(gui)
+					.build().showDialog(gui)
 				askCredential(gui, current);
 			case Right(value) => value
 		}
@@ -81,10 +78,12 @@ object Main extends App with LazyLogging {
 	screen.startScreen()
 
 
-	val gui = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.GREEN))
+	val gui = new MultiWindowTextGUI(screen,
+		new DefaultWindowManager(),
+		new EmptySpace(TextColor.Indexed.fromRGB(52, 102, 163)))
 
 
-	new NodeWindow(gui, askCredential(gui, Credential("http://localhost:8080/api")))
+	new NodeMasterWindow(gui, askCredential(gui, Credential("http://localhost:8080/api")))
 
 
 }
