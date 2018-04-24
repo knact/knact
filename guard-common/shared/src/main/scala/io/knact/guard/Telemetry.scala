@@ -18,6 +18,7 @@ case class Telemetry(arch: String,
 					 users: Long,
 					 processorCount: Int,
 					 loadAverage: Double,
+					 cpuStat: CpuStat,
 					 memoryStat: MemoryStat,
 					 threadStat: ThreadStat,
 					 netStat: Map[Iface, NetStat],
@@ -54,6 +55,9 @@ object Telemetry {
 		else InformationUnitsOfMeasures((Math.log10(information.toBytes) / Math.log10(1000)).toInt)
 	}
 
+	case class CpuStat(user: Percentage, system: Percentage) {
+		def totalPercent: Percentage = user + system
+	}
 	case class MemoryStat(total: Information, free: Information, used: Information, cache: Information)
 	case class ThreadStat(running: Long, sleeping: Long, stopped: Long, zombie: Long)
 	case class NetStat(mac: String,
@@ -65,17 +69,17 @@ object Telemetry {
 	case class DiskStat(free: Information, used: Information) {}
 
 
-	sealed trait Verdict{override def toString = ""}
-	case object Ok extends Verdict       {override def toString: String = "Ok"      }
-	case object Warning extends Verdict  {override def toString: String = "Warning" }
+	sealed trait Verdict {override def toString = ""}
+	case object Ok extends Verdict {override def toString: String = "Ok"}
+	case object Warning extends Verdict {override def toString: String = "Warning"}
 	case object Critical extends Verdict {override def toString: String = "Critical"}
 
 	sealed trait Status
-	case class StatusGen(statMessage: String, error: String, verdict: String, reason: String) extends(Status){
+	case class StatusGen(statMessage: String, error: String, verdict: String, reason: String) extends (Status) {
 		def toLegacy = (statMessage, error, verdict, reason)
 	}
-	case object Offline extends Status{override def toString = "Offline"}
-	case object Timeout extends Status{override def toString = "Timeout"}
+	case object Offline extends Status {override def toString = "Offline"}
+	case object Timeout extends Status {override def toString = "Timeout"}
 	case class Error(error: String) extends Status
 	case class Online(state: Verdict, reason: Option[String], telemetry: Telemetry) extends Status
 

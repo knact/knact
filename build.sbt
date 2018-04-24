@@ -26,11 +26,11 @@ lazy val `core-ssh-transport` = project.settings(
 		"com.google.jimfs" % "jimfs" % "1.1" % Test,
 		ScalaTest % Test
 	),
-	//	dependencyOverrides ++= Seq(
-	//		// XXX this is needed because sshj has it as compile dependency
-	//		"org.bouncycastle" % "bcprov-jdk15on" % "1.56" % Provided,
-	//		"org.bouncycastle" % "bcpkix-jdk15on" % "1.56" % Provided,
-	//	)
+	(dependencyOverrides in assembly) ++= Seq(
+		// XXX this is needed because sshj has it as compile dependency
+		"org.bouncycastle" % "bcprov-jdk15on" % "1.56" % Provided,
+		"org.bouncycastle" % "bcpkix-jdk15on" % "1.56" % Provided,
+	)
 ).dependsOn(core)
 
 
@@ -64,6 +64,7 @@ lazy val guardCommonSettings = commonSettings ++ Seq(
 
 lazy val `guard-common-js` = project.in(file("guard-common/js"))
 	.settings(guardCommonSettings)
+	.disablePlugins(sbtassembly.AssemblyPlugin) // TODO enable if cross compiling for web
 	.enablePlugins(ScalaJSPlugin)
 
 lazy val `guard-common-jvm` = project.in(file("guard-common/jvm"))
@@ -76,17 +77,19 @@ lazy val `guard-common-jvm` = project.in(file("guard-common/jvm"))
 
 lazy val `guard-server` = project.settings(
 	commonSettings,
+
+	assemblyOutputPath in assembly := new File("deploy-kit/guard-server.jar"),
 	libraryDependencies ++= http4sServer ++ Seq(
 		"com.github.scopt" %% "scopt" % "3.7.0",
 		Guava,
 		BetterFiles,
 		ScalaLogging, Logback,
-		"org.tpolecat" %% "doobie-core"      % "0.5.0",
-		"org.tpolecat" %% "doobie-h2"        % "0.5.0", // H2 driver 1.4.196 + type mappings.
-		"org.tpolecat" %% "doobie-hikari"    % "0.5.0", // HikariCP transactor.
-		"org.tpolecat" %% "doobie-postgres"  % "0.5.0", // Postgres driver 42.2.1 + type mappings.
-		"org.tpolecat" %% "doobie-specs2"    % "0.5.0", // Specs2 support for typechecking statements.
-		"org.tpolecat" %% "doobie-scalatest" % "0.5.0",  // ScalaTest support for typechecking statements.
+		"org.tpolecat" %% "doobie-core" % "0.5.0",
+		"org.tpolecat" %% "doobie-h2" % "0.5.0", // H2 driver 1.4.196 + type mappings.
+		"org.tpolecat" %% "doobie-hikari" % "0.5.0", // HikariCP transactor.
+		"org.tpolecat" %% "doobie-postgres" % "0.5.0", // Postgres driver 42.2.1 + type mappings.
+		"org.tpolecat" %% "doobie-specs2" % "0.5.0", // Specs2 support for typechecking statements.
+		"org.tpolecat" %% "doobie-scalatest" % "0.5.0", // ScalaTest support for typechecking statements.
 		ScalaTest % Test)
 ).dependsOn(
 	`guard-common-jvm`,
@@ -98,12 +101,14 @@ lazy val `guard-client-cli` = project.settings(
 	libraryDependencies ++= Seq(
 		Cats,
 		ScalaLogging,
+		Guava,
 		"com.googlecode.lanterna" % "lanterna" % "3.0.0",
 	)
 ).dependsOn(`guard-common-jvm`)
 
 lazy val `guard-client-jfx` = project.settings(
 	commonSettings,
+	assemblyOutputPath in assembly := new File("deploy-kit/guard-client-jfx.jar"),
 	libraryDependencies ++= Seq(
 		Cats,
 		Guava,
@@ -120,7 +125,7 @@ lazy val `guard-client-jfx` = project.settings(
 lazy val `guard-client-web` = project.settings(
 	commonSettings,
 	scalaJSUseMainModuleInitializer := true,
-	skip in packageJSDependencies := false,
+	skip in packageJSDependencies := true,
 	LessKeys.compress in Assets := true,
 	workbenchStartMode := WorkbenchStartModes.Manual,
 	libraryDependencies ++= Seq(
@@ -129,6 +134,7 @@ lazy val `guard-client-web` = project.settings(
 	),
 	jsDependencies ++= Seq(),
 ).enablePlugins(ScalaJSPlugin)
+	.disablePlugins(sbtassembly.AssemblyPlugin) // TODO enable if cross compiling for web
 	.dependsOn(`guard-common-js`)
 
 

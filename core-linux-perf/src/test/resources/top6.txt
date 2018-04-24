@@ -212,13 +212,8 @@ KiB Swap:        0 total,        0 free,        0 used.  6766124 avail Mem
  2793 root      20   0   65508   5996   5288 S   0.0  0.1   0:00.00 sshd: [accepted]
  2794 sshd      20   0   65508   3208   2480 S   0.0  0.0   0:00.00 sshd: [net]
  2795 ubuntu    20   0   40520   3736   3124 R   0.0  0.1   0:00.00 top -b -n1 -w512 -c
-ubuntu@virtualnode-8742:~$ top -b -n1 -w512 -c > topN.txt
-ubuntu@virtualnode-8742:~$ less topN.txt
-ubuntu@virtualnode-8742:~$ scp top-bash: warning: setlocale: LC_CTYPE: cannot change locale (en_GB.UTF-8)
--bash: warning: setlocale: LC_CTYPE: cannot change locale (en_GB.UTF-8)
-less topN.txt^C
-ubuntu@virtualnode-8742:~$ ^C
-ubuntu@virtualnode-8742:~$ cat topN.txt
+
+
 top - 23:25:46 up 2 min,  1 user,  load average: 0.18, 0.11, 0.04
 Tasks: 215 total,   1 running, 214 sleeping,   0 stopped,   0 zombie
 %Cpu(s):  2.1 us,  2.2 sy,  0.0 ni, 93.5 id,  2.0 wa,  0.0 hi,  0.1 si,  0.1 st

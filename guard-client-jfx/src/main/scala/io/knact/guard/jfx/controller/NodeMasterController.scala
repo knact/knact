@@ -8,9 +8,10 @@ import com.google.common.base.Ascii
 import com.google.common.io.Resources
 import com.typesafe.scalalogging.LazyLogging
 import io.knact.guard.Entity.{Id, Node, NodeUpdated, PoolChanged}
+import io.knact.guard.GuardService.{NodeError, NodeHistory, NodeItem}
 import io.knact.guard.Telemetry._
 import io.knact.guard.jfx.Model.NodeListLayout._
-import io.knact.guard.jfx.Model.{AppContext, NodeError, NodeHistory, NodeItem, NodeListLayout, StageContext}
+import io.knact.guard.jfx.Model.{AppContext, NodeListLayout, StageContext}
 import io.knact.guard.jfx.RichScalaFX._
 import io.knact.guard.jfx.Schedulers
 import io.knact.guard.{ClientError, ConnectionError, DecodeError, Found, NotFound, ServerError, Telemetry, _}
@@ -178,7 +179,7 @@ class NodeMasterController(private val root: SplitPane,
 			.map {_.trim}
 			.filterNot(_.isEmpty)
 			.take(1)
-//			.map {Ascii.truncate(_, 80, "...")}
+			//			.map {Ascii.truncate(_, 80, "...")}
 			.mkString("")
 
 		val (styleClasses, description) = status.lastOption.map {_._2} match {
@@ -211,7 +212,7 @@ class NodeMasterController(private val root: SplitPane,
 					animated = false
 					data = Seq(new XYChart.Series[String, Number] {
 						name = "CPU"
-						data = ss.map {mkData(_, _.cpuPercent)(0)}.takeRight(100)
+						data = ss.map {mkData(_, _.cpuStat.totalPercent)(0)}.takeRight(100)
 					}, new XYChart.Series[String, Number] {
 						name = "Mem"
 						data = ss.map {mkData(_, _.memPercent)(0)}.takeRight(100)
@@ -294,7 +295,7 @@ class NodeMasterController(private val root: SplitPane,
 
 
 	cpu.cellValueFactory = { v =>
-		ObjectProperty(mapStatus(v.value) { s => f"${s.telemetry.cpuPercent}%.1f%%" })
+		ObjectProperty(mapStatus(v.value) { s => f"${s.telemetry.cpuStat.totalPercent}%.1f%%" })
 	}
 	mem.cellValueFactory = { v =>
 		ObjectProperty(mapStatus(v.value) { s => f"${s.telemetry.memPercent}%.1f%%" })
@@ -318,61 +319,8 @@ class NodeMasterController(private val root: SplitPane,
 
 	context.service.foreach {
 		case Some(gs) =>
-
-			// Id -> NodeItem
-			type NodeItems = Map[Id[Node], NodeItem]
-			type Outcome = Either[String, NodeItems]
-
-			def pull(ids: Seq[Id[Node]]): Task[NodeItems] = {
-				Task.wanderUnordered(ids) { id =>
-					gs.nodes().find(id).map {
-						case ConnectionError(e)  => NodeError(id, s"Connection failed: ${e.getMessage}")
-						case ServerError(reason) => NodeError(id, s"Server error: $reason")
-						case ClientError(reason) => NodeError(id, s"Client error: $reason")
-						case DecodeError(reason) => NodeError(id, s"Decode error: $reason")
-						case NotFound            => NodeError(id, s"Node not found")
-						case Found(node)         =>
-							val now = ZonedDateTime.now()
-							NodeHistory(id = node.id,
-								target = node.target,
-								remark = node.remark,
-								status = node.status.fold(TreeMap.empty[ZonedDateTime, Status]) { x => TreeMap(now -> x) }
-								, log = TreeMap(now -> node.logs))
-					}.map { item => item.id -> item }
-				}.map {_.toMap}
-			}
-
-			// TODO figure out scan : 30 minutes
-
-
-			//
-			//			val that = (Observable.fromTask(xs) ++ gs.events.flatMapLatest {
-			//				// TODO right side
-			//				case PoolChanged(pool)  => Observable.fromTask(pull(pool.toSeq).map {Right(_)})
-			//				case NodeUpdated(delta) => Observable.fromTask(pull(delta.toSeq).map {Right(_)})
-			//			}).scan(Left("Waiting for telemetry"): Either[String, NodeItems]) {
-			//				case (Right(p), Right(c)) => Right(p |+| c)
-			//				case (_, x)               => x
-			//			}
-
-			def retain[K, V](xs: Map[K, V], ks: Set[K]): Map[K, V] = xs.filterKeys(ks.contains)
-
-			gs.events.scanTask(for {
-				ids <- gs.nodes().list().map {_.toEither}
-				v <- ids match {
-					case Left(e)   => Task.pure(Left(e))
-					case Right(is) => pull(is).map {Right(_)}
-				}
-			} yield v) {
-				// TODO right side
-				case (Left(_), PoolChanged(pool))    => pull(pool.toSeq).map {Right(_)}
-				case (Left(_), NodeUpdated(delta))   => pull(delta.toSeq).map {Right(_)}
-				case (Right(xs), PoolChanged(pool))  => pull(pool.toSeq).map { ys =>
-//					val left = xs.keySet.intersect(ys.keySet).map { k => k -> xs(k) }.toMap
-					Right(retain(xs, ys.keySet) |+| ys)
-				}
-				case (Right(xs), NodeUpdated(delta)) => pull(delta.toSeq).map { ys => Right(xs |+| ys) }
-			}.observeOn(Schedulers.JavaFx)
+			gs.nodes().observe()
+				.observeOn(Schedulers.JavaFx)
 				.doOnError {_.printStackTrace()}
 				.foreach {
 					case Left(e)   => nodeTable.placeholder = new Label(e)
@@ -384,9 +332,7 @@ class NodeMasterController(private val root: SplitPane,
 
 						update.filter { n => selected.contains(n.id) }.foreach {nodeTable.selectionModel().select(_)}
 
-
 				}
-
 		case None =>
 			items.clear()
 	}

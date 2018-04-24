@@ -9,8 +9,9 @@ import cats.implicits._
 import io.knact.guard
 import io.knact.guard.{Bound, ClientError, ConnectionError, DecodeError, Entity, Found, NotFound, Path, Percentage, ServerError, Telemetry}
 import io.knact.guard.Entity.{Id, Node, NodeUpdated, TelemetrySeries, TimeSeries}
+import io.knact.guard.GuardService.{NodeError, NodeHistory, NodeItem, StatusEntry}
 import io.knact.guard.Telemetry.{Status, _}
-import io.knact.guard.jfx.Model.{AppContext, NodeError, NodeHistory, NodeItem, StatusEntry}
+import io.knact.guard.jfx.Model.AppContext
 import io.knact.guard.jfx.RichScalaFX._
 import io.knact.guard.jfx.Schedulers
 import monix.eval.Task
@@ -82,7 +83,7 @@ class NodeDetailController(private val root: StackPane,
 				val freeSeries = new XYChart.Series[String, Double] {name = "Free"}
 				systemStatus.data = Seq(cpuSeries, usedSeries, cacheSeries, freeSeries).map {_.delegate}
 
-				cpuSeries.data = Seq(XYChart.Data(cpuSeries.name.value, telemetry.cpuPercent))
+				cpuSeries.data = Seq(XYChart.Data(cpuSeries.name.value, telemetry.cpuStat.totalPercent))
 
 				val mstat = telemetry.memoryStat
 				usedSeries.data = Seq(XYChart.Data("Memory", mstat.used / mstat.total))

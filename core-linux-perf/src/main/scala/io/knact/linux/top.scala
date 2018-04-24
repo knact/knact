@@ -54,9 +54,9 @@ object top {
 		import fastparse.all._
 
 		private val digit = CharIn('0' to '9')
-		val float: all.Parser[Double] = (digit.rep(1) ~ "." ~ digit.rep(1)).!.map { v => v.toDouble }
-		val long : all.Parser[Long]   = ("-".? ~ digit.rep(1)).!.map(_.toLong)
-		val i2   : all.Parser[Int]    = digit.rep(min = 1, max = 2).!.map(_.toInt)
+		val float: all.Parser[Double] = (digit.rep(1) ~ "." ~ digit.rep(1)).!.map { v => v.toDouble }.opaque("float")
+		val long : all.Parser[Long]   = ("-".? ~ digit.rep(1)).!.map(_.toLong).opaque("long")
+		val i2   : all.Parser[Int]    = digit.rep(min = 1, max = 2).!.map(_.toInt).opaque("i2")
 	}
 
 	private object Time {
@@ -64,13 +64,13 @@ object top {
 		import Num._
 		import fastparse.all._
 
-		val hmsTime     = (i2 ~ ":" ~ i2 ~ ":" ~ i2).map { case (h, m, s) => LocalTime.of(h, m, s) }
+		val hmsTime     = (i2 ~ ":" ~ i2 ~ ":" ~ i2).map { case (h, m, s) => LocalTime.of(h, m, s) }.opaque("hms")
 		val hmsDuration = (long ~ ":" ~ i2 ~ "." ~ i2).map { case (h, m, s) =>
 			Duration.ofHours(h.toLong).plusMinutes(m.toLong).plusSeconds(s.toLong)
-		}
+		}.opaque("hmsD")
 		val hhmm        = (i2 ~ ":" ~ i2).map { case (h, m) =>
 			Duration.ofHours(h.toLong).plusMinutes(m.toLong)
-		}
+		}.opaque("hhmm")
 	}
 
 	private val White = WhitespaceApi.Wrapper {
@@ -89,12 +89,22 @@ object top {
 			import White._
 			import fastparse.noApi._
 
-			// top uses uptime format here which is stupid
-			val durationWithHm = (((long ~ ("day" ~ "s".?)).map { d => Duration.ofDays(d) } |
-								   (long ~ "min" ~ "s".?).map { m => Duration.ofMinutes(m) }) ~
-								  ("," ~ hhmm).?).map { case (d, hm) => hm.map {d.plus}.getOrElse(d) }
 
-			val summaryLine = ("top - " ~/ hmsTime ~/ ("up" ~ (hhmm | durationWithHm)) ~ "," ~/
+			val day = (long ~ ("day" ~ "s".?)).map { d => Duration.ofDays(d) }
+			val min = (long ~ "min" ~ "s".?).map { m => Duration.ofMinutes(m) }
+
+			// top uses uptime format here which is stupid
+			val upTime = "up" ~ (hhmm | min |
+								 (day ~ "," ~ hhmm).map { case (d, hm) => d.plus(hm) } |
+								 (day ~ "," ~ min).map { case (d, m) => d.plus(m) })
+
+			val durationWithHm = (
+
+				((long ~ ("day" ~ "s".?)).map { d => Duration.ofDays(d) } | (long ~ "min" ~ "s".?).map { m => Duration.ofMinutes(m) }) ~
+				("," ~ hhmm).?).map { case (d, hm) => hm.map {d.plus}.getOrElse(d) }
+
+			val summaryLine = ("top - " ~/ hmsTime ~/
+							   upTime ~ "," ~/
 							   (long ~ ("user" ~ "s".?)) ~ "," ~/
 							   ("load average:" ~ float ~ "," ~ float ~ "," ~ float))
 				.map { case (time, duration, users, (l1, l5, l15)) =>
@@ -193,29 +203,32 @@ object top {
 			}
 		}
 
-		val parser = (Start ~
-					  Stats.summaryLine ~ "\n" ~/ wss ~
-					  Stats.taskLine ~ "\n" ~/ wss ~
-					  Stats.cpuLine ~ "\n" ~/ wss ~
-					  Stats.memLine ~ "\n" ~/ wss ~
-					  Stats.swapLine ~ wss ~/
-					  "\n".rep(1) ~/ wss ~
-					  Procs.dataHeader ~ "\n" ~/ wss ~
-					  Procs.dataRow.rep(sep = "\n") ~
-					  (End | "\n".rep))
+		val body = (Stats.summaryLine ~ "\n" ~/ wss ~
+					Stats.taskLine ~ "\n" ~/ wss ~
+					Stats.cpuLine ~ "\n" ~/ wss ~
+					Stats.memLine ~ "\n" ~/ wss ~
+					Stats.swapLine ~ wss ~/
+					"\n".rep(1) ~/ wss ~
+					Procs.dataHeader ~ "\n" ~/ wss ~
+					Procs.dataRow.rep(sep = "\n"))
 			.map { case (summary, tasks, cpu, mem, swap, procs) =>
 				TopData(summary, tasks, cpu, mem, swap, procs)
 			}
+
+		val parser = Start ~ body ~ (End | "\n".rep)
+
+		val batchParser = (Start ~ (body ~ "\n".rep()).rep() ~ End).map { x => x.lastOption }
 
 	}
 
 	import TopParser._
 
 	final val command = Command[ConsoleNode, TopData] { implicit n =>
-		val str = sendAndReadUntilEOF("top -b -n1 -w512 -c")
-		parser.parse(str) match {
-			case Success(v, _)      => Result.success(v)
-			case f@Failure(_, _, _) => Result.failure(f.msg)
+		val str = sendAndReadUntilEOF("top -b -n2 -d0.5 -w512 -c")
+		batchParser.parse(str) match {
+			case Success(Some(v), _) => Result.success(v)
+			case Success(None, _)    => Result.failure("batch capture failed with n=0")
+			case f@Failure(_, _, _)  => Result.failure(f.msg)
 		}
 	}
 

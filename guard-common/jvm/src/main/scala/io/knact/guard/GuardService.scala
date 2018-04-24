@@ -1,18 +1,21 @@
 package io.knact.guard
 
 import java.net.URI
+import java.time.ZonedDateTime
 import java.util.Collections.{singletonList => JSingletonList}
 import java.util.concurrent.{Future, TimeUnit}
+
 import javax.websocket
 import javax.websocket._
-
 import cats.implicits._
+import cats.kernel.Semigroup
 import io.circe.generic.auto._
 import io.circe.java8.time._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder, Json, _}
-import io.knact.guard.Entity.{Event, Id, LogSeries, Node, Outcome, Procedure, ServerStatus, TelemetrySeries}
-import io.knact.guard.GuardService.{NodeService, ProcedureService, send}
+import io.knact.guard.Entity.{Event, Id, LogSeries, Node, NodeUpdated, Outcome, PoolChanged, Procedure, ServerStatus, Target, TelemetrySeries, TimeSeries}
+import io.knact.guard.GuardService.{NodeError, NodeHistory, NodeItem, NodeService, ProcedureService, send}
+import io.knact.guard.Telemetry.Status
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 import monix.reactive.Observable
@@ -25,6 +28,7 @@ import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.headers.{Accept, MediaRangeAndQValue}
 import org.http4s.{EntityDecoder, Method, Request, Status, Uri, _}
 
+import scala.collection.immutable.TreeMap
 import scala.util.Try
 
 
@@ -66,8 +70,54 @@ class GuardService private(val baseUri: Uri,
 				.withOptionQueryParam("start", bound.start.map {_.toInstant.toEpochMilli})
 				.withOptionQueryParam("end", bound.end.map {_.toInstant.toEpochMilli})))
 		}
-	}
 
+
+		override def observe(): Observable[Either[String, Map[Id[Node], NodeItem]]] = {
+
+			// Id -> NodeItem
+			type NodeItems = Map[Id[Node], NodeItem]
+			type Outcome = Either[String, NodeItems]
+
+			def pull(ids: Seq[Id[Node]]): Task[NodeItems] = {
+				Task.wanderUnordered(ids) { id =>
+					nodes().find(id).map {
+						case ConnectionError(e)  => NodeError(id, s"Connection failed: ${e.getMessage}")
+						case ServerError(reason) => NodeError(id, s"Server error: $reason")
+						case ClientError(reason) => NodeError(id, s"Client error: $reason")
+						case DecodeError(reason) => NodeError(id, s"Decode error: $reason")
+						case NotFound            => NodeError(id, s"Node not found")
+						case Found(node)         =>
+							val now = ZonedDateTime.now()
+							NodeHistory(id = node.id,
+								target = node.target,
+								remark = node.remark,
+								status = node.status.fold(TreeMap.empty[ZonedDateTime, Telemetry.Status]) { x => TreeMap(now -> x) }
+								, log = TreeMap(now -> node.logs))
+					}.map { item => item.id -> item }
+				}.map {_.toMap}
+			}
+
+			def retain[K, V](xs: Map[K, V], ks: Set[K]): Map[K, V] = xs.filterKeys(ks.contains)
+
+			events.scanTask(for {
+				ids <- nodes().list().map {_.toEither}
+				v <- ids match {
+					case Left(e)   => Task.pure(Left(e))
+					case Right(is) => pull(is).map {Right(_)}
+				}
+			} yield v) {
+				// TODO right side
+				case (Left(_), PoolChanged(pool))    => pull(pool.toSeq).map {Right(_)}
+				case (Left(_), NodeUpdated(delta))   => pull(delta.toSeq).map {Right(_)}
+				case (Right(xs), PoolChanged(pool))  => pull(pool.toSeq).map { ys =>
+					//					val left = xs.keySet.intersect(ys.keySet).map { k => k -> xs(k) }.toMap
+					Right(retain(xs, ys.keySet) |+| ys)
+				}
+				case (Right(xs), NodeUpdated(delta)) => pull(delta.toSeq).map { ys => Right(xs |+| ys) }
+			}.doOnError {_.printStackTrace()}
+		}
+
+	}
 	abstract class Http4sEntityService[A <: Entity[A]](implicit
 													   encoder: Encoder[A],
 													   decoder: Decoder[A])
@@ -91,10 +141,34 @@ class GuardService private(val baseUri: Uri,
 object GuardService {
 
 
+	implicit val nodeHistorySemigroup: Semigroup[NodeItem] =
+		Semigroup.instance[NodeItem] {
+			case (l: NodeHistory, r: NodeHistory) =>
+				r.copy(status = l.status ++ r.status, log = l.log ++ r.log)
+			case (_: NodeError, r: NodeHistory)   => r
+			case (_, e: NodeError)                => e
+		}
+
+	sealed trait NodeItem {
+		def id: Id[Node]
+	}
+
+	case class StatusEntry(time: ZonedDateTime, event: String, reason: String)
+
+	case class NodeError(id: Id[Node], reason: String) extends NodeItem
+
+	case class NodeHistory(id: Id[Node],
+						   target: Target,
+						   remark: String,
+						   status: TimeSeries[Telemetry.Status],
+						   log: TimeSeries[Map[Path, ByteSize]]) extends NodeItem
+
+
 	trait NodeService extends EntityService[Node] {
 		def meta(id: Id[Node]): ResultF[Node]
 		def telemetry(id: Id[Node], bound: Bound): ResultF[TelemetrySeries]
 		def log(id: Id[Node], path: Path, bound: Bound): ResultF[LogSeries]
+		def observe(): Observable[Either[String, Map[Id[Node], NodeItem]]]
 	}
 
 	trait ProcedureService extends EntityService[Procedure] {

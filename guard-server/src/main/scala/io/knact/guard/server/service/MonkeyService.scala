@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom
 import com.google.common.base.Throwables
 import com.typesafe.scalalogging.LazyLogging
 import io.knact.guard.Entity.{Node, SshKeyTarget, id}
-import io.knact.guard.Telemetry.{DiskStat, MemoryStat, NetStat, ThreadStat}
+import io.knact.guard.Telemetry._
 import io.knact.guard.server.Config
 import io.knact.guard.server._
 import io.knact.guard.{NodeRepository, Telemetry}
@@ -97,6 +97,9 @@ object MonkeyService extends LazyLogging {
 							users = rand.nextLong(10),
 							processorCount = 4,
 							loadAverage = rand.nextDouble(),
+							cpuStat = CpuStat(
+								user = rand.nextDouble(),
+								system = rand.nextDouble()),
 							memoryStat = MemoryStat(
 								total = totalRam,
 								free = freeRam,

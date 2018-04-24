@@ -33,5 +33,10 @@ In project root, simply run
     ./sbt #*nix
     sbt   #Windows
 
-sbt should start and enter interactive mode, proceed to build project with `assemble`
+sbt should start and enter interactive mode, proceed to build project with `assembly`
+
+Upon completion, the directory `deploy-kit` at project root will contain all the required files. 
+
+
+
 

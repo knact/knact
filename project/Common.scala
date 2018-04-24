@@ -17,7 +17,7 @@ object Common {
 			"-Yno-adapted-args",
 			"-Ywarn-dead-code",
 			"-Ywarn-numeric-widen",
-			"-Ywarn-value-discard",
+//			"-Ywarn-value-discard",
 //			"-Ywarn-unused", // TODO turn this back on for prod
 			"-Ypartial-unification",
 //			"-Xlog-implicits",

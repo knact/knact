@@ -1,21 +1,16 @@
 package io.knact.guard.cli
 
-import com.googlecode.lanterna.TerminalSize
-import com.googlecode.lanterna.gui2.Window.Hint
-import com.googlecode.lanterna.gui2.dialogs.{MessageDialogBuilder, MessageDialogButton}
-import com.googlecode.lanterna.gui2._
-import com.googlecode.lanterna.screen.TerminalScreen
-import com.googlecode.lanterna.terminal.{DefaultTerminalFactory, Terminal}
-import com.googlecode.lanterna.gui2.Borders.doubleLine
-import com.googlecode.lanterna.gui2.Borders.singleLine
-import com.googlecode.lanterna.gui2.Borders.singleLineBevel
-import com.googlecode.lanterna.gui2.GridLayout.createHorizontallyFilledLayoutData
-
-import scala.collection.JavaConverters._
+import com.google.common.base.Throwables
 import com.googlecode.lanterna.TextColor
+import com.googlecode.lanterna.gui2.GridLayout.createHorizontallyFilledLayoutData
+import com.googlecode.lanterna.gui2._
+import com.googlecode.lanterna.gui2.dialogs.{MessageDialogBuilder, MessageDialogButton}
+import com.googlecode.lanterna.screen.TerminalScreen
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory
 import com.typesafe.scalalogging.LazyLogging
+import io.knact.guard.GuardService
 import io.knact.guard.cli.Lanterna.width
-
+import monix.execution.Scheduler.Implicits.global
 import scala.util.{Failure, Try}
 
 object Main extends App with LazyLogging {
@@ -25,24 +20,24 @@ object Main extends App with LazyLogging {
 	case class Credential(url: String)
 
 
-//	private def obtainRemote(credential : Credential):Try[Session]  =  {
-//		return authenticate(credential.complete() ? credential : askCredential(credential))
-//		.recoverWith(e -> {
-//			new MessageDialogBuilder()
-//				.setTitle("Login failed")
-//				.setText(Throwables.getStackTraceAsString(e))
-//				.addButton(MessageDialogButton.Retry)
-//				.build()
-//				.showDialog(gui);
-//			return obtainRemote(askCredential(credential));
-//		});
-//	}
+	//	private def obtainRemote(credential : Credential):Try[Session]  =  {
+	//		return authenticate(credential.complete() ? credential : askCredential(credential))
+	//		.recoverWith(e -> {
+	//			new MessageDialogBuilder()
+	//				.setTitle("Login failed")
+	//				.setText(Throwables.getStackTraceAsString(e))
+	//				.addButton(MessageDialogButton.Retry)
+	//				.build()
+	//				.showDialog(gui);
+	//			return obtainRemote(askCredential(credential));
+	//		});
+	//	}
 
-	private def askCredential(filled: Credential) = {
+	private def askCredential(gui: MultiWindowTextGUI, default: Credential): GuardService = {
 		val panel = new Panel(new GridLayout(3))
 		val window = Lanterna.newDialog("Login", panel)
 		new Label("URL").addTo(panel)
-		val url = new TextBox(width(40), filled.url).setLayoutData(createHorizontallyFilledLayoutData(2)).addTo(panel)
+		val url = new TextBox(width(40), default.url).setLayoutData(createHorizontallyFilledLayoutData(2)).addTo(panel)
 		new Label("Username").addTo(panel)
 		val username = new TextBox(width(25), "").setLayoutData(createHorizontallyFilledLayoutData(2)).addTo(panel)
 		new Label("Password").addTo(panel)
@@ -63,7 +58,18 @@ object Main extends App with LazyLogging {
 			sys.exit()
 		}).addTo(panel)
 		gui.addWindowAndWait(window)
-		Credential(url.getText)
+		val current = Credential(url.getText)
+		GuardService(current.url) match {
+			case Left(value)  =>
+				new MessageDialogBuilder()
+					.setTitle("Login failed")
+					.setText(Throwables.getStackTraceAsString(value))
+					.addButton(MessageDialogButton.Retry)
+					.build()
+					.showDialog(gui)
+				askCredential(gui, current);
+			case Right(value) => value
+		}
 	}
 
 
@@ -77,14 +83,8 @@ object Main extends App with LazyLogging {
 
 	val gui = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.GREEN))
 
-	val windowSSH = new BasicWindow("Connection Screen")
-	windowSSH.setHints(Seq(Hint.EXPANDED).asJava)
 
-	val panelSSH = new Panel()
-	panelSSH.setLayoutManager(new GridLayout(2))
-
-	panelSSH.addComponent(new Label("SSH:").setLabelWidth(10))
-	val sshBox = new TextBox("Enter SSH Credentials Here!").addTo(panelSSH)
+	new NodeWindow(gui, askCredential(gui, Credential("http://localhost:8080/api")))
 
 
 }
