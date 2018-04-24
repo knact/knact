@@ -98,6 +98,7 @@ lazy val `guard-server` = project.settings(
 
 lazy val `guard-client-cli` = project.settings(
 	commonSettings,
+	assemblyOutputPath in assembly := new File("deploy-kit/guard-client-cli.jar"),
 	libraryDependencies ++= Seq(
 		Cats,
 		ScalaLogging,

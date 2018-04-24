@@ -14,18 +14,15 @@ import scalafxml.core.{DependenciesByType, FXMLView}
 object Main extends JFXApp with LazyLogging {
 
 
+	def mkScene() = new Scene(FXMLView(
+		Resources.getResource("Frame.fxml"),
+		new DependenciesByType(Map(typeOf[StageContext] -> new StageContext {
+			override val stage: Stage = Main.stage
+		}))))
 
 	stage = new JFXApp.PrimaryStage
-	private val ctx = new StageContext {
-		override val stage: Stage = Main.stage
-	}
-
-	stage.title = "Knact JFX"
-	stage.scene = new Scene(FXMLView(
-		Resources.getResource("Frame.fxml"),
-		new DependenciesByType(Map(typeOf[StageContext] -> ctx)))
-	)
-	//	stage.icons += new Image(Resources.getResource("icon.png").toExternalForm)
+	stage.title = "Knact guard client"
+	stage.scene = mkScene()
 	logger.info("Scene ready")
 
 

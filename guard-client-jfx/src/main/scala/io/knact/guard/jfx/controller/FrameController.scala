@@ -3,6 +3,7 @@ package io.knact.guard.jfx.controller
 import com.google.common.io.Resources._
 import com.typesafe.scalalogging.LazyLogging
 import io.knact.guard._
+import io.knact.guard.jfx.Main
 import io.knact.guard.jfx.Model.{AppContext, StageContext}
 import io.knact.guard.{Entity, GuardService}
 import io.knact.guard.jfx.RichScalaFX._
@@ -25,13 +26,8 @@ import scalafxml.core.{DependenciesByType, FXMLView}
 @sfxml(additionalControls = List("org.controlsfx"))
 class FrameController(private val root: VBox,
 					  private val newWindow: MenuItem,
-					  private val export: MenuItem,
 					  private val preferences: MenuItem,
 					  private val quit: MenuItem,
-
-					  private val groupInNewWindow: CheckMenuItem,
-					  private val manual: MenuItem,
-					  private val about: MenuItem,
 
 					  private val views: SegmentedButton,
 					  private val nodeOverview: ToggleButton,
@@ -69,6 +65,14 @@ class FrameController(private val root: VBox,
 			case unexpected      => sys.error(s"Unexpected toggle $unexpected")
 		}
 	}
+
+	newWindow.onAction = handle {
+		new Stage() {
+			scene = Main.mkScene()
+			title = "Knact guard client"
+		}.show
+	}
+	quit.onAction = handle {Platform.exit()}
 
 	serverUrl.text = "http://localhost:8080/api"
 	serverUrl.onAction = handle {

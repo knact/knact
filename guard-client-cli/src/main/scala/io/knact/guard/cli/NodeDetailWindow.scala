@@ -131,7 +131,6 @@ class NodeDetailWindow(val node: NodeItem, val gui: MultiWindowTextGUI, val serv
 	}
 
 
-
 	gui.addWindowAndWait(window)
 
 }

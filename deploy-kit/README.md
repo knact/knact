@@ -10,10 +10,20 @@ are included separately in the `bcprov` directory.
 
 Simply execute the JAR by doing 
 
-    java -jar guard-client-jfx.jar
+    java -jar guard-client-jfx.jar         # JavaFX interface
+    java -jar guard-client-cli.jar -native # CLI interface
     
+    
+**JavaFX interface**
+
 To connect to a server, set the URL in the address bar to your guard server's address then 
 press enter. 
+
+**CLI interface**
+
+The CLI interface supports two modes: Java Swing emulated terminal and the native terminal. 
+On Windows it is recommended to *not* enable the `-native` flag as the `cmd.exe` has not support 
+for escape sequences. 
 
 ## Server instruction
 
@@ -90,7 +100,9 @@ To monitor nodes that uses public key authentication:
 The schema is defined at `io.knact.guard.Entity.Target`
 
 Changes can be made to the `targets.json` file while the server is running. The server will listen 
-for file changes and reload them when required; errors will be logged but are otherwise harmless.
+for file changes and reload them when required; any syntax error in the `targets.json` file will be
+logged but are otherwise harmless; the server will use the last know good configuration(empty if
+there are no know working last configuration)
 
 
 

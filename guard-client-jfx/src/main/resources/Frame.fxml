@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Menu?><?import javafx.scene.control.MenuBar?><?import javafx.scene.control.MenuItem?><?import javafx.scene.control.SeparatorMenuItem?><?import javafx.scene.control.TextField?><?import javafx.scene.control.ToggleButton?><?import javafx.scene.layout.HBox?><?import javafx.scene.layout.Region?><?import javafx.scene.layout.StackPane?><?import javafx.scene.layout.VBox?><?import org.controlsfx.control.SegmentedButton?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.SegmentedButton?>
 
-<VBox fx:id="root" prefHeight="600.0" prefWidth="960.0" stylesheets="@style.css"
-    xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="io.knact.guard.jfx.controller.FrameController">
+<VBox fx:id="root" prefHeight="600.0" prefWidth="960.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.knact.guard.jfx.controller.FrameController">
     <children>
         <HBox fx:id="toolbar" styleClass="tool-bar">
             <children>
@@ -12,21 +20,10 @@
                     <menus>
                         <Menu mnemonicParsing="false" text="File">
                             <items>
-                                <MenuItem fx:id="newWindow" mnemonicParsing="false"
-                                    text="Connect to server" />
+                                <MenuItem fx:id="newWindow" mnemonicParsing="false" text="New window" />
                                 <SeparatorMenuItem mnemonicParsing="false" />
-                                <MenuItem fx:id="export" mnemonicParsing="false" text="Export" />
-                                <SeparatorMenuItem mnemonicParsing="false" />
-                                <MenuItem fx:id="preferences" mnemonicParsing="false"
-                                    text="Preferences…" />
+                                <MenuItem fx:id="preferences" disable="true" mnemonicParsing="false" text="Preferences…" />
                                 <MenuItem fx:id="quit" mnemonicParsing="false" text="Quit" />
-                            </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Help">
-                            <items>
-                                <MenuItem fx:id="manual" mnemonicParsing="false" text="Manual" />
-                                <MenuItem fx:id="about" mnemonicParsing="false"
-                                    text="About Knact JFX" />
                             </items>
                         </Menu>
                     </menus>
@@ -34,12 +31,9 @@
 
                 <SegmentedButton fx:id="views" minWidth="-Infinity">
                     <buttons>
-                        <ToggleButton fx:id="nodeOverview" mnemonicParsing="false" selected="true"
-                            text="Nodes" />
-                        <ToggleButton fx:id="guardOverview" mnemonicParsing="false"
-                            text="Guard status" />
-                        <ToggleButton fx:id="logOverview" mnemonicParsing="false"
-                            text="Client log" />
+                        <ToggleButton fx:id="nodeOverview" mnemonicParsing="false" selected="true" text="Nodes" />
+                        <ToggleButton fx:id="guardOverview" mnemonicParsing="false" text="Guard status" />
+                        <ToggleButton fx:id="logOverview" mnemonicParsing="false" text="Client log" />
                     </buttons>
                 </SegmentedButton>
 

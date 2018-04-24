@@ -14,24 +14,8 @@ import monix.execution.Scheduler.Implicits.global
 import scala.util.{Failure, Try}
 
 object Main extends App with LazyLogging {
-
-	case class Session()
-
 	case class Credential(url: String)
 
-
-	//	private def obtainRemote(credential : Credential):Try[Session]  =  {
-	//		return authenticate(credential.complete() ? credential : askCredential(credential))
-	//		.recoverWith(e -> {
-	//			new MessageDialogBuilder()
-	//				.setTitle("Login failed")
-	//				.setText(Throwables.getStackTraceAsString(e))
-	//				.addButton(MessageDialogButton.Retry)
-	//				.build()
-	//				.showDialog(gui);
-	//			return obtainRemote(askCredential(credential));
-	//		});
-	//	}
 
 	private def askCredential(gui: MultiWindowTextGUI, default: Credential): GuardService = {
 		val panel = new Panel(new GridLayout(3))
@@ -70,20 +54,31 @@ object Main extends App with LazyLogging {
 	}
 
 
-	val terminal = new DefaultTerminalFactory()
-		.setForceTextTerminal(false)
-		.createTerminal()
+	override def main(args: Array[String]): Unit = {
 
-	val screen = new TerminalScreen(terminal)
-	screen.startScreen()
+		val native = args.toList match {
+			case Nil              => false
+			case "-native" :: Nil => true
+			case _                =>
+				println(s"Unsupported argument:${args.mkString(" ")}")
+				sys.exit()
+		}
+
+		val terminal = new DefaultTerminalFactory()
+			.setForceTextTerminal(native)
+			.createTerminal()
+
+		val screen = new TerminalScreen(terminal)
+		screen.startScreen()
 
 
-	val gui = new MultiWindowTextGUI(screen,
-		new DefaultWindowManager(),
-		new EmptySpace(TextColor.Indexed.fromRGB(52, 102, 163)))
+		val gui = new MultiWindowTextGUI(screen,
+			new DefaultWindowManager(),
+			new EmptySpace(TextColor.Indexed.fromRGB(52, 102, 163)))
 
 
-	new NodeMasterWindow(gui, askCredential(gui, Credential("http://localhost:8080/api")))
+		new NodeMasterWindow(gui, askCredential(gui, Credential("http://localhost:8080/api")))
+	}
 
 
 }
