@@ -29,7 +29,7 @@ object LinuxSshPerfService extends LazyLogging {
 
 	def apply(config: Config, nodes: NodeRepository): Task[Unit] = Task {
 		val wd = new Watchdog[Node, ConsoleNode](nodes.entities)
-		wd.dispatchRepeated(config.eventInterval, ssh.autoClosed(LinuxTelemetry.command)).dump("A")
+		wd.dispatchRepeated(config.eventInterval, ssh.autoClosed(LinuxTelemetry.command))
 			.doOnError(e => e.printStackTrace())
 			.mapTask { case (id, node, r) =>
 				logger.info(s"Writing $id $node $r")

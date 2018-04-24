@@ -22,20 +22,20 @@ object Basic {
 	}
 
 
-	implicit def shInstance[A]: Connectable[A, ConsoleNode] = (_: A) => Task {
-		new ConsoleNode {
-			private val process: Process = Runtime.getRuntime.exec("/bin/sh")
-
-			val s = ConsoleIO(
-				in = process.getInputStream,
-				err = process.getErrorStream,
-				out = process.getOutputStream,
-				isEof = process.isAlive,
-				close = () => {process.destroy()})
-			override def exec(command: String): ConsoleIO = ???
-			override def unsafeTerminate(): Unit = ???
-		}
-	}
+//	implicit def shInstance[A]: Connectable[A, ConsoleNode] = (_: A) => Task {
+//		new ConsoleNode {
+//			private val process: Process = Runtime.getRuntime.exec("/bin/sh")
+//
+//			val s = ConsoleIO(
+//				in = process.getInputStream,
+//				err = process.getErrorStream,
+//				out = process.getOutputStream,
+//				isEof = process.isAlive,
+//				close = () => {process.destroy()})
+//			override def exec(command: String): ConsoleIO = ???
+//			override def unsafeTerminate(): Unit = ???
+//		}
+//	}
 
 
 }

@@ -45,6 +45,7 @@ lazy val `core-linux-perf` = project.settings(
 
 lazy val `core-sample` = project.settings(
 	commonSettings,
+	libraryDependencies += Logback,
 ).dependsOn(core, `core-linux-perf`, `core-ssh-transport`)
 
 lazy val guardCommonSettings = commonSettings ++ Seq(
