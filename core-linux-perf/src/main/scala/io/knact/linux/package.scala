@@ -31,7 +31,13 @@ package object linux {
 			else SimpleResult.failure(input, false)
 		}
 	}
-	private[knact] def sendAndReadUntilEOF(s: String)(implicit n: ConsoleNode): String = {
+
+	/**
+	  * Sends a command and reads fully until EOF
+	  * @param s the command to execute
+	  * @return stdout mapped to a string
+	  */
+	def sendAndReadUntilEOF(s: String)(implicit n: ConsoleNode): String = {
 		val io = n.exec(s)
 		val expect = mkExpect(io)
 		val input = expect.expect(eofWithFirstLineWorkaround()).getInput
