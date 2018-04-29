@@ -1,4 +1,4 @@
-[
+[[
   {
     "SshKeyTarget" : {
       "host" : "129.213.90.18",
@@ -167,4 +167,4 @@
       "keyPath" : "/home/tom/oci-harness/credentials/mykeys"
     }
   }
-]
+]]

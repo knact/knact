@@ -1,6 +1,6 @@
 {
   "port" : 8080,
-  "eventInterval" : "1 second",
+  "eventInterval" : "0.5 second",
   "commandMaxThread" : 80,
   "serverMaxThread" : 16
 }

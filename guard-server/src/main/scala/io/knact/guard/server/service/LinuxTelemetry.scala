@@ -49,6 +49,8 @@ object LinuxTelemetry extends LazyLogging {
 				diskStats = Map())
 
 
+			// XXX modify this to customise how the statuses are determined
+
 			val freeRamPercentage = telemetry.memoryStat.free / telemetry.memoryStat.total
 			val (state, reason) =
 				if (freeRamPercentage < 0.3) {

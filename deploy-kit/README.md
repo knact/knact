@@ -1,12 +1,34 @@
-# Knact guard
+# Knact 
+
+This deployment package provides two sets of artefacts. One is a sample project that uses the knact
+core library in a templete SBT project. The other artefact contians the actual server and client 
+software.
 
 
-This package contains both the client and the server executable JAR files. 
+## Knact sample project
+
+The sample project (`knact-import-template-*.zip`) contains all the dependencies published on 
+JitPack as listed here:
+
+    libraryDependencies ++= Seq(
+    	"com.github.knact.knact" %% "core" % "16033135e3",
+    	"com.github.knact.knact" %% "core-linux-perf" % "16033135e3",
+    	"com.github.knact.knact" %% "core-ssh-transport" % "16033135e3",
+    )
+
+You can see all available builds at JitPack listed [here](https://jitpack.io/#knact/knact)
+To use the sample, simply extract the zip and type `sbt compile`. A tiny tutorial class is also 
+included for convenience
+
+## Knact guard server
+
+
+Both the client and the server are included as executable JAR files. 
 All dependencies are packaged together with the exception of JCE signed JARs which 
 are included separately in the `bcprov` directory.
 
 
-## Client instruction
+### Client instruction
 
 Simply execute the JAR by doing 
 
@@ -25,7 +47,7 @@ The CLI interface supports two modes: Java Swing emulated terminal and the nativ
 On Windows it is recommended to *not* enable the `-native` flag as the `cmd.exe` has not support 
 for escape sequences. 
 
-## Server instruction
+### Server instruction
 
 To use the server, prepare the following files:
 
@@ -105,6 +127,12 @@ logged but are otherwise harmless; the server will use the last know good config
 there are no know working last configuration)
 
 
+
+### Customising status reporting 
+
+To customise server status reporting, you will have to modify the 
+`io.knact.guard.server.service.LinuxTelemetry` file. The status is determined by the 
+incoming data which is already in scope. For more details please consult the source file.
 
 
 
